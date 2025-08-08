@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Assignment</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body { background-color: #f4f6f9; }
+    .sidebar {
+      height: 100vh;
+      background-color: #2A5C88;
+      color: white;
+      padding: 1rem;
+      position: fixed;
+      width: 250px;
+    }
+    .sidebar a {
+      display: block;
+      padding: 0.75rem 1rem;
+      color: white;
+      text-decoration: none;
+      margin-bottom: 0.5rem;
+      border-radius: 8px;
+    }
+    .sidebar a:hover, .sidebar a.active { background-color: #1f4568; }
+    .main-content {
+      margin-left: 270px;
+      padding: 2rem;
+    }
+    .card {
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin-bottom: 2rem;
+    }
+    .dashboard-title {
+      color: #2A5C88;
+      font-weight: 600;
+      margin-bottom: 2rem;
+    }
+    textarea { resize: vertical; }
+  </style>
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h4 class="mb-4">Admin Panel</h4>
+    <a class="active" href="create_assignment.html">Create Assignment</a>
+    <a href="create_Code_Assignment.html">create code Assignment </a>
+    <a href="create_assignment_History.html">Assignment History</a>
+    <a href="admin-dashboard.html" onclick="logout()">← Back</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h2 class="dashboard-title">Create Assignment</h2>
+
+    <!-- Course / Week / Subject -->
+    <div class="card p-4">
+      <div class="mb-3">
+        <label>Select Course</label>
+        <select class="form-select" id="courseSelect" required></select>
+      </div>
+      <div class="mb-3">
+        <label>Select Week</label>
+        <select class="form-select" id="weekSelect" required></select>
+      </div>
+      <div class="mb-3">
+        <label>Select Subject</label>
+        <select class="form-select" id="subjectSelect" required></select>
+      </div>
+    </div>
+
+    <!-- Start / End Date -->
+    <div class="row mb-4">
+      <div class="col">
+        <label>Start Date</label>
+        <input type="datetime-local" class="form-control" id="startDate" />
+      </div>
+      <div class="col">
+        <label>End Date</label>
+        <input type="datetime-local" class="form-control" id="endDate" />
+      </div>
+    </div>
+
+    <!-- Manual Entry -->
+    <h5>Manual Entry</h5>
+    <div class="mb-3">
+      <button class="btn btn-primary me-2" id="addQuestionBtn">Add Question</button>
+      <button class="btn btn-success" id="saveQuizBtn">Save & Generate Code</button>
+    </div>
+    <div id="questions"></div>
+
+    <!-- Text Input -->
+    <hr />
+    <h5>Text Format Input</h5>
+    <textarea class="form-control mb-2" id="textFormatInput" rows="8" placeholder="Question: What is 2+2?
+a) 2
+b) 3
+c) 4
+d) 5
+Answer: c
+---
+Question: Capital of France?
+a) Berlin
+b) Madrid
+c) Rome
+d) Paris
+Answer: d"></textarea>
+    <button class="btn btn-secondary" id="parseTextBtn">Parse Text</button>
+    <p id="saveMsg" class="mt-2 text-success text-center"></p>
+
+    <!-- Final Save -->
+    <button onclick="saveFinalAssignment()">Save Final Assignment</button>
+
+    <div id="successMsg" class="alert alert-success mt-3 d-none">Assignment saved!</div>
+  </div>
+
+  <!-- Firebase Scripts -->
+  <script type="module">
+    import {
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import {
+  getFirestore,
+  collection,
+  setDoc,
+  doc,
+  getDoc,
+  getDocs,
+  addDoc // ← Add this
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAPFlx9gVV6Q0a8Bwv4Et0OfytgIWApQng",
+      authDomain: "clms-3b972.firebaseapp.com",
+      projectId: "clms-3b972",
+      storageBucket: "clms-3b972.appspot.com",
+      messagingSenderId: "213199198013",
+      appId: "1:213199198013:web:4a576ce4f4af68469b1754"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const courseSelect = document.getElementById("courseSelect");
+    const weekSelect = document.getElementById("weekSelect");
+    const subjectSelect = document.getElementById("subjectSelect");
+
+    async function loadCourses() {
+      const snapshot = await getDocs(collection(db, "courses"));
+      courseSelect.innerHTML = `<option value="">-- Select Course --</option>`;
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const option = document.createElement("option");
+        option.value = doc.id;
+        option.textContent = data.title;
+        courseSelect.appendChild(option);
+      });
+    }
+
+    courseSelect.addEventListener("change", async () => {
+  const courseId = courseSelect.value;
+  if (!courseId) {
+    weekSelect.innerHTML = `<option value="">-- Select Week --</option>`;
+    subjectSelect.innerHTML = `<option value="">-- Select Subject --</option>`;
+    return;
+  }
+
+  try {
+    const courseDoc = await getDoc(doc(db, "courses", courseId));
+    if (!courseDoc.exists()) {
+      console.warn("Course not found in Firestore");
+      return;
+    }
+
+    const data = courseDoc.data();
+
+    // Populate Weeks Dropdown (generate weeks from number)
+    weekSelect.innerHTML = `<option value="">-- Select Week --</option>`;
+    if (typeof data.weeks === 'number') {
+      for (let i = 1; i <= data.weeks; i++) {
+        const opt = document.createElement("option");
+        opt.value = `Week ${i}`;
+        opt.textContent = `Week ${i}`;
+        weekSelect.appendChild(opt);
+      }
+    } else {
+      console.warn("Weeks not found or invalid");
+    }
+
+    // Populate Subjects Dropdown
+    subjectSelect.innerHTML = `<option value="">-- Select Subject --</option>`;
+    if (Array.isArray(data.subjects)) {
+      data.subjects.forEach(subject => {
+        const opt = document.createElement("option");
+        opt.value = subject;
+        opt.textContent = subject;
+        subjectSelect.appendChild(opt);
+      });
+    } else {
+      console.warn("Subjects not found or not in array format");
+    }
+  } catch (error) {
+    console.error("Error loading course data:", error);
+  }
+});
+
+
+    // Question Handling
+    const startDate = document.getElementById("startDate");
+    const endDate = document.getElementById("endDate");
+    const questionsDiv = document.getElementById("questions");
+    const saveMsg = document.getElementById("saveMsg");
+    const parseBtn = document.getElementById("parseTextBtn");
+    const textInput = document.getElementById("textFormatInput");
+    const addQBtn = document.getElementById("addQuestionBtn");
+    const saveQBtn = document.getElementById("saveQuizBtn");
+
+    let parsedQuestions = [];
+
+    addQBtn.addEventListener("click", () => {
+      parsedQuestions.push({
+        question: '',
+        a: '',
+        b: '',
+        c: '',
+        d: '',
+        correct: 'a',
+        timeLimit: 30
+      });
+      renderQuestions();
+    });
+
+    function renderQuestions() {
+      questionsDiv.innerHTML = '';
+      parsedQuestions.forEach((q, idx) => {
+        const card = document.createElement("div");
+        card.className = "card mb-3 p-3";
+        card.innerHTML = `
+          <label>Question ${idx + 1}</label>
+          <input type="text" class="form-control mb-2" placeholder="Enter question">
+          <input type="text" class="form-control mb-2" placeholder="Option A">
+          <input type="text" class="form-control mb-2" placeholder="Option B">
+          <input type="text" class="form-control mb-2" placeholder="Option C">
+          <input type="text" class="form-control mb-2" placeholder="Option D">
+          <label>Correct Option:</label>
+          <select class="form-select mb-2">
+            <option value="a">A</option>
+            <option value="b">B</option>
+            <option value="c">C</option>
+            <option value="d">D</option>
+          </select>
+          <label>Time Limit (seconds):</label>
+          <input type="number" class="form-control" value="30">
+        `;
+        const inputs = card.querySelectorAll("input, select");
+        inputs[0].value = q.question;
+        inputs[1].value = q.a;
+        inputs[2].value = q.b;
+        inputs[3].value = q.c;
+        inputs[4].value = q.d;
+        inputs[5].value = q.correct;
+        inputs[6].value = q.timeLimit;
+
+        inputs[0].addEventListener("input", e => q.question = e.target.value);
+        inputs[1].addEventListener("input", e => q.a = e.target.value);
+        inputs[2].addEventListener("input", e => q.b = e.target.value);
+        inputs[3].addEventListener("input", e => q.c = e.target.value);
+        inputs[4].addEventListener("input", e => q.d = e.target.value);
+        inputs[5].addEventListener("change", e => q.correct = e.target.value);
+        inputs[6].addEventListener("input", e => q.timeLimit = Number(e.target.value));
+
+        questionsDiv.appendChild(card);
+      });
+    }
+
+    parseBtn.addEventListener("click", () => {
+      const inputText = textInput.value.trim();
+      const blocks = inputText.split(/\n\s*\n/).map(b => b.trim()).filter(b => b);
+      parsedQuestions = [];
+
+      blocks.forEach(block => {
+        const lines = block.split("\n").map(line => line.trim()).filter(line => line);
+        if (lines.length < 3) return;
+
+        const questionText = lines[0].replace(/^Question:\s*/i, "");
+        const options = { a: "", b: "", c: "", d: "" };
+        let correct = "a";
+
+        const answerLine = lines.find(l => /^Answer:\s*/i.test(l));
+        if (answerLine) correct = answerLine.replace(/^Answer:\s*/i, "").trim().toLowerCase();
+
+        lines.forEach(line => {
+          if (/^a\)/i.test(line)) options.a = line.replace(/^a\)\s*/i, "");
+          else if (/^b\)/i.test(line)) options.b = line.replace(/^b\)\s*/i, "");
+          else if (/^c\)/i.test(line)) options.c = line.replace(/^c\)\s*/i, "");
+          else if (/^d\)/i.test(line)) options.d = line.replace(/^d\)\s*/i, "");
+        });
+
+        const isTF = options.a.toLowerCase() === "true" && options.b.toLowerCase() === "false" && !options.c && !options.d;
+        const isFill = questionText.includes("___");
+
+        parsedQuestions.push({
+          question: questionText,
+          a: options.a,
+          b: options.b,
+          c: options.c,
+          d: options.d,
+          correct,
+          timeLimit: isTF ? 10 : isFill ? 15 : 20,
+          type: isTF ? "truefalse" : isFill ? "fillblank" : "mcq"
+        });
+      });
+
+      if (parsedQuestions.length === 0) {
+        alert("No valid questions found. Check your format.");
+      } else {
+        renderQuestions();
+        alert(`${parsedQuestions.length} questions parsed successfully.`);
+      }
+    });
+
+    function generateQuizCode(length = 6) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    }
+
+    saveQBtn.addEventListener("click", async () => {
+      if (!startDate.value || !endDate.value || parsedQuestions.length === 0) {
+        alert("Please fill all fields and add at least one question.");
+        return;
+      }
+
+      const quizCode = generateQuizCode();
+
+      const quiz = {
+        quizCode,
+        startAt: startDate.value,
+        endAt: endDate.value,
+        course: courseSelect.value,
+        week: weekSelect.value,
+        subject: subjectSelect.value,
+        questions: parsedQuestions,
+        createdAt: new Date().toISOString()
+      };
+
+      try {
+        await setDoc(doc(db, "quizzes", quizCode), quiz);
+        saveMsg.textContent = `Quiz saved successfully! Code: ${quizCode}`;
+        setTimeout(() => window.location.reload(), 1000);
+      } catch (err) {
+        console.error(err);
+        alert("Error saving quiz!");
+      }
+    });
+
+    window.saveFinalAssignment = async function () {
+  const courseId = courseSelect.value;
+  const week = weekSelect.value;
+  const subject = subjectSelect.value;
+
+  if (!courseId || !week || !subject) {
+    alert("Please select course, week, and subject.");
+    return;
+  }
+
+  if (parsedQuestions.length === 0) {
+    alert("No questions to save. Please parse or add questions.");
+    return;
+  }
+
+  const assignmentData = {
+    courseId,
+    week,
+    subject,
+    mcq: parsedQuestions.filter(q => q.type === "mcq"),
+    fillBlanks: parsedQuestions.filter(q => q.type === "fillblank"),
+    trueFalse: parsedQuestions.filter(q => q.type === "truefalse"),
+    codeQuestions: [], // if needed
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    await addDoc(collection(db, "assignments"), assignmentData);
+    alert("Assignment saved successfully!");
+    window.location.reload(); // optional
+  } catch (err) {
+    console.error("Error saving assignment:", err);
+    alert("Failed to save assignment.");
+  }
+};
+    window.onload = loadCourses;
+  </script>
+</body>
+</html>

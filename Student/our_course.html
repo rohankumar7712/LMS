@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Course History</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f4f6f9;
+    }
+    .sidebar {
+      height: 100vh;
+      background-color: #2A5C88;
+      color: white;
+      padding: 1rem;
+    }
+    .sidebar a {
+      display: block;
+      padding: 0.75rem 1rem;
+      color: white;
+      text-decoration: none;
+      margin-bottom: 0.5rem;
+      border-radius: 8px;
+    }
+    .sidebar a:hover, .sidebar a.active {
+      background-color: #1f4568;
+    }
+    .main-content {
+      padding: 2rem;
+    }
+    .course-card {
+      border-radius: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background-color: white;
+    }
+  </style>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-3 sidebar">
+      <h4 class="mb-4">Student Panel</h4>
+      <a href="student_dashboard.html">Dashboard</a>
+      <a href="our_course.html" class="active">Course History</a>
+      <a href="../index.html" onclick="logout()">Logout</a>
+    </div>
+
+    <div class="col-md-9 main-content">
+      <h3 class="mb-4">Enrolled Course History</h3>
+      <div id="enrolledCourses"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    getDocs
+  } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAPFlx9gVV6Q0a8Bwv4Et0OfytgIWApQng",
+    authDomain: "clms-3b972.firebaseapp.com",
+    projectId: "clms-3b972",
+    storageBucket: "clms-3b972.appspot.com",
+    messagingSenderId: "213199198013",
+    appId: "1:213199198013:web:4a576ce4f4af68469b1754"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const enrolledCoursesDiv = document.getElementById("enrolledCourses");
+
+  async function loadEnrolledCourses() {
+    // ✅ Get student data from localStorage
+    const studentData = JSON.parse(localStorage.getItem("student"));
+    
+    if (!studentData || !studentData.enrollment) {
+      alert("Unauthorized access. Please login again.");
+      window.location.href = "../index.html";
+      return;
+    }
+
+    const enrollmentNumber = studentData.enrollment;
+
+    const enrollmentsSnapshot = await getDocs(collection(db, "enrollments"));
+    const courseSnapshot = await getDocs(collection(db, "courses"));
+
+    const enrolled = [];
+
+    enrollmentsSnapshot.forEach(enrollDoc => {
+      const data = enrollDoc.data();
+      if (data.enrollment === enrollmentNumber) {
+        enrolled.push(data);
+      }
+    });
+
+    if (enrolled.length === 0) {
+      enrolledCoursesDiv.innerHTML = "<p>No courses enrolled.</p>";
+      return;
+    }
+
+    enrolled.forEach(data => {
+      const course = Array.from(courseSnapshot.docs).find(doc => doc.id === data.courseId);
+      if (!course) return;
+      const courseData = course.data();
+      const courseCard = document.createElement("div");
+      courseCard.className = "course-card";
+      courseCard.innerHTML = `
+        <h5>${courseData.title}</h5>
+        <p>${courseData.startDate} to ${courseData.endDate}</p>
+        <button class="btn btn-primary" onclick="goToCourse('${course.id}')">Go to Course</button>
+      `;
+      enrolledCoursesDiv.appendChild(courseCard);
+    });
+  }
+
+  loadEnrolledCourses();
+</script>
+
+<script>
+  function goToCourse(courseId) {
+    window.location.href = `course_detail.html?courseId=${courseId}`;
+  }
+
+  function logout() {
+    localStorage.removeItem("student");
+    location.href = "../index.html";
+  }
+</script>
+</body>
+</html>
