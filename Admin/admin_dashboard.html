@@ -1,22 +1,94 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Admin Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
   <style>
     body {
       background-color: #f4f6f9;
+      margin: 0;
+      font-family: 'Inter', sans-serif; /* Using Inter font */
     }
 
-    .sidebar {
-      height: 100vh;
+    /* Toggle button styling */
+    .toggle-btn {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1100;
       background-color: #2A5C88;
       color: white;
-      padding: 1rem;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-size: 1.2rem;
+      border-radius: 5px;
+      cursor: pointer;
+      display: none; /* hidden by default */
     }
 
+    /* Show toggle button only on small screens */
+    @media (max-width: 767.98px) {
+      .toggle-btn {
+        display: block;
+      }
+      .sidebar.show + .main-content {
+        /* Adjust main content when sidebar is shown on small screens */
+        transform: translateX(250px);
+        transition: transform 0.3s ease-in-out;
+      }
+    }
+
+    /* Sidebar styles for large screens */
+    @media (min-width: 768px) {
+      .sidebar {
+        height: 100vh;
+        background-color: #2A5C88;
+        color: white;
+        padding: 1rem;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 250px;
+        overflow-y: auto;
+      }
+
+      .main-content {
+        margin-left: 250px;
+        padding: 2rem;
+      }
+    }
+
+    /* Sidebar styles for small screens - hidden by default */
+    @media (max-width: 767.98px) {
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 250px;
+        background-color: #2A5C88;
+        padding: 1rem;
+        color: white;
+        overflow-y: auto;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 1099;
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 2rem 1rem;
+      }
+    }
+
+    /* Sidebar link styles */
     .sidebar a {
       display: block;
       padding: 0.75rem 1rem;
@@ -26,14 +98,12 @@
       border-radius: 8px;
     }
 
-    .sidebar a:hover, .sidebar a.active {
+    .sidebar a:hover,
+    .sidebar a.active {
       background-color: #1f4568;
     }
 
-    .main-content {
-      padding: 2rem;
-    }
-
+    /* Card styling */
     .card {
       border: none;
       border-radius: 1rem;
@@ -52,61 +122,61 @@
   </style>
 </head>
 <body>
-  <div class="container-fluid">
-    <div class="row">
-      <!-- Sidebar -->
-      <div class="col-md-3 sidebar">
-        <h4 class="mb-4">Admin Panel</h4>
-        <a href="admin_dashboard.html" class="active">Dashboard</a>
-        <a href="admin_courses.html">Courses</a>
-        <a href="create_assignment.html">Assignment</a>
-        <a href="upload_material.html">Upload Material</a>
-        <a href="assignments.html">Students</a>
-        <a href="../index.html" onclick="logout()">Logout</a>
-      </div>
 
-      <!-- Main Content -->
-      <div class="col-md-9 main-content">
-        <h2 class="dashboard-title">Welcome, Admin 👋</h2>
+  <!-- Your toggle button -->
+  <button class="toggle-btn" onclick="toggleSidebar()">☰ Menu</button>
 
-        <div class="row">
-          <div class="col-md-4 mb-4">
-            <div class="card text-center p-4">
-              <h5 class="card-title">Total Students</h5>
-              <h2 id="studentCount">--</h2>
-            </div>
-          </div>
-          <div class="col-md-4 mb-4">
-            <div class="card text-center p-4">
-              <h5 class="card-title">Total Courses</h5>
-              <h2 id="courseCount">--</h2>
-            </div>
-          </div>
-          <div class="col-md-4 mb-4">
-            <div class="card text-center p-4">
-              <h5 class="card-title">Assignments</h5>
-              <h2 id="assignmentCount">--</h2>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <h4 class="mb-4">Admin Panel</h4>
+    <a href="admin_dashboard.html" class="active">Dashboard</a>
+    <a href="admin_courses.html">Courses</a>
+    <a href="create_assignment.html">Assignment</a>
+    <a href="upload_material.html">Upload Material</a>
+    <a href="assignments.html">Students</a>
+    <a href="../index.html" onclick="logout()">Logout</a>
   </div>
 
-  <!-- Firebase -->
+  <!-- Main content -->
+  <main class="main-content">
+    <h2 class="dashboard-title">Welcome, Admin 👋</h2>
+
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <div class="card text-center p-4">
+          <h5 class="card-title">Total Students</h5>
+          <h2 id="studentCount">--</h2>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card text-center p-4">
+          <h5 class="card-title">Total Courses</h5>
+          <h2 id="courseCount">--</h2>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card text-center p-4">
+          <h5 class="card-title">Assignments</h5>
+          <h2 id="assignmentCount">--</h2>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
-    apiKey: "AIzaSyBYHB5XMte4Qj919ZsQWjoiFBcNrjl1xso",
-    authDomain: "clms-dbfe1.firebaseapp.com",
-    projectId: "clms-dbfe1",
-    storageBucket: "clms-dbfe1.firebasestorage.app",
-    messagingSenderId: "1025852714357",
-    appId: "1:1025852714357:web:282d74003f389767ad773c"
-  };
+      apiKey: "AIzaSyBYHB5XMte4Qj919ZsQWjoiFBcNrjl1xso",
+      authDomain: "clms-dbfe1.firebaseapp.com",
+      projectId: "clms-dbfe1",
+      storageBucket: "clms-dbfe1.firebasestorage.app",
+      messagingSenderId: "1025852714357",
+      appId: "1:1025852714357:web:282d74003f389767ad773c"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -126,6 +196,12 @@
 
     window.logout = function () {
       window.location.href = "../index.html";
+    }
+
+    // Make toggleSidebar globally accessible
+    window.toggleSidebar = function () {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('show');
     }
   </script>
 </body>

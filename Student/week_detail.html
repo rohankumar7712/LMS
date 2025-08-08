@@ -2,20 +2,88 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Week Details</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body {
       background-color: #f4f6f9;
+      font-family: 'Segoe UI', sans-serif; /* Preserving your font choice */
+      margin: 0; /* Ensure no default body margin */
     }
-    .sidebar {
-      background: #2A5C88;
-      color: white;
-      min-height: 100vh;
-      padding: 20px;
-      border-radius: 8px;
+
+    /* Hide toggle button by default (for larger screens) */
+    .toggle-btn {
+      display: none;
     }
+
+    /* Sidebar styles for large screens (md and up) */
+    @media (min-width: 768px) {
+      .sidebar {
+        min-height: 100vh;
+        background-color: #2A5C88; /* Your specified color */
+        color: white;
+        padding: 20px; /* Original padding for sidebar */
+        border-radius: 8px; /* Original border-radius for sidebar */
+        position: fixed; /* Fixed sidebar on desktop */
+        top: 0;
+        left: 0;
+        width: 250px; /* Define a fixed width for desktop sidebar */
+        overflow-y: auto;
+      }
+      /* Adjust main content to make space for the fixed sidebar */
+      .main-content-wrapper {
+        margin-left: 250px; /* Offset for the fixed sidebar */
+        padding: 2rem; /* Add padding for content */
+      }
+    }
+
+    /* Sidebar styles for small screens (below md) */
+    @media (max-width: 767.98px) {
+      .sidebar {
+        position: fixed;
+        width: 250px; /* Define width for mobile sidebar */
+        z-index: 1000;
+        transform: translateX(-100%); /* Hidden by default */
+        transition: transform 0.3s ease-in-out;
+        height: 100vh; /* Full height on mobile */
+        background-color: #2A5C88; /* Your specified color */
+        color: white;
+        padding: 1rem; /* Adjusted padding for mobile sidebar */
+        border-radius: 0; /* No border-radius for full-height fixed sidebar */
+      }
+
+      .sidebar.show {
+        transform: translateX(0); /* Show when 'show' class is added */
+      }
+
+      /* Toggle button visibility and styling for mobile */
+      .toggle-btn {
+        display: block !important; /* Ensure it's visible on mobile */
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 1001; /* Above sidebar */
+        background-color: #2A5C88; /* Your specified color */
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        font-size: 1.2rem;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      /* Adjust main content when sidebar is shown on small screens */
+      .main-content-wrapper {
+        padding: 2rem 1rem; /* Default padding for mobile, adjusted for small screens */
+        transition: transform 0.3s ease-in-out;
+      }
+      .main-content-wrapper.shifted {
+        transform: translateX(250px); /* Shift content when sidebar is open */
+      }
+    }
+
+    /* Common sidebar elements */
     .sidebar h5 {
       font-weight: bold;
       margin-bottom: 1rem;
@@ -32,30 +100,55 @@
     .sidebar a:hover {
       background: rgba(255, 255, 255, 0.2);
     }
+    
+    /* Main content styling */
     .content {
       background: white;
       padding: 1rem;
       border-radius: 10px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      min-height: 100vh;
+      min-height: 100vh; /* Original min-height for content */
+    }
+    /* Adjust main content padding on smaller screens */
+    @media (max-width: 767.98px) {
+      .content {
+        min-height: auto;
+        padding-top: 1rem;
+      }
+    }
+
+    /* Custom status message styling */
+    #statusMessage {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1200;
+      padding: 10px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: none; /* hidden by default */
     }
   </style>
 </head>
 <body>
+
+  <!-- Toggle button for mobile -->
+  <button class="toggle-btn" onclick="toggleSidebar()">☰ Menu</button>
+
   <div class="container-fluid">
     <div class="row">
 
       <!-- Sidebar -->
-      <div class="col-md-3 sidebar">
+      <div class="sidebar" id="sidebar">
         <h5 id="pageTitle">Loading...</h5>
-        <a id="btnStudy">📚 Study Material</a>
-        <a id="btnAssignment">📝 Assignment</a>
+        <a id="btnStudy" href="#" role="button">📚 Study Material</a>
+        <a id="btnAssignment" href="#" role="button">📝 Assignment</a>
         <hr>
-       <a id="btnBackToCourse" href="#" class="btn btn-light btn-sm mt-3">⬅ Back</a>
+        <a id="btnBackToCourse" href="#" class="btn btn-light btn-sm mt-3">⬅ Back</a>
       </div>
 
       <!-- Main Content -->
-      <div class="col-md-9 p-4">
+      <div class="col-12 col-md-9 main-content-wrapper">
         <div id="content" class="content">
           <p>Loading...</p>
         </div>
@@ -64,21 +157,37 @@
     </div>
   </div>
 
+  <!-- Custom Status Message -->
+  <div id="statusMessage" class="alert"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
-    apiKey: "AIzaSyBYHB5XMte4Qj919ZsQWjoiFBcNrjl1xso",
-    authDomain: "clms-dbfe1.firebaseapp.com",
-    projectId: "clms-dbfe1",
-    storageBucket: "clms-dbfe1.firebasestorage.app",
-    messagingSenderId: "1025852714357",
-    appId: "1:1025852714357:web:282d74003f389767ad773c"
-  };
+      apiKey: "AIzaSyBYHB5XMte4Qj919ZsQWjoiFBcNrjl1xso",
+      authDomain: "clms-dbfe1.firebaseapp.com",
+      projectId: "clms-dbfe1",
+      storageBucket: "clms-dbfe1.firebasestorage.app",
+      messagingSenderId: "1025852714357",
+      appId: "1:1025852714357:web:282d74003f389767ad773c"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+
+    const statusMessageDiv = document.getElementById("statusMessage");
+
+    // Function to display custom status messages
+    function showStatusMessage(message, type = 'info') {
+      statusMessageDiv.textContent = message;
+      statusMessageDiv.className = `alert mt-3 alert-${type}`;
+      statusMessageDiv.style.display = 'block';
+      setTimeout(() => {
+        statusMessageDiv.style.display = 'none';
+      }, 3000); // Hide after 3 seconds
+    }
 
     // Get parameters from URL
     const params = new URLSearchParams(window.location.search);
@@ -87,13 +196,13 @@
     const subject = params.get("subject");
 
     if (!courseId || !week || !subject) {
-      alert("Invalid parameters.");
+      showStatusMessage("Invalid parameters.", "danger");
       throw new Error("Invalid parameters.");
     }
 
     document.getElementById("pageTitle").innerText = `${subject} - Week ${week}`;
 
-    // ===== Updated studentIdentifier retrieval from localStorage =====
+    // Student identifier from localStorage
     let studentIdentifier = null;
     const studentDataStr = localStorage.getItem("student");
     if (studentDataStr) {
@@ -104,13 +213,11 @@
         console.error("Error parsing student data from localStorage", e);
       }
     }
-
     if (!studentIdentifier) {
-      alert("Student not logged in. Please login first.");
-      window.location.href = "login.html"; // Change to your actual login page
+      showStatusMessage("Student not logged in. Please login first.", "danger");
+      window.location.href = "login.html"; // adjust your login URL here
       throw new Error("Student not logged in");
     }
-    // ================================================================
 
     let studyMaterials = [];
     let assignments = [];
@@ -118,11 +225,9 @@
     // Helper to query submissions from a given collection
     async function querySubmissions(collectionName, assignmentIds) {
       if (!assignmentIds.length) return [];
-
       const submissionsRef = collection(db, collectionName);
       let results = [];
       const chunkSize = 10; // Firestore 'in' query limit
-
       for (let i = 0; i < assignmentIds.length; i += chunkSize) {
         const chunk = assignmentIds.slice(i, i + chunkSize);
         const q = query(
@@ -139,11 +244,12 @@
     }
 
     async function loadSubmissionsForStudent(assignmentIds) {
-      const [codeSubs, normalSubs] = await Promise.all([
-        querySubmissions("code_submission", assignmentIds),
-        querySubmissions("submission", assignmentIds)
+      // Need to query both 'submissions' (for normal assignments) and 'code_submission'
+      const [normalSubsSnapshot, codeSubsSnapshot] = await Promise.all([
+        querySubmissions("submissions", assignmentIds),
+        querySubmissions("code_submission", assignmentIds)
       ]);
-      return [...codeSubs, ...normalSubs];
+      return [...normalSubsSnapshot, ...codeSubsSnapshot];
     }
 
     async function loadData() {
@@ -232,6 +338,7 @@
         console.error("Error loading data:", error);
         document.getElementById("content").innerHTML =
           `<p class="alert alert-danger">Error loading data.</p>`;
+        showStatusMessage("Error loading data.", "danger");
       }
     }
 
@@ -245,10 +352,10 @@
             <h4>📚 Study Material</h4>
             <div class="row row-cols-1 row-cols-md-2 g-4">
               ${studyMaterials.map(url => {
-                const fileName = url.split('/').pop();
-                const decodedFileName = decodeURIComponent(fileName)
-                  .split('_').slice(1).join('_')
-                  .replace(/\.pdf$/, '');
+                const parts = url.split('/');
+                const fileNameWithTimestamp = parts.pop(); // materials/courseId/weekX/subject/timestamp_filename.pdf
+                const fileName = fileNameWithTimestamp.substring(fileNameWithTimestamp.indexOf('_') + 1); // Remove timestamp part
+                const decodedFileName = decodeURIComponent(fileName).replace(/\.pdf$/, '');
                 return `
                   <div class="col">
                     <div class="card h-100">
@@ -310,4 +417,4 @@
     loadData();
   </script>
 </body>
-</html>
+</ht

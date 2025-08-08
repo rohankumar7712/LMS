@@ -6,15 +6,84 @@
   <title>Create Assignment</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <style>
-    body { background-color: #f4f6f9; }
-    .sidebar {
-      height: 100vh;
+    body { 
+      background-color: #f4f6f9; 
+      margin: 0; 
+      font-family: 'Inter', sans-serif; /* Using Inter font */
+    }
+    
+    /* Toggle button styling */
+    .toggle-btn {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1100;
       background-color: #2A5C88;
       color: white;
-      padding: 1rem;
-      position: fixed;
-      width: 250px;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-size: 1.2rem;
+      border-radius: 5px;
+      cursor: pointer;
+      display: none; /* hidden by default */
     }
+    
+    /* Show toggle button only on small screens */
+    @media (max-width: 767.98px) {
+      .toggle-btn {
+        display: block;
+      }
+      .sidebar.show + .main-content {
+        /* Adjust main content when sidebar is shown on small screens */
+        transform: translateX(250px);
+        transition: transform 0.3s ease-in-out;
+      }
+    }
+
+    /* Sidebar styles for large screens */
+    @media (min-width: 768px) {
+      .sidebar {
+        height: 100vh;
+        background-color: #2A5C88;
+        color: white;
+        padding: 1rem;
+        position: fixed;
+        width: 250px;
+        top: 0;
+        left: 0;
+        overflow-y: auto;
+      }
+      .main-content {
+        margin-left: 270px;
+        padding: 2rem;
+      }
+    }
+
+    /* Sidebar styles for small screens - hidden by default */
+    @media (max-width: 767.98px) {
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 250px;
+        background-color: #2A5C88;
+        padding: 1rem;
+        color: white;
+        overflow-y: auto;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 1099;
+      }
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      .main-content {
+        margin-left: 0;
+        padding: 2rem 1rem;
+      }
+    }
+
     .sidebar a {
       display: block;
       padding: 0.75rem 1rem;
@@ -24,10 +93,7 @@
       border-radius: 8px;
     }
     .sidebar a:hover, .sidebar a.active { background-color: #1f4568; }
-    .main-content {
-      margin-left: 270px;
-      padding: 2rem;
-    }
+
     .card {
       border: none;
       border-radius: 1rem;
@@ -40,17 +106,32 @@
       margin-bottom: 2rem;
     }
     textarea { resize: vertical; }
+
+    /* Custom status message styling */
+    #statusMessage {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1200;
+      padding: 10px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: none; /* hidden by default */
+    }
   </style>
 </head>
 
 <body>
+  <!-- Toggle button -->
+  <button class="toggle-btn" onclick="toggleSidebar()">☰ Menu</button>
+
   <!-- Sidebar -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <h4 class="mb-4">Admin Panel</h4>
     <a class="active" href="create_assignment.html">Create Assignment</a>
     <a href="create_Code_Assignment.html">create code Assignment </a>
     <a href="create_assignment_History.html">Assignment History</a>
-    <a href="admin-dashboard.html" onclick="logout()">← Back</a>
+    <a href="admin_dashboard.html" onclick="logout()">← Back</a>
   </div>
 
   <!-- Main Content -->
@@ -60,15 +141,15 @@
     <!-- Course / Week / Subject -->
     <div class="card p-4">
       <div class="mb-3">
-        <label>Select Course</label>
+        <label class="form-label">Select Course</label>
         <select class="form-select" id="courseSelect" required></select>
       </div>
       <div class="mb-3">
-        <label>Select Week</label>
+        <label class="form-label">Select Week</label>
         <select class="form-select" id="weekSelect" required></select>
       </div>
       <div class="mb-3">
-        <label>Select Subject</label>
+        <label class="form-label">Select Subject</label>
         <select class="form-select" id="subjectSelect" required></select>
       </div>
     </div>
@@ -113,10 +194,13 @@ Answer: d"></textarea>
     <p id="saveMsg" class="mt-2 text-success text-center"></p>
 
     <!-- Final Save -->
-    <button onclick="saveFinalAssignment()">Save Final Assignment</button>
+    <button class="btn btn-info mt-3" onclick="saveFinalAssignment()">Save Final Assignment</button>
 
     <div id="successMsg" class="alert alert-success mt-3 d-none">Assignment saved!</div>
   </div>
+
+  <!-- Custom Status Message -->
+  <div id="statusMessage" class="alert"></div>
 
   <!-- Firebase Scripts -->
   <script type="module">
@@ -124,23 +208,23 @@ Answer: d"></textarea>
       initializeApp
     } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import {
-  getFirestore,
-  collection,
-  setDoc,
-  doc,
-  getDoc,
-  getDocs,
-  addDoc // ← Add this
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+      getFirestore,
+      collection,
+      setDoc,
+      doc,
+      getDoc,
+      getDocs,
+      addDoc
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
-    apiKey: "AIzaSyBYHB5XMte4Qj919ZsQWjoiFBcNrjl1xso",
-    authDomain: "clms-dbfe1.firebaseapp.com",
-    projectId: "clms-dbfe1",
-    storageBucket: "clms-dbfe1.firebasestorage.app",
-    messagingSenderId: "1025852714357",
-    appId: "1:1025852714357:web:282d74003f389767ad773c"
-  };
+      apiKey: "AIzaSyBYHB5XMte4Qj919ZsQWjoiFBcNrjl1xso",
+      authDomain: "clms-dbfe1.firebaseapp.com",
+      projectId: "clms-dbfe1",
+      storageBucket: "clms-dbfe1.firebasestorage.app",
+      messagingSenderId: "1025852714357",
+      appId: "1:1025852714357:web:282d74003f389767ad773c"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -148,72 +232,91 @@ Answer: d"></textarea>
     const courseSelect = document.getElementById("courseSelect");
     const weekSelect = document.getElementById("weekSelect");
     const subjectSelect = document.getElementById("subjectSelect");
+    const statusMessageDiv = document.getElementById("statusMessage");
+
+    // Function to show custom status messages
+    function showStatusMessage(message, type = 'info') {
+      statusMessageDiv.textContent = message;
+      statusMessageDiv.className = `alert mt-3 alert-${type}`;
+      statusMessageDiv.style.display = 'block';
+      setTimeout(() => {
+        statusMessageDiv.style.display = 'none';
+      }, 3000); // Hide after 3 seconds
+    }
 
     async function loadCourses() {
-      const snapshot = await getDocs(collection(db, "courses"));
-      courseSelect.innerHTML = `<option value="">-- Select Course --</option>`;
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const option = document.createElement("option");
-        option.value = doc.id;
-        option.textContent = data.title;
-        courseSelect.appendChild(option);
-      });
+      try {
+        const snapshot = await getDocs(collection(db, "courses"));
+        courseSelect.innerHTML = `<option value="">-- Select Course --</option>`;
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const option = document.createElement("option");
+          option.value = doc.id;
+          option.textContent = data.title;
+          courseSelect.appendChild(option);
+        });
+      } catch (error) {
+        console.error("Error loading courses:", error);
+        showStatusMessage("Error loading courses.", "danger");
+      }
     }
 
     courseSelect.addEventListener("change", async () => {
-  const courseId = courseSelect.value;
-  if (!courseId) {
-    weekSelect.innerHTML = `<option value="">-- Select Week --</option>`;
-    subjectSelect.innerHTML = `<option value="">-- Select Subject --</option>`;
-    return;
-  }
-
-  try {
-    const courseDoc = await getDoc(doc(db, "courses", courseId));
-    if (!courseDoc.exists()) {
-      console.warn("Course not found in Firestore");
-      return;
-    }
-
-    const data = courseDoc.data();
-
-    // Populate Weeks Dropdown (generate weeks from number)
-    weekSelect.innerHTML = `<option value="">-- Select Week --</option>`;
-    if (typeof data.weeks === 'number') {
-      for (let i = 1; i <= data.weeks; i++) {
-        const opt = document.createElement("option");
-        opt.value = `Week ${i}`;
-        opt.textContent = `Week ${i}`;
-        weekSelect.appendChild(opt);
+      const courseId = courseSelect.value;
+      if (!courseId) {
+        weekSelect.innerHTML = `<option value="">-- Select Week --</option>`;
+        subjectSelect.innerHTML = `<option value="">-- Select Subject --</option>`;
+        return;
       }
-    } else {
-      console.warn("Weeks not found or invalid");
-    }
 
-    // Populate Subjects Dropdown
-    subjectSelect.innerHTML = `<option value="">-- Select Subject --</option>`;
-    if (Array.isArray(data.subjects)) {
-      data.subjects.forEach(subject => {
-        const opt = document.createElement("option");
-        opt.value = subject;
-        opt.textContent = subject;
-        subjectSelect.appendChild(opt);
-      });
-    } else {
-      console.warn("Subjects not found or not in array format");
-    }
-  } catch (error) {
-    console.error("Error loading course data:", error);
-  }
-});
+      try {
+        const courseDoc = await getDoc(doc(db, "courses", courseId));
+        if (!courseDoc.exists()) {
+          console.warn("Course not found in Firestore");
+          showStatusMessage("Course not found.", "warning");
+          return;
+        }
 
+        const data = courseDoc.data();
+
+        // Populate Weeks Dropdown (generate weeks from number)
+        weekSelect.innerHTML = `<option value="">-- Select Week --</option>`;
+        if (typeof data.weeks === 'number') {
+          for (let i = 1; i <= data.weeks; i++) {
+            const opt = document.createElement("option");
+            opt.value = `Week ${i}`;
+            opt.textContent = `Week ${i}`;
+            weekSelect.appendChild(opt);
+          }
+        } else {
+          console.warn("Weeks not found or invalid");
+          showStatusMessage("Number of weeks not defined for this course.", "warning");
+        }
+
+        // Populate Subjects Dropdown
+        subjectSelect.innerHTML = `<option value="">-- Select Subject --</option>`;
+        if (Array.isArray(data.subjects)) {
+          data.subjects.forEach(subject => {
+            const opt = document.createElement("option");
+            opt.value = subject;
+            opt.textContent = subject;
+            subjectSelect.appendChild(opt);
+          });
+        } else {
+          console.warn("Subjects not found or not in array format");
+          showStatusMessage("Subjects not defined for this course.", "warning");
+        }
+      } catch (error) {
+        console.error("Error loading course data:", error);
+        showStatusMessage("Error loading course data: " + error.message, "danger");
+      }
+    });
 
     // Question Handling
     const startDate = document.getElementById("startDate");
     const endDate = document.getElementById("endDate");
     const questionsDiv = document.getElementById("questions");
-    const saveMsg = document.getElementById("saveMsg");
+    const saveMsg = document.getElementById("saveMsg"); // This is for the Quiz code.
     const parseBtn = document.getElementById("parseTextBtn");
     const textInput = document.getElementById("textFormatInput");
     const addQBtn = document.getElementById("addQuestionBtn");
@@ -279,14 +382,17 @@ Answer: d"></textarea>
 
     parseBtn.addEventListener("click", () => {
       const inputText = textInput.value.trim();
-      const blocks = inputText.split(/\n\s*\n/).map(b => b.trim()).filter(b => b);
+      const blocks = inputText.split(/---\s*\n/).map(b => b.trim()).filter(b => b); // Split by "---"
       parsedQuestions = [];
 
       blocks.forEach(block => {
         const lines = block.split("\n").map(line => line.trim()).filter(line => line);
         if (lines.length < 3) return;
 
-        const questionText = lines[0].replace(/^Question:\s*/i, "");
+        const questionLine = lines.find(l => /^Question:\s*/i.test(l));
+        if (!questionLine) return; // Skip if no question line found
+
+        const questionText = questionLine.replace(/^Question:\s*/i, "");
         const options = { a: "", b: "", c: "", d: "" };
         let correct = "a";
 
@@ -316,10 +422,10 @@ Answer: d"></textarea>
       });
 
       if (parsedQuestions.length === 0) {
-        alert("No valid questions found. Check your format.");
+        showStatusMessage("No valid questions found. Check your format.", "warning");
       } else {
         renderQuestions();
-        alert(`${parsedQuestions.length} questions parsed successfully.`);
+        showStatusMessage(`${parsedQuestions.length} questions parsed successfully.`, "success");
       }
     });
 
@@ -330,7 +436,11 @@ Answer: d"></textarea>
 
     saveQBtn.addEventListener("click", async () => {
       if (!startDate.value || !endDate.value || parsedQuestions.length === 0) {
-        alert("Please fill all fields and add at least one question.");
+        showStatusMessage("Please fill all fields and add at least one question.", "warning");
+        return;
+      }
+      if (!courseSelect.value || !weekSelect.value || !subjectSelect.value) {
+        showStatusMessage("Please select course, week, and subject before saving quiz.", "warning");
         return;
       }
 
@@ -350,48 +460,60 @@ Answer: d"></textarea>
       try {
         await setDoc(doc(db, "quizzes", quizCode), quiz);
         saveMsg.textContent = `Quiz saved successfully! Code: ${quizCode}`;
-        setTimeout(() => window.location.reload(), 1000);
+        showStatusMessage(`Quiz saved successfully! Code: ${quizCode}`, "success");
+        setTimeout(() => window.location.reload(), 2000); // Reload after showing message
       } catch (err) {
         console.error(err);
-        alert("Error saving quiz!");
+        showStatusMessage("Error saving quiz! " + err.message, "danger");
       }
     });
 
     window.saveFinalAssignment = async function () {
-  const courseId = courseSelect.value;
-  const week = weekSelect.value;
-  const subject = subjectSelect.value;
+      const courseId = courseSelect.value;
+      const week = weekSelect.value;
+      const subject = subjectSelect.value;
 
-  if (!courseId || !week || !subject) {
-    alert("Please select course, week, and subject.");
-    return;
-  }
+      if (!courseId || !week || !subject) {
+        showStatusMessage("Please select course, week, and subject.", "warning");
+        return;
+      }
 
-  if (parsedQuestions.length === 0) {
-    alert("No questions to save. Please parse or add questions.");
-    return;
-  }
+      if (parsedQuestions.length === 0) {
+        showStatusMessage("No questions to save. Please parse or add questions.", "warning");
+        return;
+      }
 
-  const assignmentData = {
-    courseId,
-    week,
-    subject,
-    mcq: parsedQuestions.filter(q => q.type === "mcq"),
-    fillBlanks: parsedQuestions.filter(q => q.type === "fillblank"),
-    trueFalse: parsedQuestions.filter(q => q.type === "truefalse"),
-    codeQuestions: [], // if needed
-    createdAt: new Date().toISOString()
-  };
+      const assignmentData = {
+        courseId,
+        week,
+        subject,
+        mcq: parsedQuestions.filter(q => q.type === "mcq"),
+        fillBlanks: parsedQuestions.filter(q => q.type === "fillblank"),
+        trueFalse: parsedQuestions.filter(q => q.type === "truefalse"),
+        codeQuestions: [], // Assuming code questions are handled separately or added here manually
+        createdAt: new Date().toISOString()
+      };
 
-  try {
-    await addDoc(collection(db, "assignments"), assignmentData);
-    alert("Assignment saved successfully!");
-    window.location.reload(); // optional
-  } catch (err) {
-    console.error("Error saving assignment:", err);
-    alert("Failed to save assignment.");
-  }
-};
+      try {
+        await addDoc(collection(db, "assignments"), assignmentData);
+        showStatusMessage("Assignment saved successfully!", "success");
+        setTimeout(() => window.location.reload(), 2000); // Reload after showing message
+      } catch (err) {
+        console.error("Error saving assignment:", err);
+        showStatusMessage("Failed to save assignment. " + err.message, "danger");
+      }
+    };
+
+    // Sidebar toggle function for mobile
+    window.toggleSidebar = function () {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('show');
+    }
+
+    window.logout = function () {
+      window.location.href = "../index.html";
+    }
+
     window.onload = loadCourses;
   </script>
 </body>
