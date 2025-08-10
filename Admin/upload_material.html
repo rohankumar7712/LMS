@@ -60,28 +60,25 @@
       display: none;
     }
 
-    @media (max-width: 768px) {
-      .sidebar {
-        position: fixed;
-        width: 200px;
-        z-index: 1000;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease-in-out;
-      }
+    /* Desktop layout */
+@media (min-width: 769px) {
+  .sidebar {
+    position: fixed;
+    width: 220px;
+    top: 0;
+    left: 0;
+    transform: none; /* Always visible on desktop */
+  }
 
-      .sidebar.show {
-        transform: translateX(0);
-      }
+  .main-content {
+    margin-left: 220px; /* Leave space for sidebar */
+  }
 
-      .toggle-btn {
-        display: block;
-        background-color: #2A5C88;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        margin: 10px;
-      }
-    }
+  .toggle-btn {
+    display: none; /* Hide toggle button on desktop */
+  }
+}
+
   </style>
 </head>
 <body>
