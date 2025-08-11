@@ -10,20 +10,20 @@
       background: #f5f9f8;
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
+      display: flex;
     }
-
     .sidebar {
       min-height: 100vh;
       background-color: #2A5C88;
       color: white;
       padding: 20px 10px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      transition: transform 0.3s ease-in-out;
+      z-index: 1000;
     }
-
-    .sidebar h4 {
-      font-weight: bold;
-      margin-bottom: 30px;
-    }
-
+    .sidebar h4 { font-weight: bold; margin-bottom: 30px; }
     .sidebar a {
       color: white;
       text-decoration: none;
@@ -33,105 +33,84 @@
       transition: background-color 0.3s ease;
       cursor: pointer;
     }
-
-    .sidebar a:hover {
-      background-color: #1d4568;
-    }
-
-    .sidebar a.active {
-      background-color: #17405f;
-    }
-
-    .sidebar a.logout-link {
-      color: #ffcccc !important;
-    }
-
-    .sidebar a.logout-link:hover {
-      background-color: #c0392b;
-      color: white !important;
-    }
-
-    .btn-purple {
-      background: #2A5C88;
-      color: white;
-    }
-
-    .btn-purple:hover {
-      background: #1d4568;
-    }
-
+    .sidebar a:hover { background-color: #1d4568; }
+    .sidebar a.active { background-color: #17405f; }
+    .sidebar a.logout-link { color: #ffcccc !important; }
+    .sidebar a.logout-link:hover { background-color: #c0392b; color: white !important; }
+    .main-content { flex-grow: 1; padding: 20px; margin-left: 0; }
     .toggle-btn {
       display: none;
-    }
-
-    .main-content {
-      padding: 20px;
-    }
-
-    .card {
+      background-color: #2A5C88;
+      color: white;
       border: none;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 10px 15px;
+      margin: 10px;
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 1001;
     }
-
-    /* Desktop layout */
-@media (min-width: 769px) {
-  .sidebar {
-    position: fixed;
-    width: 220px;
-    top: 0;
-    left: 0;
-    transform: none; /* Always visible on desktop */
-  }
-
-  .main-content {
-    margin-left: 220px; /* Leave space for sidebar */
-  }
-
-  .toggle-btn {
-    display: none; /* Hide toggle button on desktop */
-  }
-}
-
+    .course-history-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .course-history-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    .course-history-card h5 { font-weight: bold; color: #2A5C88; margin-bottom: 8px; font-size: 1.1em; }
+    .course-history-card p { margin-bottom: 3px; color: #555; font-size: 0.9em; }
+    .course-history-card .btn { width: 100%; padding: 8px; font-weight: bold; border-radius: 5px; margin-top: 10px; font-size: 0.9em; }
+    @media (max-width: 768px) {
+      body { display: block; }
+      .sidebar { width: 200px; transform: translateX(-100%); }
+      .sidebar.show { transform: translateX(0); }
+      .toggle-btn { display: block; }
+      .main-content { padding-top: 60px; }
+    }
+    @media (min-width: 769px) {
+      .sidebar { width: 220px; transform: none; }
+      .main-content { margin-left: 220px; }
+    }
   </style>
 </head>
 <body>
 
-<!-- Toggle button for mobile -->
 <button class="toggle-btn" onclick="toggleSidebar()">☰ Menu</button>
 
-<div class="container-fluid">
-  <div class="row">
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-      <h4 class="mb-4">Student Panel</h4>
-      <a href="student_dashboard.html">Dashboard</a>
-      <a href="our_course.html" class="active">Course History</a>
-      <a href="../index.html" onclick="logout()">Logout</a>
-    </div>
-
-    <!-- Main Content -->
-    <div class="col-12 col-md-9 main-content-wrapper">
-      <h3 class="mb-4">Enrolled Course History</h3>
-      <div id="enrolledCourses"></div>
-    </div>
-  </div>
+<div class="sidebar" id="sidebar">
+  <h4>Student Panel</h4>
+  <a href="student_dashboard.html">Dashboard</a>
+  <a href="our_course.html" class="active">Course History</a>
+  <a href="../index.html" class="logout-link" id="logoutBtn">Logout</a>
 </div>
 
-<!-- Custom Status Message -->
-<div id="statusMessage" class="alert"></div>
+<div class="main-content">
+  <h3>Enrolled Course History</h3>
+  <div id="enrolledCourses" class="row"></div>
+</div>
+
+<div id="statusMessage" class="alert" style="display:none;"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, doc, getDoc, query, where } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyBYHB5XMte4Qj919ZsQWjoiFBcNrjl1xso",
-    authDomain: "clms-dbfe1.firebaseapp.com",
-    projectId: "clms-dbfe1",
-    storageBucket: "clms-dbfe1.firebasestorage.app",
-    messagingSenderId: "1025852714357",
-    appId: "1:1025852714357:web:282d74003f389767ad773c"
+    apiKey: "AIzaSyD_C4ZPXTXQZtZJbtAwTiub_rkIZcvsE2Y",
+    authDomain: "clms-19db3.firebaseapp.com",
+    projectId: "clms-19db3",
+    storageBucket: "clms-19db3.firebasestorage.app",
+    messagingSenderId: "218119035486",
+    appId: "1:218119035486:web:39291d39b4b461b56032cf"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -140,19 +119,15 @@
   const enrolledCoursesDiv = document.getElementById("enrolledCourses");
   const statusMessageDiv = document.getElementById("statusMessage");
 
-  // Function to display custom status messages
   function showStatusMessage(message, type = 'info') {
     statusMessageDiv.textContent = message;
     statusMessageDiv.className = `alert mt-3 alert-${type}`;
     statusMessageDiv.style.display = 'block';
-    setTimeout(() => {
-      statusMessageDiv.style.display = 'none';
-    }, 3000); // Hide after 3 seconds
+    setTimeout(() => statusMessageDiv.style.display = 'none', 3000);
   }
 
   async function loadEnrolledCourses() {
     const studentData = JSON.parse(localStorage.getItem("student"));
-
     if (!studentData || !studentData.enrollment) {
       showStatusMessage("Unauthorized access. Please login again.", "danger");
       window.location.href = "../index.html";
@@ -160,39 +135,52 @@
     }
 
     const enrollmentNumber = studentData.enrollment;
+    enrolledCoursesDiv.innerHTML = `<div class="col-12 text-center my-4">
+      <div class="spinner-border text-primary" role="status"></div>
+    </div>`;
 
     try {
-      const enrollmentsSnapshot = await getDocs(collection(db, "enrollments"));
-      const courseSnapshot = await getDocs(collection(db, "courses"));
+      const q = query(collection(db, "enrollments"), where("enrollment", "==", enrollmentNumber));
+      const enrollmentsSnapshot = await getDocs(q);
 
-      const enrolled = [];
-
-      enrollmentsSnapshot.forEach(enrollDoc => {
-        const data = enrollDoc.data();
-        if (data.enrollment === enrollmentNumber) {
-          enrolled.push(data);
-        }
-      });
-
-      if (enrolled.length === 0) {
-        enrolledCoursesDiv.innerHTML = "<p>No courses enrolled.</p>";
+      if (enrollmentsSnapshot.empty) {
+        enrolledCoursesDiv.innerHTML = "<p class='col-12 text-center'>No courses enrolled.</p>";
         return;
       }
 
-      enrolledCoursesDiv.innerHTML = ""; // Clear existing content
-      enrolled.forEach(data => {
-        const course = Array.from(courseSnapshot.docs).find(doc => doc.id === data.courseId);
-        if (!course) return;
-        const courseData = course.data();
-        const courseCard = document.createElement("div");
-        courseCard.className = "course-card";
-        courseCard.innerHTML = `
-          <h5>${courseData.title}</h5>
-          <p>${courseData.startDate} to ${courseData.endDate}</p>
-          <button class="btn btn-primary" onclick="goToCourse('${course.id}')">Go to Course</button>
+      const coursesData = await Promise.all(
+        enrollmentsSnapshot.docs.map(async (enrollDoc) => {
+          const { courseId } = enrollDoc.data();
+          const courseRef = doc(db, "courses", courseId);
+          const courseSnap = await getDoc(courseRef);
+          return courseSnap.exists() ? { id: courseSnap.id, ...courseSnap.data() } : null;
+        })
+      );
+
+      enrolledCoursesDiv.innerHTML = "";
+      coursesData.filter(Boolean).forEach(course => {
+        const subjectsList = Array.isArray(course.subjects) ? course.subjects.join(', ') : 'N/A';
+        const col = document.createElement("div");
+        col.className = "col-12 col-md-6 mb-4";
+        col.innerHTML = `
+          <div class="course-history-card">
+            <h5>${course.title || 'N/A'}</h5>
+            <p><strong>Start Date:</strong> ${course.startDate || 'N/A'}</p>
+            <p><strong>End Date:</strong> ${course.endDate || 'N/A'}</p>
+            <p><strong>Subjects:</strong> ${subjectsList}</p>
+            <p><strong>Total Weeks:</strong> ${course.weeks || 'N/A'}</p>
+            <button class="btn btn-primary go-to-course" data-id="${course.id}">Go to Course</button>
+          </div>
         `;
-        enrolledCoursesDiv.appendChild(courseCard);
+        enrolledCoursesDiv.appendChild(col);
       });
+
+      document.querySelectorAll(".go-to-course").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          window.location.href = `course_detail.html?courseId=${e.target.dataset.id}`;
+        });
+      });
+
     } catch (error) {
       console.error("Error loading enrolled courses:", error);
       showStatusMessage("Error loading enrolled courses: " + error.message, "danger");
@@ -200,27 +188,15 @@
   }
 
   loadEnrolledCourses();
-</script>
 
-<script>
-  function goToCourse(courseId) {
-    window.location.href = `course_detail.html?courseId=${courseId}`;
-  }
-
-  function logout() {
+  document.getElementById("logoutBtn").addEventListener("click", () => {
     localStorage.removeItem("student");
     location.href = "../index.html";
-  }
+  });
 
-  // Sidebar toggle function for mobile
   window.toggleSidebar = function () {
-    const sidebar = document.getElementById("sidebar");
-    const mainContent = document.querySelector(".main-content-wrapper");
-    if (sidebar && mainContent) {
-      sidebar.classList.toggle('show');
-      mainContent.classList.toggle('shifted');
-    }
-  }
+    document.getElementById("sidebar").classList.toggle("show");
+  };
 </script>
 </body>
 </html>

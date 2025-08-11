@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,7 +11,7 @@
   body {
     background: #f5f9f8;
     font-family: 'Segoe UI', sans-serif;
-    margin: 0; /* Remove browser default margin */
+    margin: 0;
   }
 
   .sidebar {
@@ -35,9 +36,12 @@
     cursor: pointer;
   }
 
-  .sidebar a:hover,
+  .sidebar a:hover {
+    background-color: #1d4568;
+  }
+
   .sidebar a.active {
-    background-color: #204664; /* Darker hover for clarity */
+    background-color: #17405f;
   }
 
   .sidebar a.logout-link {
@@ -49,11 +53,29 @@
     color: white !important;
   }
 
+  .btn-purple {
+    background: #2A5C88;
+    color: white;
+  }
+
+  .btn-purple:hover {
+    background: #1d4568;
+  }
+
   .toggle-btn {
     display: none;
   }
 
-  /* Mobile */
+  .main-content {
+    padding: 20px;
+  }
+
+  .card {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  /* Mobile layout */
   @media (max-width: 768px) {
     .sidebar {
       position: fixed;
@@ -62,9 +84,11 @@
       transform: translateX(-100%);
       transition: transform 0.3s ease-in-out;
     }
+
     .sidebar.show {
       transform: translateX(0);
     }
+
     .toggle-btn {
       display: block;
       background-color: #2A5C88;
@@ -73,12 +97,13 @@
       padding: 10px 15px;
       margin: 10px;
     }
+
     .main-content {
-      margin-left: 0; /* No sidebar space on mobile */
+      margin-left: 0;
     }
   }
 
-  /* Desktop */
+  /* Desktop layout */
   @media (min-width: 769px) {
     .sidebar {
       position: fixed;
@@ -87,12 +112,13 @@
       left: 0;
       transform: none; /* Always visible */
     }
+
     .main-content {
-      margin-left: 220px; /* Push content beside sidebar */
-      padding: 20px;
+      margin-left: 220px; /* Space for sidebar */
     }
+
     .toggle-btn {
-      display: none; /* Hide toggle on desktop */
+      display: none; /* Hide toggle button on desktop */
     }
   }
 </style>
@@ -146,7 +172,7 @@
             <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="C++"><label class="form-check-label">C++</label></div>
             <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="ML"><label class="form-check-label">ML</label></div>
             <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="C"><label class="form-check-label">C</label></div>
-            <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="uantitative Aptitude & Reasoning"><label class="form-check-label">Quantitative Aptitude & Reasoning</label></div>
+            <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="Quantitative Aptitude & Reasoning"><label class="form-check-label">Quantitative Aptitude & Reasoning</label></div>
 
           </div>
           <button type="submit" class="btn btn-primary">Create Course</button>
@@ -162,13 +188,13 @@
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyBYHB5XMte4Qj919ZsQWjoiFBcNrjl1xso",
-      authDomain: "clms-dbfe1.firebaseapp.com",
-      projectId: "clms-dbfe1",
-      storageBucket: "clms-dbfe1.firebasestorage.app",
-      messagingSenderId: "1025852714357",
-      appId: "1:1025852714357:web:282d74003f389767ad773c"
-    };
+    apiKey: "AIzaSyD_C4ZPXTXQZtZJbtAwTiub_rkIZcvsE2Y",
+    authDomain: "clms-19db3.firebaseapp.com",
+    projectId: "clms-19db3",
+    storageBucket: "clms-19db3.firebasestorage.app",
+    messagingSenderId: "218119035486",
+    appId: "1:218119035486:web:39291d39b4b461b56032cf"
+  };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -230,6 +256,9 @@
         document.getElementById('sidebar').classList.remove('show');
       });
     });
+    window.toggleSidebar = function () {
+      document.getElementById('sidebar').classList.toggle('show');
+    }
   </script>
 </body>
 </html>

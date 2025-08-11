@@ -6,82 +6,276 @@
   <title>Code Assignment with Judge0</title>
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Google Fonts - Inter for a clean look -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Optional: Fira Code for monospace fonts (coding feel) -->
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body {
-      background-color: #f8f9fa;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      font-family: 'Inter', sans-serif; /* Using Inter font */
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      justify-content: center; /* Center content vertically */
+      align-items: center; /* Center content horizontally */
+      margin: 0; /* Remove default body margin */
+      position: relative; /* For positioning the timer */
     }
+    .container {
+      max-width: 1200px; /* Max width for the entire container */
+      width: 100%; /* Ensure it's responsive */
+      padding-top: 2rem; /* Adjusted padding */
+      padding-bottom: 2rem;
+    }
+    #assignment-container {
+      background: linear-gradient(145deg, #ffffff, #f0f0f0); /* Subtle gradient */
+      border-radius: 15px; /* More rounded corners */
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15); /* Stronger, softer shadow */
+      padding: 2.5rem; /* Increased padding */
+      border: 1px solid #e0e0e0; /* Subtle border */
+    }
+    h1, h2, h3, h4, h5, h6 {
+        color: #2A5C88; /* Consistent primary color for headings */
+        font-weight: 700; /* Bolder headings */
+    }
+    .text-primary { color: #2A5C88 !important; } /* Ensure primary color is correctly applied */
+
+    .problem-statement {
+      background: #ffffff; /* Explicitly white background */
+      border-radius: 10px; /* Slightly less rounded than main container */
+      padding: 1.8rem; /* Adjusted padding */
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08); /* Lighter shadow for nested card */
+      height: 100%; /* Ensure it fills parent height */
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto; /* Enable scrolling for problem statement */
+      max-height: calc(100vh - 100px); /* Adjust max-height dynamically if needed */
+    }
+    .problem-statement h2.h5, .problem-statement h3.h6 {
+        color: #495057; /* Slightly muted color for sub-headings */
+        font-weight: 600;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .problem-statement p {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #343a40;
+    }
+    .problem-statement .text-muted.fst-italic {
+        font-size: 0.95rem;
+    }
+
+    /* Ace Editor Styling */
     #editor {
       height: 400px;
       width: 100%;
       border-radius: 0.5rem;
-      border: 1px solid #ced4da;
+      border: 1px solid #495057; /* Darker border for the editor */
       font-size: 14px;
       line-height: 1.5;
+      overflow: hidden;
     }
+    .ace_editor {
+        border-radius: 0.5rem; /* Apply to Ace Editor's internal element */
+        font-family: 'Fira Code', monospace !important; /* Ensure code font */
+        background-color: #282a36 !important; /* Dark background like Dracula/Monokai */
+    }
+    .ace_gutter { /* Gutter background */
+        background-color: #282a36 !important;
+        color: #6272a4 !important; /* Gutter text color */
+    }
+    .ace_print-margin { /* Remove print margin if not desired */
+        display: none !important;
+    }
+
     .compiler-output {
-      background-color: #212529;
-      color: #e9ecef;
+      background-color: #212529; /* Dark background for output */
+      color: #e9ecef; /* Light text color */
       border-radius: 0.5rem;
       padding: 1rem;
       white-space: pre-wrap;
-      font-family: monospace;
+      font-family: 'Fira Code', monospace; /* Use a monospaced font for code/output */
       overflow-x: auto;
       min-height: 150px;
       margin-top: 0.5rem;
+      border: 1px solid #495057;
     }
     #custom-input {
       background-color: #212529;
       color: #e9ecef;
       border-color: #495057;
       resize: vertical;
-      font-family: monospace;
+      font-family: 'Fira Code', monospace;
       font-size: 14px;
+      border-radius: 0.5rem;
+      padding: 0.75rem;
     }
+    #language-select {
+        border-radius: 0.5rem;
+        padding: 0.65rem 1rem;
+        font-size: 1rem;
+        border-color: #ced4da;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #343a40;
+    }
+    .form-label.bg-dark { /* Label for code editor */
+        background-color: #212529 !important;
+        color: #e9ecef !important;
+        border-top-left-radius: 0.5rem;
+        border-top-right-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+    }
+    .form-check-label {
+        color: #343a40;
+    }
+    .form-check-input:checked {
+        background-color: #2A5C88;
+        border-color: #2A5C88;
+    }
+
+
+    /* Buttons */
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 8px; /* Rounded buttons */
+        transition: all 0.3s ease;
+    }
+    .btn-primary {
+      background-color: #2A5C88;
+      border-color: #2A5C88;
+    }
+    .btn-primary:hover {
+      background-color: #204664;
+      border-color: #204664;
+      transform: translateY(-2px);
+    }
+    .btn-success {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+    .btn-success:hover {
+      background-color: #218838;
+      border-color: #1e7e34;
+      transform: translateY(-2px);
+    }
+    .btn-outline-danger {
+        border-color: #dc3545;
+        color: #dc3545;
+    }
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        color: white;
+        transform: translateY(-2px);
+    }
+    .btn-secondary {
+        background-color: #6c757d; /* Standard secondary color */
+        border-color: #6c757d;
+    }
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+        transform: translateY(-2px);
+    }
+
+
+    /* Message Box */
     #message-box > div {
       position: fixed;
       top: 1rem;
       right: 1rem;
       z-index: 1050;
-      min-width: 280px;
-      box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,.1);
+      min-width: 300px; /* Slightly wider message box */
+      box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,.15); /* Stronger shadow */
+      border-radius: 10px; /* Rounded corners */
+      padding: 1rem 1.5rem; /* Increased padding */
+      font-size: 1rem;
+      font-weight: 500;
     }
-    .problem-statement {
-      background: white;
-      border-radius: 0.5rem;
-      padding: 1.5rem;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-      max-height: 600px;
-      overflow-y: auto;
-    }
+
+    /* Table for test cases */
     .table-responsive {
-      max-height: 250px;
+      max-height: 250px; /* Keep max height for scrolling */
       overflow-y: auto;
+      border: 1px solid #e0e0e0; /* Border around the responsive table */
+      border-radius: 0.5rem;
+    }
+    .table {
+        margin-bottom: 0; /* Remove default table bottom margin */
+    }
+    .table thead th {
+        background-color: #f8f9fa; /* Light header background for nested table */
+        color: #495057;
+        font-weight: 600;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .table tbody td {
+        white-space: pre-wrap; /* Preserve whitespace for input/output */
+        word-break: break-all; /* Break long words */
+        font-family: 'Fira Code', monospace;
+        font-size: 0.9rem;
+        vertical-align: top; /* Align content to top in table cells */
+        border-color: #e9ecef;
+    }
+    .table-bordered th, .table-bordered td {
+        border: 1px solid #dee2e6; /* Ensure borders are visible */
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 991.98px) {
+        .problem-statement {
+            max-height: 400px; /* Reduce max height on smaller screens for problem statement */
+        }
+    }
+
+    /* New: Timer display */
+    #assignment-timer {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #2A5C88; /* Blue background matching theme */
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 1000; /* Ensure it's above other content */
+    }
+    #assignment-timer.alert-danger { /* Red for low time */
+        background-color: #dc3545;
     }
   </style>
 </head>
 <body>
-  <div class="container py-5">
-    <div id="assignment-container" class="bg-white rounded-3 shadow p-4">
-      <h1 class="text-primary mb-4 fw-bold">Code Assignment</h1>
+  <!-- New: Global Assignment Timer -->
+  <div id="assignment-timer">Time Left: <span id="time-left-display">--:--</span></div>
+
+  <div class="container">
+    <div id="assignment-container">
+      <h1 class="text-primary mb-4">Code Assignment</h1>
+      <p id="assignment-meta" class="text-muted"></p>
 
       <div class="row gx-5 gy-4">
         <!-- Left: Problem Statement -->
         <div class="col-lg-5">
           <div class="problem-statement">
-            <h2 class="h5 mb-3 border-bottom pb-2 text-secondary">Problem Statement</h2>
+            <h2 class="h5 mb-3 border-bottom pb-2">Problem <span id="problem-number">1</span>: <span id="problem-title">Loading...</span></h2>
             <div id="problem-statement-content" class="text-dark fs-6">
               <p class="text-muted fst-italic">Loading problem details...</p>
             </div>
 
             <div id="test-cases-section" class="mt-4">
-              <h3 class="h6 border-bottom pb-2 text-secondary">Sample Test Cases</h3>
+              <h3 class="h6 border-bottom pb-2">Visible Sample Test Cases (First 2)</h3>
               <div class="table-responsive">
                 <table class="table table-sm table-bordered align-middle">
-                  <thead class="table-light text-secondary">
+                  <thead class="table-light">
                     <tr>
                       <th scope="col" style="width: 40%;">Input</th>
                       <th scope="col" style="width: 40%;">Expected Output</th>
@@ -98,7 +292,7 @@
 
         <!-- Right: Editor + Controls -->
         <div class="col-lg-7 d-flex flex-column">
-          <label for="language-select" class="form-label fw-semibold mb-2">Select Language</label>
+          <label for="language-select" class="form-label mb-2">Select Language</label>
           <select id="language-select" class="form-select mb-3" aria-label="Select Programming Language">
             <option value="54">C++ (GCC 9.2.0)</option>
             <option value="71">Python 3</option>
@@ -106,7 +300,7 @@
             <option value="62">Java (OpenJDK 13.0.1)</option>
           </select>
 
-          <label for="editor" class="form-label bg-dark text-white p-2 rounded-top mb-0 fw-semibold">Write your code here</label>
+          <label for="editor" class="form-label bg-dark text-white p-2 rounded-top mb-0">Write your code here</label>
           <div id="editor" class="border border-dark rounded-bottom flex-grow-1 mb-3"></div>
 
           <div class="form-check form-switch mb-2">
@@ -121,13 +315,17 @@
             aria-label="Custom input"
           ></textarea>
 
-          <h2 class="h6 mb-2 fw-semibold">Compiler Message</h2>
+          <h2 class="h6 mb-2">Compiler Message</h2>
           <pre id="compiler-output" class="compiler-output">Output will be displayed here.</pre>
 
           <div class="d-flex gap-3 mt-4">
             <button id="clear-btn" class="btn btn-outline-danger flex-grow-1">Clear</button>
             <button id="run-btn" class="btn btn-primary flex-grow-1">Compile &amp; Run</button>
-            <button id="submit-btn" class="btn btn-success flex-grow-1">Submit Code</button>
+          </div>
+          <div class="d-flex justify-content-between gap-3 mt-3">
+              <button id="prev-problem-btn" class="btn btn-secondary flex-grow-1" style="display:none;">Previous</button>
+              <button id="next-problem-btn" class="btn btn-primary flex-grow-1">Next Problem</button>
+              <button id="final-submit-btn" class="btn btn-success flex-grow-1" style="display:none;">Submit Assignment</button>
           </div>
         </div>
       </div>
@@ -139,6 +337,8 @@
 
   <!-- Ace Editor -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+  <!-- Add themes for Ace Editor. Monokai is a popular dark theme. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/theme-monokai.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-c_cpp.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-python.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-javascript.js"></script>
@@ -155,40 +355,56 @@
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
-    apiKey: "AIzaSyBYHB5XMte4Qj919ZsQWjoiFBcNrjl1xso",
-    authDomain: "clms-dbfe1.firebaseapp.com",
-    projectId: "clms-dbfe1",
-    storageBucket: "clms-dbfe1.firebasestorage.app",
-    messagingSenderId: "1025852714357",
-    appId: "1:1025852714357:web:282d74003f389767ad773c"
-  };
+      apiKey: "AIzaSyD_C4ZPXTXQZtZJbtAwTiub_rkIZcvsE2Y",
+      authDomain: "clms-19db3.firebaseapp.com",
+      projectId: "clms-19db3",
+      storageBucket: "clms-19db3.firebasestorage.app",
+      messagingSenderId: "218119035486",
+      appId: "1:218119035486:web:39291d39b4b461b56032cf"
+    };
 
     let app, db, editor;
     let currentAssignment = {};
+    let allProblems = []; // Array to hold all coding problems for the assignment
+    let currentProblemIndex = 0; // Current problem being displayed
 
-   let studentIdentifier = null;
-try {
-  const studentDataStr = localStorage.getItem("student");
-  if (studentDataStr) {
-    const studentData = JSON.parse(studentDataStr);
-    studentIdentifier = studentData.enrollment;
-  }
-} catch {
-  // ignore parse errors
-}
+    // Store student info
+    let studentIdentifier = null;
+    let studentName = null;
+    try {
+      const studentDataStr = localStorage.getItem("student");
+      if (studentDataStr) {
+        const studentData = JSON.parse(studentDataStr);
+        studentIdentifier = studentData.enrollment;
+        studentName = `${studentData.firstName} ${studentData.lastName}`;
+      }
+    } catch (e) {
+      console.error("Error parsing student data from localStorage", e);
+    }
 
-if (!studentIdentifier) {
-  alert("Student not logged in. Please login first.");
-  window.location.href = "login.html"; // adjust your login URL here
-  throw new Error("Student not logged in");
-}
+    if (!studentIdentifier) {
+      showMessage("Student not logged in. Please login first.", "danger");
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 2000);
+      throw new Error("Student not logged in");
+    }
 
+    // Timer variables
+    let totalTimeSeconds;
+    let timerInterval;
+    const assignmentTimerElement = document.getElementById("assignment-timer");
+    const timeLeftDisplay = document.getElementById("time-left-display");
+
+    // Submission data for all problems
+    let problemSubmissions = {}; // { problemIndex: { code: "...", languageId: "...", testCaseResults: [] } }
 
     function showMessage(message, type = 'success') {
       const messageBox = document.getElementById('message-box');
       const div = document.createElement('div');
       div.className = `alert alert-${type === 'success' ? 'success' : 'danger'} shadow`;
       div.textContent = message;
+      messageBox.innerHTML = ''; 
       messageBox.appendChild(div);
       setTimeout(() => {
         div.remove();
@@ -207,9 +423,19 @@ if (!studentIdentifier) {
       db = getFirestore(app);
 
       editor = ace.edit("editor");
-      editor.setTheme("ace/theme/monokai");
+      editor.setTheme("ace/theme/monokai"); // Set a dark, colorful theme
       editor.session.setMode("ace/mode/c_cpp");
       editor.setOption("placeholder", "// Fill your code here");
+      editor.setOptions({
+          enableLiveAutocompletion: true, // Enable autocompletion
+          enableBasicAutocompletion: true,
+          enableSnippets: true,
+          highlightActiveLine: true,
+          highlightSelectedWord: true,
+          showPrintMargin: false, // Hide the vertical print margin line
+          readOnly: false // Ensure it's editable
+      });
+
 
       document.getElementById("language-select").addEventListener("change", (e) => {
         const langId = e.target.value;
@@ -221,6 +447,13 @@ if (!studentIdentifier) {
         const textarea = document.getElementById("custom-input");
         textarea.classList.toggle("d-none", !e.target.checked);
       });
+
+      // Navigation buttons
+      document.getElementById("prev-problem-btn").addEventListener("click", goToPreviousProblem);
+      document.getElementById("next-problem-btn").addEventListener("click", goToNextProblem);
+      document.getElementById("final-submit-btn").addEventListener("click", () => submitAssignment(false)); // Not time-up submission
+      document.getElementById("clear-btn").addEventListener("click", clearEditorOutput);
+      document.getElementById("run-btn").addEventListener("click", runCode);
 
       await loadAssignmentData();
     }
@@ -242,7 +475,31 @@ if (!studentIdentifier) {
 
         if (docSnap.exists()) {
           currentAssignment = docSnap.data();
-          renderAssignmentDetails();
+          allProblems = currentAssignment.problems || []; 
+          
+          if (allProblems.length === 0) {
+            showMessage("No coding problems found for this assignment.", "danger");
+            document.getElementById("problem-statement-content").innerHTML = `<p class="text-danger">No coding problems available.</p>`;
+            document.getElementById("assignment-container").style.display = 'none';
+            return;
+          }
+
+          // Check if already submitted
+          const submissionDocRef = doc(db, "code_submission", `${studentIdentifier}_${assignmentId}`);
+          const submissionSnap = await getDoc(submissionDocRef);
+          if (submissionSnap.exists()) {
+              showMessage("You have already submitted this code assignment.", "warning");
+              setTimeout(() => {
+                redirectToWeekDetail();
+              }, 3000);
+              return;
+          }
+
+          // Initialize timer
+          totalTimeSeconds = (currentAssignment.totalTimeMinutes || 60) * 60; // Default 60 minutes
+          startAssignmentTimer();
+
+          renderProblem(); // Render the first problem
         } else {
           showMessage("Assignment not found.", "danger");
           document.getElementById("problem-statement-content").innerHTML = `<p class="text-danger">Assignment not found.</p>`;
@@ -253,19 +510,68 @@ if (!studentIdentifier) {
       }
     }
 
-    function renderAssignmentDetails() {
+    function startAssignmentTimer() {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            totalTimeSeconds--;
+            const minutes = Math.floor(totalTimeSeconds / 60);
+            const seconds = totalTimeSeconds % 60;
+            timeLeftDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            if (totalTimeSeconds <= 60 && totalTimeSeconds > 0) { // Last minute warning
+                assignmentTimerElement.classList.add("alert-danger");
+            } else if (totalTimeSeconds <= 0) {
+                clearInterval(timerInterval);
+                timeLeftDisplay.textContent = "00:00";
+                assignmentTimerElement.classList.remove("alert-danger");
+                showMessage("Time's up! Submitting your assignment.", "danger");
+                submitAssignment(true); // Auto-submit when time runs out
+            } else {
+                assignmentTimerElement.classList.remove("alert-danger");
+            }
+        }, 1000);
+    }
+
+    function renderProblem() {
+      const problem = allProblems[currentProblemIndex];
+      if (!problem) {
+        showMessage("Problem not found.", "danger");
+        return;
+      }
+
+      document.getElementById("problem-number").textContent = currentProblemIndex + 1;
+      document.getElementById("problem-title").textContent = problem.title || `Problem ${currentProblemIndex + 1}`;
+
       const div = document.getElementById("problem-statement-content");
       div.innerHTML = `
-        <p><strong>${currentAssignment.problemStatement || "No problem statement provided."}</strong></p>
-        ${currentAssignment.inputFormat ? `<h6 class="mt-3">Input Format:</h6><p>${currentAssignment.inputFormat}</p>` : ''}
-        ${currentAssignment.outputFormat ? `<h6 class="mt-3">Output Format:</h6><p>${currentAssignment.outputFormat}</p>` : ''}
-        ${currentAssignment.codeConstraints ? `<h6 class="mt-3">Constraints:</h6><p>${currentAssignment.codeConstraints}</p>` : ''}
+        <p><strong>${problem.problemStatement || "No problem statement provided."}</strong></p>
+        ${problem.inputFormat ? `<h6 class="mt-3">Input Format:</h6><p>${problem.inputFormat}</p>` : ''}
+        ${problem.outputFormat ? `<h6 class="mt-3">Output Format:</h6><p>${problem.outputFormat}</p>` : ''}
+        ${problem.codeConstraints ? `<h6 class="mt-3">Constraints:</h6><p>${problem.codeConstraints}</p>` : ''}
       `;
+
+      // Load previously saved code/language for this problem, if any
+      const savedProblemData = problemSubmissions[currentProblemIndex];
+      if (savedProblemData && savedProblemData.code) {
+        editor.setValue(savedProblemData.code, -1); // -1 to move cursor to start
+        document.getElementById("language-select").value = savedProblemData.languageId;
+        editor.session.setMode(languageIdToAceMode(savedProblemData.languageId));
+      } else {
+        editor.setValue(""); // Clear editor if no saved code
+        document.getElementById("language-select").value = "54"; // Default to C++
+        editor.session.setMode("ace/mode/c_cpp");
+      }
+      document.getElementById("compiler-output").textContent = "Output will be displayed here.";
+
 
       const tbody = document.getElementById("test-cases-table-body");
       tbody.innerHTML = "";
-      if (currentAssignment.testCases && currentAssignment.testCases.length > 0) {
-        currentAssignment.testCases.forEach(tc => {
+      
+      // Display only the first 2 VISIBLE test cases
+      const visibleTestCasesToDisplay = (problem.visibleTestCases || []).slice(0, 2); 
+
+      if (visibleTestCasesToDisplay.length > 0) {
+        visibleTestCasesToDisplay.forEach(tc => {
           const tr = document.createElement("tr");
 
           const tdInput = document.createElement("td");
@@ -281,7 +587,71 @@ if (!studentIdentifier) {
           tbody.appendChild(tr);
         });
       } else {
-        tbody.innerHTML = `<tr><td colspan="2" class="text-center text-muted">No sample test cases available.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="2" class="text-center text-muted">No visible sample test cases available.</td></tr>`;
+      }
+
+      // Update navigation button visibility
+      document.getElementById("prev-problem-btn").style.display = currentProblemIndex === 0 ? "none" : "inline-block";
+      document.getElementById("next-problem-btn").style.display = currentProblemIndex === allProblems.length - 1 ? "none" : "inline-block";
+      document.getElementById("final-submit-btn").style.display = currentProblemIndex === allProblems.length - 1 ? "inline-block" : "none";
+    }
+
+    function saveCurrentProblemState() {
+        const currentProblemCode = editor.getValue();
+        const currentLanguageId = document.getElementById("language-select").value;
+        problemSubmissions[currentProblemIndex] = {
+            code: currentProblemCode,
+            languageId: currentLanguageId,
+            testCaseResults: [] // This will be populated during final submission
+        };
+    }
+
+    function goToNextProblem() {
+      saveCurrentProblemState();
+      if (currentProblemIndex < allProblems.length - 1) {
+        currentProblemIndex++;
+        renderProblem();
+      }
+    }
+
+    function goToPreviousProblem() {
+      saveCurrentProblemState();
+      if (currentProblemIndex > 0) {
+        currentProblemIndex--;
+        renderProblem();
+      }
+    }
+
+    function clearEditorOutput() {
+      editor.setValue("");
+      document.getElementById("compiler-output").textContent = "Output cleared.";
+    }
+
+    async function runCode() {
+      const code = editor.getValue();
+      const customInputToggle = document.getElementById("custom-input-toggle").checked;
+      const customInput = document.getElementById("custom-input").value;
+      const languageId = document.getElementById("language-select").value;
+
+      let input = "";
+      if (customInputToggle && customInput.trim() !== "") {
+        input = customInput.trim();
+      } else { // Use the first visible sample test case if no custom input and samples exist
+        const currentProblemVisibleTestCases = (allProblems[currentProblemIndex]?.visibleTestCases || []);
+        if (currentProblemVisibleTestCases.length > 0) {
+          input = currentProblemVisibleTestCases[0].input || "";
+        }
+      }
+
+      const outputEl = document.getElementById("compiler-output");
+      outputEl.textContent = "Compiling and running...";
+
+      try {
+        const output = await runCodeWithJudge0(code, input, languageId);
+        outputEl.textContent = output;
+      } catch (error) {
+        outputEl.textContent = "Error running code: " + error.message;
+        showMessage("Error running code: " + error.message, "danger");
       }
     }
 
@@ -303,7 +673,7 @@ if (!studentIdentifier) {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to compile and run code");
+        throw new Error("Failed to compile and run code: " + response.statusText);
       }
 
       const result = await response.json();
@@ -317,121 +687,184 @@ if (!studentIdentifier) {
       }
     }
 
-    document.getElementById("clear-btn").addEventListener("click", () => {
-      editor.setValue("");
-      document.getElementById("compiler-output").textContent = "Output cleared.";
-    });
+    async function submitAssignment(timeUp = false) {
+      clearInterval(timerInterval); // Stop the timer
 
-    document.getElementById("run-btn").addEventListener("click", async () => {
-      const code = editor.getValue();
-      const customInputToggle = document.getElementById("custom-input-toggle").checked;
-      const customInput = document.getElementById("custom-input").value;
-      const languageId = document.getElementById("language-select").value;
-
-      let input = "";
-      if (customInputToggle && customInput.trim() !== "") {
-        input = customInput.trim();
-      } else if (currentAssignment.testCases && currentAssignment.testCases.length > 0) {
-        input = currentAssignment.testCases[0].input || "";
-      }
+      // Save state of the last problem before final submission
+      saveCurrentProblemState(); 
 
       const outputEl = document.getElementById("compiler-output");
-      outputEl.textContent = "Compiling and running...";
+      outputEl.textContent = "Submitting assignment and running all test cases for all problems...\n\n";
+
+      let totalPassedCount = 0;
+      let grandTotalTests = 0;
+      let detailedProblemResults = [];
+
+      for (let i = 0; i < allProblems.length; i++) {
+        const problem = allProblems[i];
+        const problemCode = problemSubmissions[i]?.code || "";
+        const problemLanguageId = problemSubmissions[i]?.languageId || document.getElementById("language-select").value;
+
+        let problemPassedCount = 0;
+        let problemTotalVisibleTests = (problem.visibleTestCases || []).length;
+        let problemTotalHiddenTests = (problem.hiddenTestCases || []).length;
+        let problemTotalTests = problemTotalVisibleTests + problemTotalHiddenTests;
+        
+        let problemTestCaseResultsForSubmission = []; // Full details for Firestore
+        let problemTestCaseDetailsForDisplay = `--- Problem ${i + 1}: ${problem.title || `Problem ${i + 1}`} ---\n`;
+
+        grandTotalTests += problemTotalTests;
+
+        // --- Run Visible Test Cases ---
+        if (problem.visibleTestCases && problem.visibleTestCases.length > 0) {
+            problemTestCaseDetailsForDisplay += `\n--- Visible Test Cases ---\n`;
+            for (let j = 0; j < problem.visibleTestCases.length; j++) {
+                const testCase = problem.visibleTestCases[j];
+                try {
+                    const output = await runCodeWithJudge0(problemCode, testCase.input, problemLanguageId);
+                    const expected = (testCase.expectedOutput || "").trim();
+                    const actual = output.trim();
+
+                    const status = (actual === expected) ? "PASSED" : "FAILED";
+                    if (status === "PASSED") {
+                        problemPassedCount++;
+                    }
+
+                    problemTestCaseResultsForSubmission.push({
+                        type: 'visible',
+                        input: testCase.input,
+                        expectedOutput: expected,
+                        actualOutput: actual,
+                        status: status
+                    });
+
+                    problemTestCaseDetailsForDisplay += `Test Case ${j + 1} (Visible):\n`;
+                    problemTestCaseDetailsForDisplay += `Input: \n${testCase.input}\n`;
+                    problemTestCaseDetailsForDisplay += `Expected: \n${expected}\n`;
+                    problemTestCaseDetailsForDisplay += `Actual: \n${actual}\n`;
+                    problemTestCaseDetailsForDisplay += `Status: ${status}\n\n`;
+
+                } catch (error) {
+                    problemTestCaseResultsForSubmission.push({
+                        type: 'visible',
+                        input: testCase.input,
+                        expectedOutput: testCase.expectedOutput,
+                        actualOutput: `Error: ${error.message}`,
+                        status: "ERROR"
+                    });
+                    problemTestCaseDetailsForDisplay += `Test Case ${j + 1} (Visible):\n`;
+                    problemTestCaseDetailsForDisplay += `Error running: ${error.message}\n\n`;
+                }
+            }
+        }
+
+        // --- Run Hidden Test Cases ---
+        if (problem.hiddenTestCases && problem.hiddenTestCases.length > 0) {
+            problemTestCaseDetailsForDisplay += `\n--- Hidden Test Cases ---\n`;
+            for (let j = 0; j < problem.hiddenTestCases.length; j++) {
+                const testCase = problem.hiddenTestCases[j];
+                try {
+                    const output = await runCodeWithJudge0(problemCode, testCase.input, problemLanguageId);
+                    const expected = (testCase.expectedOutput || "").trim();
+                    const actual = output.trim();
+
+                    const status = (actual === expected) ? "PASSED" : "FAILED";
+                    if (status === "PASSED") {
+                        problemPassedCount++;
+                    }
+
+                    problemTestCaseResultsForSubmission.push({
+                        type: 'hidden',
+                        input: testCase.input, // Store full details for admin review
+                        expectedOutput: expected,
+                        actualOutput: actual,
+                        status: status
+                    });
+
+                    // Only display status for hidden test cases
+                    problemTestCaseDetailsForDisplay += `Hidden Test Case ${j + 1}: ${status}\n`;
+
+                } catch (error) {
+                    problemTestCaseResultsForSubmission.push({
+                        type: 'hidden',
+                        input: testCase.input,
+                        expectedOutput: testCase.expectedOutput,
+                        actualOutput: `Error: ${error.message}`,
+                        status: "ERROR"
+                    });
+                    problemTestCaseDetailsForDisplay += `Hidden Test Case ${j + 1}: ERROR (${error.message})\n`;
+                }
+            }
+            problemTestCaseDetailsForDisplay += '\n'; // Add extra newline after hidden test cases
+        }
+
+
+        totalPassedCount += problemPassedCount;
+
+        detailedProblemResults.push({
+            problemIndex: i,
+            problemTitle: problem.title || `Problem ${i+1}`,
+            code: problemCode,
+            languageId: problemLanguageId,
+            passedCount: problemPassedCount,
+            totalTests: problemTotalTests,
+            testCaseResults: problemTestCaseResultsForSubmission // This goes to Firestore
+        });
+
+        outputEl.textContent += problemTestCaseDetailsForDisplay; // Append results for current problem
+      }
+
+      const overallScore = totalPassedCount;
+      const overallMaxScore = grandTotalTests;
+      const overallPercentage = overallMaxScore > 0 ? (overallScore / overallMaxScore) * 100 : 0;
+
+      // Prepare submission data
+      const submissionDocId = `${studentIdentifier}_${assignmentId}`;
+      const submissionData = {
+        studentId: studentIdentifier,
+        studentName: studentName,
+        assignmentId: assignmentId,
+        courseId: currentAssignment.courseId,
+        week: currentAssignment.week,
+        subject: currentAssignment.subject,
+        submittedAt: serverTimestamp(),
+        problems: detailedProblemResults, // Store results for each problem
+        overallScore: overallScore,
+        overallMaxScore: overallMaxScore,
+        overallPercentage: parseFloat(overallPercentage.toFixed(2)),
+        timedOut: timeUp // Indicate if submitted due to timer
+      };
 
       try {
-        const output = await runCodeWithJudge0(code, input, languageId);
-        outputEl.textContent = output;
-      } catch (error) {
-        outputEl.textContent = "Error running code: " + error.message;
+        await setDoc(doc(db, "code_submission", submissionDocId), submissionData, { merge: true });
+        if (timeUp) {
+            showMessage(`Time's up! Assignment submitted automatically. Score: ${overallScore}/${overallMaxScore} (${overallPercentage.toFixed(2)}%)`, "warning");
+        } else if (overallScore === overallMaxScore) { /* Corrected variable name here */
+            showMessage(`All problems passed! Assignment submitted successfully. Score: ${overallScore}/${overallMaxScore} (${overallPercentage.toFixed(2)}%)`, "success");
+        } else if (overallScore > 0) { /* Corrected variable name here */
+            showMessage(`Assignment submitted. ${overallScore} of ${overallMaxScore} total test cases passed. Score: ${overallScore}/${overallMaxScore} (${overallPercentage.toFixed(2)}%)`, "warning");
+        } else {
+            showMessage(`Assignment submitted. ${overallScore} of ${overallMaxScore} total test cases passed. Score: ${overallScore}/${overallMaxScore} (${overallPercentage.toFixed(2)}%). Please review your code.`, "danger");
+        }
+
+        setTimeout(() => {
+          redirectToWeekDetail();
+        }, 3000); // Redirect after 3 seconds
+      } catch (err) {
+        console.error("Error submitting assignment:", err);
+        showMessage("Error submitting assignment. Please try again.", "danger");
       }
-    });
-
-    async function saveSubmission({ studentId, assignmentId, code, languageId, testCaseDetails }) {
-  try {
-    // Use a unique doc id to avoid overwriting different submissions
-    const submissionDocRef = doc(db, "code_submission", `${studentId}_${assignmentId}`);
-    await setDoc(submissionDocRef, {
-      studentId,
-      assignmentId,
-      code,
-      languageId: Number(languageId),
-      testCaseDetails,
-      timestamp: serverTimestamp()
-    });
-    showMessage("Submission saved successfully.", "success");
-  } catch (err) {
-    console.error("Error saving submission:", err);
-    showMessage("Failed to save submission.", "danger");
-  }
-}
-
-    document.getElementById("submit-btn").addEventListener("click", async () => {
-  if (!studentIdentifier) {
-    showMessage("Student identifier missing. Cannot submit.", "danger");
-    return;
-  }
-
-  const code = editor.getValue();
-  const outputEl = document.getElementById("compiler-output");
-  const languageId = document.getElementById("language-select").value;
-
-  if (!currentAssignment.testCases || currentAssignment.testCases.length === 0) {
-    showMessage("No test cases available to submit.", "danger");
-    return;
-  }
-
-  outputEl.textContent = "Submitting and running all test cases...";
-
-  let allPassed = true;
-  let testCaseDetails = "";
-
-  for (const testCase of currentAssignment.testCases) {
-    try {
-      const output = await runCodeWithJudge0(code, testCase.input, languageId);
-      const expected = (testCase.expectedOutput || "").trim();
-      const actual = output.trim();
-
-      testCaseDetails += 
-        `Input: \n${testCase.input}\n` +
-        `Expected Output: \n${expected}\n` +
-        `Actual Output: \n${actual}\n`;
-
-      if (actual !== expected) {
-        allPassed = false;
-        testCaseDetails += "Status: FAILED\n\n";
-      } else {
-        testCaseDetails += "Status: PASSED\n\n";
-      }
-    } catch (error) {
-      testCaseDetails += `Error running test case: ${error.message}\n\n`;
-      allPassed = false;
     }
-  }
 
-  outputEl.textContent = testCaseDetails;
+    function redirectToWeekDetail() {
+        // Default values in case currentAssignment properties are missing
+        const courseId = currentAssignment.courseId || "defaultCourse"; 
+        const weekNumber = currentAssignment.week || 1; 
+        const subject = currentAssignment.subject || "defaultSubject";
+        const url = `week_detail.html?courseId=${courseId}&week=${weekNumber}&subject=${encodeURIComponent(subject)}`;
+        window.location.href = url;
+    }
 
-  await saveSubmission({
-    studentId: studentIdentifier,
-    assignmentId,
-    code,
-    languageId,
-    testCaseDetails
-  });
-
-  if (allPassed) {
-    showMessage("All test cases passed! Assignment submitted successfully.", "success");
-  } else {
-    showMessage("Some test cases failed. Please review your code.", "danger");
-  }
-
-  // Redirect to week_detail after 3s
-  const weekNumber = currentAssignment.week || 1; // fallback if missing
-  const url = `week_detail.html?courseId=${currentAssignment.courseId}&week=${weekNumber}&subject=${currentAssignment.subject}`;
-
-  setTimeout(() => {
-    window.location.href = url;
-  }, 3000);
-});
     window.onload = init;
   </script>
 </body>

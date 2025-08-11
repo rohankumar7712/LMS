@@ -88,6 +88,14 @@
       margin-left: 0; /* full width on mobile */
     }
   }
+  /* Add this new class to your <style> block */
+.form-container {
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
 
   /* Desktop layout */
   @media (min-width: 769px) {
@@ -125,28 +133,26 @@
     <a href="admin_dashboard.html" onclick="logout()">← Back</a>
   </div>
 
-  <!-- Main Content -->
   <div class="main-content">
-    <h2 class="dashboard-title">Create Assignment</h2>
+  <h2 class="dashboard-title">Create Assignment</h2>
 
-    <!-- Course / Week / Subject -->
-    <div class="card p-4">
-      <div class="mb-3">
-        <label class="form-label">Select Course</label>
-        <select class="form-select" id="courseSelect" required></select>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Select Week</label>
-        <select class="form-select" id="weekSelect" required></select>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Select Subject</label>
-        <select class="form-select" id="subjectSelect" required></select>
-      </div>
+  <div class="form-container mb-4">
+    <div class="mb-3">
+      <label class="form-label">Select Course</label>
+      <select class="form-select" id="courseSelect" required></select>
     </div>
+    <div class="mb-3">
+      <label class="form-label">Select Week</label>
+      <select class="form-select" id="weekSelect" required></select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Select Subject</label>
+      <select class="form-select" id="subjectSelect" required></select>
+    </div>
+  </div>
 
-    <!-- Start / End Date -->
-    <div class="row mb-4">
+  <div class="form-container mb-4">
+    <div class="row">
       <div class="col">
         <label>Start Date</label>
         <input type="datetime-local" class="form-control" id="startDate" />
@@ -156,8 +162,9 @@
         <input type="datetime-local" class="form-control" id="endDate" />
       </div>
     </div>
+  </div>
 
-    <!-- Manual Entry -->
+  <div class="form-container mb-4">
     <h5>Manual Entry</h5>
     <div class="mb-3">
       <button class="btn btn-primary me-2" id="addQuestionBtn">Add Question</button>
@@ -165,7 +172,6 @@
     </div>
     <div id="questions"></div>
 
-    <!-- Text Input -->
     <hr />
     <h5>Text Format Input</h5>
     <textarea class="form-control mb-2" id="textFormatInput" rows="8" placeholder="Question: What is 2+2?
@@ -183,13 +189,12 @@ d) Paris
 Answer: d"></textarea>
     <button class="btn btn-secondary" id="parseTextBtn">Parse Text</button>
     <p id="saveMsg" class="mt-2 text-success text-center"></p>
-
-    <!-- Final Save -->
-    <button class="btn btn-info mt-3" onclick="saveFinalAssignment()">Save Final Assignment</button>
-
-    <div id="successMsg" class="alert alert-success mt-3 d-none">Assignment saved!</div>
   </div>
 
+  <button class="btn btn-info mt-3" onclick="saveFinalAssignment()">Save Final Assignment</button>
+
+  <div id="successMsg" class="alert alert-success mt-3 d-none">Assignment saved!</div>
+</div>
   <!-- Custom Status Message -->
   <div id="statusMessage" class="alert"></div>
 
@@ -209,13 +214,13 @@ Answer: d"></textarea>
     } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyBYHB5XMte4Qj919ZsQWjoiFBcNrjl1xso",
-      authDomain: "clms-dbfe1.firebaseapp.com",
-      projectId: "clms-dbfe1",
-      storageBucket: "clms-dbfe1.firebasestorage.app",
-      messagingSenderId: "1025852714357",
-      appId: "1:1025852714357:web:282d74003f389767ad773c"
-    };
+    apiKey: "AIzaSyD_C4ZPXTXQZtZJbtAwTiub_rkIZcvsE2Y",
+    authDomain: "clms-19db3.firebaseapp.com",
+    projectId: "clms-19db3",
+    storageBucket: "clms-19db3.firebasestorage.app",
+    messagingSenderId: "218119035486",
+    appId: "1:218119035486:web:39291d39b4b461b56032cf"
+  };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -373,7 +378,7 @@ Answer: d"></textarea>
 
     parseBtn.addEventListener("click", () => {
       const inputText = textInput.value.trim();
-      const blocks = inputText.split(/---\s*\n/).map(b => b.trim()).filter(b => b); // Split by "---"
+      const blocks = inputText.split(/\n\s*\n(?=Question:)/).map(b => b.trim()).filter(b => b); // Split by "---"
       parsedQuestions = [];
 
       blocks.forEach(block => {

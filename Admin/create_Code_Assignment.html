@@ -63,6 +63,11 @@
     font-size: 16px;
   }
 
+  /* Main Content */
+  .main-content {
+    padding: 20px;
+  }
+
   /* Mobile Layout */
    @media (max-width: 768px) {
     .sidebar {
@@ -119,7 +124,7 @@
 
   <div class="sidebar" id="sidebar">
     <h4 class="mb-4">Admin Panel</h4>
-    <a  href="create_assignment.html">Create Assignment</a>
+    <a href="create_assignment.html">Create Assignment</a>
     <a class="active" href="create_Code_Assignment.html">Create Code Assignment</a>
     <a href="create_assignment_History.html">Assignment History</a>
     <a href="admin_dashboard.html" onclick="logout()">← Back</a>
@@ -150,35 +155,59 @@
           </div>
         </div>
 
-        <h3 class="mt-4 mb-3">Questions</h3>
+        <div class="mb-3">
+            <label for="totalTimeMinutes" class="form-label">Total Assignment Time Limit (minutes)</label>
+            <input type="number" min="1" class="form-control" id="totalTimeMinutes" placeholder="e.g., 60" required>
+        </div>
+
+        <h3 class="mt-4 mb-3">Problems/Questions</h3>
         <div id="questionsContainer">
           <div class="question-block border rounded p-3 mb-3">
             <div class="mb-3">
-              <label class="form-label">Question Title</label>
-              <input type="text" class="form-control question-title" placeholder="e.g., Sasha and Brenda's Game" required>
+              <label class="form-label">Problem Title</label>
+              <input type="text" class="form-control problem-title" placeholder="e.g., Sum of Two Numbers" required>
             </div>
             <div class="mb-3">
               <label class="form-label">Problem Statement (Markdown Supported)</label>
-              <textarea class="form-control question-problem" rows="5" required></textarea>
+              <textarea class="form-control problem-statement-text" rows="5" required></textarea>
             </div>
             <div class="mb-3">
-              <label class="form-label">Time Limit (minutes)</label>
-              <input type="number" min="1" class="form-control question-time" placeholder="e.g., 15" required>
+              <label class="form-label">Input Format</label>
+              <textarea class="form-control input-format" rows="2"></textarea>
             </div>
-
-            <h5>Test Cases</h5>
-            <div class="testCasesContainer">
-              <div class="input-group mb-2 test-case-group">
-                <textarea class="form-control" placeholder="Input" required></textarea>
-                <textarea class="form-control ms-2" placeholder="Expected Output" required></textarea>
+            <div class="mb-3">
+              <label class="form-label">Output Format</label>
+              <textarea class="form-control output-format" rows="2"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Code Constraints</label>
+              <textarea class="form-control code-constraints" rows="2"></textarea>
+            </div>
+            
+            <h5 class="mt-4">Visible Test Cases (Shown to students)</h5>
+            <div class="visible-test-cases-container test-cases-group">
+              <div class="input-group mb-2 test-case-item">
+                <textarea class="form-control test-case-input" placeholder="Input" required></textarea>
+                <textarea class="form-control ms-2 test-case-expected-output" placeholder="Expected Output" required></textarea>
                 <button type="button" class="btn btn-outline-danger ms-2 remove-test-case">Remove</button>
               </div>
             </div>
-            <button type="button" class="btn btn-secondary btn-sm mt-2 addTestCaseBtn">Add Test Case</button>
-            <button type="button" class="btn btn-outline-danger btn-sm mt-2 remove-question">Remove Question</button>
+            <button type="button" class="btn btn-secondary btn-sm mt-2 add-visible-test-case-btn">Add Visible Test Case</button>
+
+            <h5 class="mt-4">Hidden Test Cases (Status only shown to students)</h5>
+            <div class="hidden-test-cases-container test-cases-group">
+              <div class="input-group mb-2 test-case-item">
+                <textarea class="form-control test-case-input" placeholder="Input" required></textarea>
+                <textarea class="form-control ms-2 test-case-expected-output" placeholder="Expected Output" required></textarea>
+                <button type="button" class="btn btn-outline-danger ms-2 remove-test-case">Remove</button>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm mt-2 add-hidden-test-case-btn">Add Hidden Test Case</button>
+            
+            <button type="button" class="btn btn-outline-danger btn-sm mt-4 remove-problem">Remove Problem</button>
           </div>
         </div>
-        <button type="button" class="btn btn-success mt-3" id="addQuestionBtn">Add Another Question</button>
+        <button type="button" class="btn btn-success mt-3" id="addProblemBtn">Add Another Problem</button>
 
         <div class="d-grid mt-4">
           <button type="submit" class="btn btn-primary btn-lg" id="saveAssignmentBtn">Save Assignment</button>
@@ -195,12 +224,12 @@
     import { getFirestore, collection, addDoc, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyBYHB5XMte4Qj919ZsQWjoiFBcNrjl1xso",
-      authDomain: "clms-dbfe1.firebaseapp.com",
-      projectId: "clms-dbfe1",
-      storageBucket: "clms-dbfe1.firebasestorage.app",
-      messagingSenderId: "1025852714357",
-      appId: "1:1025852714357:web:282d74003f389767ad773c",
+      apiKey: "AIzaSyD_C4ZPXTXQZtZJbtAwTiub_rkIZcvsE2Y",
+      authDomain: "clms-19db3.firebaseapp.com",
+      projectId: "clms-19db3",
+      storageBucket: "clms-19db3.firebasestorage.app",
+      messagingSenderId: "218119035486",
+      appId: "1:218119035486:web:39291d39b4b461b56032cf"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -210,8 +239,9 @@
     const courseSelect = document.getElementById("courseSelect");
     const weekSelect = document.getElementById("weekSelect");
     const subjectSelect = document.getElementById("subjectSelect");
+    const totalTimeMinutesInput = document.getElementById("totalTimeMinutes");
     const questionsContainer = document.getElementById("questionsContainer");
-    const addQuestionBtn = document.getElementById("addQuestionBtn");
+    const addProblemBtn = document.getElementById("addProblemBtn"); // Renamed from addQuestionBtn
     const saveAssignmentBtn = document.getElementById("saveAssignmentBtn");
     const statusMessage = document.getElementById("statusMessage");
 
@@ -264,31 +294,51 @@
       }
     });
 
-    addQuestionBtn.addEventListener("click", () => {
-      const firstQuestion = questionsContainer.querySelector(".question-block");
-      const newQuestion = firstQuestion.cloneNode(true);
-      newQuestion.querySelectorAll("input, textarea").forEach(el => el.value = "");
-      questionsContainer.appendChild(newQuestion);
+    function createNewTestCaseInputGroup(visible = true) {
+        const newTestCase = document.createElement("div");
+        newTestCase.className = "input-group mb-2 test-case-item";
+        newTestCase.innerHTML = `
+            <textarea class="form-control test-case-input" placeholder="Input" required></textarea>
+            <textarea class="form-control ms-2 test-case-expected-output" placeholder="Expected Output" required></textarea>
+            <button type="button" class="btn btn-outline-danger ms-2 remove-test-case">Remove</button>
+        `;
+        return newTestCase;
+    }
+
+    addProblemBtn.addEventListener("click", () => {
+      const firstProblemBlock = questionsContainer.querySelector(".question-block");
+      const newProblemBlock = firstProblemBlock.cloneNode(true);
+      
+      // Clear all input values in the cloned block
+      newProblemBlock.querySelectorAll("input, textarea").forEach(el => el.value = "");
+      
+      // Clear existing test cases and add one default for each type
+      newProblemBlock.querySelector(".visible-test-cases-container").innerHTML = '';
+      newProblemBlock.querySelector(".visible-test-cases-container").appendChild(createNewTestCaseInputGroup(true));
+
+      newProblemBlock.querySelector(".hidden-test-cases-container").innerHTML = '';
+      newProblemBlock.querySelector(".hidden-test-cases-container").appendChild(createNewTestCaseInputGroup(false));
+
+      questionsContainer.appendChild(newProblemBlock);
     });
 
     questionsContainer.addEventListener("click", (e) => {
-      if (e.target.classList.contains("addTestCaseBtn")) {
-        const testCaseContainer = e.target.closest(".question-block").querySelector(".testCasesContainer");
-        const newTestCase = document.createElement("div");
-        newTestCase.className = "input-group mb-2 test-case-group";
-        newTestCase.innerHTML = `
-          <textarea class="form-control" placeholder="Input" required></textarea>
-          <textarea class="form-control ms-2" placeholder="Expected Output" required></textarea>
-          <button type="button" class="btn btn-outline-danger ms-2 remove-test-case">Remove</button>
-        `;
-        testCaseContainer.appendChild(newTestCase);
+      if (e.target.classList.contains("add-visible-test-case-btn")) {
+        const testCaseContainer = e.target.closest(".question-block").querySelector(".visible-test-cases-container");
+        testCaseContainer.appendChild(createNewTestCaseInputGroup(true));
+      }
+      if (e.target.classList.contains("add-hidden-test-case-btn")) {
+        const testCaseContainer = e.target.closest(".question-block").querySelector(".hidden-test-cases-container");
+        testCaseContainer.appendChild(createNewTestCaseInputGroup(false));
       }
       if (e.target.classList.contains("remove-test-case")) {
-        e.target.closest(".test-case-group").remove();
+        e.target.closest(".test-case-item").remove();
       }
-      if (e.target.classList.contains("remove-question")) {
+      if (e.target.classList.contains("remove-problem")) {
         if (document.querySelectorAll(".question-block").length > 1) {
           e.target.closest(".question-block").remove();
+        } else {
+            statusMessage.innerHTML = `<p class="text-danger">You must have at least one problem.</p>`;
         }
       }
     });
@@ -298,28 +348,59 @@
       saveAssignmentBtn.disabled = true;
       statusMessage.innerHTML = `<p class="text-info">Saving assignment...</p>`;
 
-      const questions = [];
-      document.querySelectorAll(".question-block").forEach(block => {
-        const title = block.querySelector(".question-title").value.trim();
-        const problemStatement = block.querySelector(".question-problem").value.trim();
-        const timeLimitMinutes = parseInt(block.querySelector(".question-time").value.trim(), 10);
-        const testCases = [];
+      const totalTimeMinutes = parseInt(totalTimeMinutesInput.value, 10);
+      if (isNaN(totalTimeMinutes) || totalTimeMinutes <= 0) {
+        statusMessage.innerHTML = `<p class="text-danger">Please enter a valid total time limit in minutes.</p>`;
+        saveAssignmentBtn.disabled = false;
+        return;
+      }
 
-        block.querySelectorAll(".test-case-group").forEach(group => {
-          const input = group.querySelector("textarea:nth-child(1)").value.trim();
-          const expectedOutput = group.querySelector("textarea:nth-child(2)").value.trim();
+      const problems = [];
+      document.querySelectorAll(".question-block").forEach(block => {
+        const title = block.querySelector(".problem-title").value.trim();
+        const problemStatement = block.querySelector(".problem-statement-text").value.trim();
+        const inputFormat = block.querySelector(".input-format").value.trim();
+        const outputFormat = block.querySelector(".output-format").value.trim();
+        const codeConstraints = block.querySelector(".code-constraints").value.trim();
+        
+        // Time limit per question is now optional in problem object
+        // The HTML input `question-time` was removed, if you want to keep it,
+        // you'd add: const timeLimitMinutes = parseInt(block.querySelector(".question-time").value.trim(), 10);
+        // and add `timeLimitMinutes: isNaN(timeLimitMinutes) ? null : timeLimitMinutes,` to the problem object.
+
+        const visibleTestCases = [];
+        block.querySelectorAll(".visible-test-cases-container .test-case-item").forEach(item => {
+          const input = item.querySelector(".test-case-input").value.trim();
+          const expectedOutput = item.querySelector(".test-case-expected-output").value.trim();
           if (input && expectedOutput) {
-            testCases.push({ input, expectedOutput });
+            visibleTestCases.push({ input, expectedOutput });
           }
         });
 
-        if (title && problemStatement && timeLimitMinutes && testCases.length > 0) {
-          questions.push({ title, problemStatement, timeLimitMinutes, testCases });
+        const hiddenTestCases = [];
+        block.querySelectorAll(".hidden-test-cases-container .test-case-item").forEach(item => {
+          const input = item.querySelector(".test-case-input").value.trim();
+          const expectedOutput = item.querySelector(".test-case-expected-output").value.trim();
+          if (input && expectedOutput) {
+            hiddenTestCases.push({ input, expectedOutput });
+          }
+        });
+
+        if (title && problemStatement && (visibleTestCases.length > 0 || hiddenTestCases.length > 0)) {
+          problems.push({ 
+            title, 
+            problemStatement, 
+            inputFormat, 
+            outputFormat, 
+            codeConstraints, 
+            visibleTestCases, 
+            hiddenTestCases 
+          });
         }
       });
 
-      if (questions.length === 0) {
-        statusMessage.innerHTML = `<p class="text-danger">Please add at least one question with test cases.</p>`;
+      if (problems.length === 0) {
+        statusMessage.innerHTML = `<p class="text-danger">Please add at least one problem with test cases.</p>`;
         saveAssignmentBtn.disabled = false;
         return;
       }
@@ -329,14 +410,15 @@
           courseId: courseSelect.value,
           subject: subjectSelect.value,
           week: parseInt(weekSelect.value, 10),
-          questions: questions,
+          totalTimeMinutes: totalTimeMinutes, // Total assignment time
+          problems: problems, // Now stores an array of problem objects
           createdAt: new Date(),
           createdBy: "admin"
         });
         statusMessage.innerHTML = `<p class="text-success">Assignment saved! ID: ${newAssignmentRef.id}</p>`;
         form.reset();
         questionsContainer.innerHTML = "";
-        addQuestionBtn.click();
+        addProblemBtn.click(); // Add back one empty problem block
       } catch (error) {
         statusMessage.innerHTML = `<p class="text-danger">Error saving assignment: ${error.message}</p>`;
       } finally {
@@ -348,7 +430,20 @@
       document.getElementById('sidebar').classList.toggle('show');
     }
 
-    loadCourses();
+    // Initial setup: Add one default problem block when the page loads
+    // and load courses.
+    document.addEventListener("DOMContentLoaded", () => {
+        addProblemBtn.click(); // Add initial problem block
+        loadCourses();
+    });
+
+    // Logout function
+    window.logout = () => {
+        // Here you would implement Firebase Auth signOut
+        // For now, just redirecting for demo purposes
+        location.href = "admin_dashboard.html"; // Adjust to your admin dashboard or login
+    };
+
   </script>
 </body>
 </html>

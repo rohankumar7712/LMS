@@ -1,363 +1,435 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Student Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background: #f5f9f8;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Student Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f5f9f8;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            display: flex; /* Enables side-by-side layout for sidebar and main content */
+        }
 
-    .sidebar {
-      min-height: 100vh;
-      background-color: #2A5C88;
-      color: white;
-      padding: 20px 10px;
-    }
+        /* Sidebar */
+        .sidebar {
+            min-height: 100vh;
+            background-color: #2A5C88;
+            color: white;
+            padding: 20px 10px;
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
 
-    .sidebar h4 {
-      font-weight: bold;
-      margin-bottom: 30px;
-    }
+        .sidebar h4 {
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
 
-    .sidebar a {
-      color: white;
-      text-decoration: none;
-      display: block;
-      padding: 10px;
-      border-radius: 8px;
-      transition: background-color 0.3s ease;
-      cursor: pointer;
-    }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
 
-    .sidebar a:hover {
-      background-color: #1d4568;
-    }
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: #204664;
+        }
 
-    .sidebar a.active {
-      background-color: #17405f;
-    }
+        .sidebar a.logout-link {
+            color: #ffcccc !important;
+        }
 
-    .sidebar a.logout-link {
-      color: #ffcccc !important;
-    }
+        .sidebar a.logout-link:hover {
+            background-color: #c0392b;
+            color: white !important;
+        }
 
-    .sidebar a.logout-link:hover {
-      background-color: #c0392b;
-      color: white !important;
-    }
+        /* Toggle Button */
+        .toggle-btn {
+            display: none;
+            background-color: #2A5C88;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
 
-    .btn-purple {
-      background: #2A5C88;
-      color: white;
-    }
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            margin-left: 0; /* Default for mobile, will be overridden by desktop layout */
+        }
 
-    .btn-purple:hover {
-      background: #1d4568;
-    }
+        /* Styles for the course cards */
+        .course-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px; /* Adjust padding for desired card size */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            height: 100%; /* Ensures cards in a row have equal height */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Pushes button to bottom */
+        }
 
-    .toggle-btn {
-      display: none;
-    }
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
 
-    .main-content {
-      padding: 20px;
-    }
+        .course-card h5 {
+            font-weight: bold;
+            color: #2A5C88;
+            margin-bottom: 8px; /* Slightly reduced margin */
+            font-size: 1.1em; /* Slightly smaller font for title */
+        }
 
-    .card {
-      border: none;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
+        .course-card p {
+            margin-bottom: 3px; /* Reduced margin between paragraphs */
+            color: #555;
+            font-size: 0.9em; /* Slightly smaller font for details */
+        }
 
-    /* Desktop layout */
-@media (min-width: 769px) {
-  .sidebar {
-    position: fixed;
-    width: 220px;
-    top: 0;
-    left: 0;
-    transform: none; /* Always visible on desktop */
-  }
+        .course-card .enroll-btn {
+            width: 100%;
+            padding: 8px; /* Reduced padding for button */
+            font-weight: bold;
+            border-radius: 5px;
+            margin-top: 10px; /* Reduced top margin */
+            font-size: 0.9em; /* Smaller font for button text */
+        }
 
-  .main-content {
-    margin-left: 220px; /* Leave space for sidebar */
-  }
+        /* Mobile Layout */
+        @media (max-width: 768px) {
+            body {
+                display: block; /* Stack sidebar and main content vertically on mobile */
+            }
+            .sidebar {
+                width: 200px;
+                transform: translateX(-100%);
+                position: fixed; /* Keep it fixed so it slides from left */
+                top: 0;
+                left: 0;
+            }
 
-  .toggle-btn {
-    display: none; /* Hide toggle button on desktop */
-  }
-}
+            .sidebar.show {
+                transform: translateX(0);
+            }
 
-  </style>
-  </head>
+            .toggle-btn {
+                display: block;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                margin: 10px;
+                z-index: 1001;
+            }
+
+            .main-content {
+                margin-left: 0; /* Full width on mobile */
+                padding-top: 60px; /* Add padding to prevent content from going under the fixed toggle button */
+            }
+        }
+
+        /* Desktop Layout */
+        @media (min-width: 769px) {
+            .sidebar {
+                width: 220px;
+                transform: none; /* Always visible */
+                position: fixed;
+                top: 0;
+                left: 0;
+            }
+            
+            .main-content {
+                margin-left: 220px; /* Space for the fixed sidebar */
+                padding: 20px;
+            }
+            
+            .toggle-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
 <body>
 
 <!-- Toggle button for mobile -->
 <button class="toggle-btn" onclick="toggleSidebar()">☰ Menu</button>
 
-<div class="container-fluid">
-  <div class="row">
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-      <h4 class="mb-4">Student Panel</h4>
-      <a href="student_dashboard.html" class="active">Dashboard</a>
-      <a href="our_course.html">Course History</a>
-      <a href="../index.html" onclick="logout()">Logout</a>
-    </div>
+<div class="sidebar" id="sidebar">
+    <h4 class="mb-4">Student Panel</h4>
+    <a href="student_dashboard.html" class="active">Dashboard</a>
+    <a href="our_course.html">Course History</a>
+    <a href="../index.html" onclick="logout()">Logout</a>
+</div>
 
-    <!-- Main Content -->
-    <div class="col-12 col-md-9 main-content-wrapper">
-      <h2 class="dashboard-title">Welcome 👋</h2>
-      <p><em id="shayari"></em></p>
+<div class="main-content">
+    <h2 class="dashboard-title">Welcome 👋</h2>
+    <p><em id="shayari"></em></p>
 
-      <!-- Available Courses -->
-      <h4 class="mt-4">Available Courses</h4>
-      <div id="availableCourses"></div>
-    </div>
-  </div>
+    <h4 class="mt-4">Available Courses</h4>
+    <div id="availableCourses" class="row"></div>
+    <!-- Custom Status Message moved here for proper positioning -->
+    <div id="statusMessage" class="alert"></div> 
 </div>
 
 <!-- Enroll Modal -->
 <div class="modal fade" id="enrollModal" tabindex="-1">
-  <div class="modal-dialog">
-    <form id="enrollForm" class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Enroll in Course</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="selectedCourseId" />
-        <div class="mb-3">
-          <label class="form-label">Full Name</label>
-          <input type="text" class="form-control" id="studentName" required />
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Enrollment No</label>
-          <input type="text" class="form-control" id="enrollmentNumber" required />
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Email ID</label>
-          <input type="email" class="form-control" id="emailId" required />
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-success">Submit</button>
-      </div>
-    </form>
-  </div>
+    <div class="modal-dialog">
+        <form id="enrollForm" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enroll in Course</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="selectedCourseId" />
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="studentName" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Enrollment No</label>
+                    <input type="text" class="form-control" id="enrollmentNumber" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email ID</label>
+                    <input type="email" class="form-control" id="emailId" required />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-success">Submit</button>
+            </div>
+        </form>
+    </div>
 </div>
-
-<!-- Custom Status Message -->
-<div id="statusMessage" class="alert"></div>
 
 <!-- Firebase & Firestore -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-  import {
-    getFirestore,
-    collection,
-    getDocs,
-    query,
-    where,
-    doc,
-    setDoc
-  } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import {
+        getFirestore,
+        collection,
+        getDocs,
+        query,
+        where,
+        doc,
+        setDoc
+    } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBYHB5XMte4Qj919ZsQWjoiFBcNrjl1xso",
-    authDomain: "clms-dbfe1.firebaseapp.com",
-    projectId: "clms-dbfe1",
-    storageBucket: "clms-dbfe1.firebasestorage.app",
-    messagingSenderId: "1025852714357",
-    appId: "1:1025852714357:web:282d74003f389767ad773c"
-  };
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+    const firebaseConfig = {
+        apiKey: "AIzaSyD_C4ZPXTXQZtZJbtAwTiub_rkIZcvsE2Y",
+        authDomain: "clms-19db3.firebaseapp.com",
+        projectId: "clms-19db3",
+        storageBucket: "clms-19db3.firebasestorage.app",
+        messagingSenderId: "218119035486",
+        appId: "1:218119035486:web:39291d39b4b461b56032cf"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-  const shayaris = [
-    "हर सुबह एक नई शुरुआत है।",
-    "कभी हार मत मानो!",
-    "जो खो गया उसके लिए रोया नहीं करते।",
-    "सपने वो नहीं जो नींद में आए, सपने वो हैं जो नींद तोड़ दें।"
-  ];
-  document.getElementById("shayari").innerText = shayaris[Math.floor(Math.random() * shayaris.length)];
+    const shayaris = [
+        "हर सुबह एक नई शुरुआत है।",
+        "कभी हार मत मानो!",
+        "जो खो गया उसके लिए रोया नहीं करते।",
+        "सपने वो नहीं जो नींद में आए, सपने वो हैं जो नींद तोड़ दें।"
+    ];
+    document.getElementById("shayari").innerText = shayaris[Math.floor(Math.random() * shayaris.length)];
 
-  const availableCoursesDiv = document.getElementById("availableCourses");
-  const statusMessageDiv = document.getElementById("statusMessage");
+    const availableCoursesDiv = document.getElementById("availableCourses");
+    const statusMessageDiv = document.getElementById("statusMessage");
 
-  // Function to display custom status messages
-  function showStatusMessage(message, type = 'info') {
-    statusMessageDiv.textContent = message;
-    statusMessageDiv.className = `alert mt-3 alert-${type}`;
-    statusMessageDiv.style.display = 'block';
-    setTimeout(() => {
-      statusMessageDiv.style.display = 'none';
-    }, 3000); // Hide after 3 seconds
-  }
-
-  async function loadCourses() {
-    const student = JSON.parse(localStorage.getItem("student"));
-    if (!student) {
-      showStatusMessage("Unauthorized access. Please login again.", "danger");
-      location.href = "../index.html";
-      return;
+    // Function to display custom status messages
+    function showStatusMessage(message, type = 'info') {
+        statusMessageDiv.textContent = message;
+        statusMessageDiv.className = `alert mt-3 alert-${type}`;
+        statusMessageDiv.style.display = 'block';
+        setTimeout(() => {
+            statusMessageDiv.style.display = 'none';
+        }, 3000); // Hide after 3 seconds
     }
 
-    // Step 1: Find student document ID by enrollment
-    const studentsRef = collection(db, "students");
-    const q = query(studentsRef, where("enrollment", "==", student.enrollment));
-    let studentSnap;
-    try {
-      studentSnap = await getDocs(q);
-    } catch (error) {
-      console.error("Error fetching student record:", error);
-      showStatusMessage("Error fetching student record. Please try again.", "danger");
-      return;
+    async function loadCourses() {
+        const student = JSON.parse(localStorage.getItem("student"));
+        if (!student) {
+            showStatusMessage("Unauthorized access. Please login again.", "danger");
+            location.href = "../index.html";
+            return;
+        }
+
+        // Step 1: Find student document ID by enrollment
+        const studentsRef = collection(db, "students");
+        const q = query(studentsRef, where("enrollment", "==", student.enrollment));
+        let studentSnap;
+        try {
+            studentSnap = await getDocs(q);
+        } catch (error) {
+            console.error("Error fetching student record:", error);
+            showStatusMessage("Error fetching student record. Please try again.", "danger");
+            return;
+        }
+
+        if (studentSnap.empty) {
+            showStatusMessage("Student record not found!", "danger");
+            location.href = "../index.html";
+            return;
+        }
+
+        const studentDoc = studentSnap.docs[0];
+        const studentDocId = studentDoc.id;
+
+        // Step 2: Fetch all courses
+        let coursesSnapshot;
+        try {
+            coursesSnapshot = await getDocs(collection(db, "courses"));
+        } catch (error) {
+            console.error("Error fetching courses:", error);
+            showStatusMessage("Error fetching courses. Please try again.", "danger");
+            return;
+        }
+
+        // Step 3: Fetch enrollments for this student
+        let enrollmentsSnapshot;
+        try {
+            enrollmentsSnapshot = await getDocs(collection(db, "enrollments"));
+        } catch (error) {
+            console.error("Error fetching enrollments:", error);
+            showStatusMessage("Error fetching enrollments. Please try again.", "danger");
+            return;
+        }
+
+        const enrolledCourseIds = new Set();
+        enrollmentsSnapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            if (data.enrollment === student.enrollment) {
+                enrolledCourseIds.add(data.courseId);
+            }
+        });
+
+        // Step 4: Show allowed courses and mark enrolled ones
+        availableCoursesDiv.innerHTML = "";
+        let coursesDisplayed = 0;
+
+        coursesSnapshot.forEach(docSnap => {
+            const course = docSnap.data();
+            const courseId = docSnap.id;
+
+            const allowedStudents = course.allowedStudents || [];
+            if (!allowedStudents.includes(studentDocId)) {
+                return; // Skip courses not allowed for this student
+            }
+
+            const isEnrolled = enrolledCourseIds.has(courseId);
+            const subjectsList = Array.isArray(course.subjects) ? course.subjects.join(', ') : 'N/A';
+
+            const courseCol = document.createElement("div");
+            // Set Bootstrap column classes for two cards per row
+            courseCol.className = "col-12 col-md-6 mb-4"; 
+
+            courseCol.innerHTML = `
+                <div class="course-card h-100">
+                    <h5>${course.title}</h5>
+                    <p><strong>Start Date:</strong> ${course.startDate || 'N/A'}</p>
+                    <p><strong>End Date:</strong> ${course.endDate || 'N/A'}</p>
+                    <p><strong>Subjects:</strong> ${subjectsList}</p>
+                    <p><strong>Total Weeks:</strong> ${course.weeks || 'N/A'}</p>
+                    <button class="btn ${isEnrolled ? "btn-secondary" : "btn-success"} enroll-btn"
+                        data-course-id="${courseId}"
+                        ${isEnrolled ? "disabled" : `onclick="openEnrollModal('${courseId}')"`}>
+                        ${isEnrolled ? "Enrolled" : "Enroll"}
+                    </button>
+                </div>
+            `;
+
+            availableCoursesDiv.appendChild(courseCol);
+            coursesDisplayed++;
+        });
+
+        if (coursesDisplayed === 0) {
+            availableCoursesDiv.innerHTML = "<p class='col-12 text-center'>No courses available for you yet.</p>";
+        }
     }
 
-    if (studentSnap.empty) {
-      showStatusMessage("Student record not found!", "danger");
-      location.href = "../index.html";
-      return;
-    }
+    loadCourses();
 
-    const studentDoc = studentSnap.docs[0];
-    const studentDocId = studentDoc.id;
+    const enrollForm = document.getElementById("enrollForm");
+    enrollForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const courseId = document.getElementById("selectedCourseId").value;
+        const name = document.getElementById("studentName").value;
+        const enrollment = document.getElementById("enrollmentNumber").value;
+        const email = document.getElementById("emailId").value;
 
-    // Step 2: Fetch all courses
-    let coursesSnapshot;
-    try {
-      coursesSnapshot = await getDocs(collection(db, "courses"));
-    } catch (error) {
-      console.error("Error fetching courses:", error);
-      showStatusMessage("Error fetching courses. Please try again.", "danger");
-      return;
-    }
+        try {
+            await setDoc(doc(db, "enrollments", `${courseId}_${enrollment}`), {
+                courseId, name, enrollment, email,
+                enrolledAt: new Date().toISOString()
+            });
 
-    // Step 3: Fetch enrollments for this student
-    let enrollmentsSnapshot;
-    try {
-      enrollmentsSnapshot = await getDocs(collection(db, "enrollments"));
-    } catch (error) {
-      console.error("Error fetching enrollments:", error);
-      showStatusMessage("Error fetching enrollments. Please try again.", "danger");
-      return;
-    }
+            showStatusMessage("Enrolled successfully!", "success");
+            const button = document.querySelector(`.enroll-btn[data-course-id="${courseId}"]`);
+            if (button) {
+                button.disabled = true;
+                button.innerText = "Enrolled";
+                button.classList.remove('btn-success');
+                button.classList.add('btn-secondary');
+            }
 
-    const enrolledCourseIds = new Set();
-    enrollmentsSnapshot.forEach(docSnap => {
-      const data = docSnap.data();
-      if (data.enrollment === student.enrollment) {
-        enrolledCourseIds.add(data.courseId);
-      }
+            const modal = bootstrap.Modal.getInstance(document.getElementById("enrollModal"));
+            modal.hide();
+            enrollForm.reset();
+        } catch (err) {
+            console.error("Error enrolling:", err);
+            showStatusMessage("Error enrolling: " + err.message, "danger");
+        }
     });
-
-    // Step 4: Show allowed courses and mark enrolled ones
-    availableCoursesDiv.innerHTML = "";
-    let coursesDisplayed = 0;
-
-    coursesSnapshot.forEach(docSnap => {
-      const course = docSnap.data();
-      const courseId = docSnap.id;
-
-      const allowedStudents = course.allowedStudents || [];
-      if (!allowedStudents.includes(studentDocId)) {
-        return; // Skip courses not allowed for this student
-      }
-
-      const isEnrolled = enrolledCourseIds.has(courseId);
-
-      const courseDiv = document.createElement("div");
-      courseDiv.className = "course-card";
-
-      courseDiv.innerHTML = `
-        <h5>${course.title}</h5>
-        <p>${course.startDate} to ${course.endDate}</p>
-        <button class="btn ${isEnrolled ? "btn-secondary" : "btn-success"} enroll-btn"
-          data-course-id="${courseId}"
-          ${isEnrolled ? "disabled" : `onclick="openEnrollModal('${courseId}')"`}>
-          ${isEnrolled ? "Enrolled" : "Enroll"}
-        </button>
-      `;
-
-      availableCoursesDiv.appendChild(courseDiv);
-      coursesDisplayed++;
-    });
-
-    if (coursesDisplayed === 0) {
-      availableCoursesDiv.innerHTML = "<p>No courses available for you yet.</p>";
-    }
-  }
-
-  loadCourses();
-
-  const enrollForm = document.getElementById("enrollForm");
-  enrollForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const courseId = document.getElementById("selectedCourseId").value;
-    const name = document.getElementById("studentName").value;
-    const enrollment = document.getElementById("enrollmentNumber").value;
-    const email = document.getElementById("emailId").value;
-
-    try {
-      await setDoc(doc(db, "enrollments", `${courseId}_${enrollment}`), {
-        courseId, name, enrollment, email,
-        enrolledAt: new Date().toISOString()
-      });
-
-      showStatusMessage("Enrolled successfully!", "success");
-      const button = document.querySelector(`.enroll-btn[data-course-id="${courseId}"]`);
-      if (button) {
-        button.disabled = true;
-        button.innerText = "Enrolled";
-      }
-
-      const modal = bootstrap.Modal.getInstance(document.getElementById("enrollModal"));
-      modal.hide();
-      enrollForm.reset();
-    } catch (err) {
-      console.error("Error enrolling:", err);
-      showStatusMessage("Error enrolling: " + err.message, "danger");
-    }
-  });
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  window.openEnrollModal = function(courseId) {
-    const student = JSON.parse(localStorage.getItem("student"));
-    if (!student) {
-      showStatusMessage("Login expired. Please login again.", "danger");
-      return;
+    window.openEnrollModal = function(courseId) {
+        const student = JSON.parse(localStorage.getItem("student"));
+        if (!student) {
+            showStatusMessage("Login expired. Please login again.", "danger");
+            return;
+        }
+
+        document.getElementById("selectedCourseId").value = courseId;
+        document.getElementById("studentName").value = `${student.firstName} ${student.lastName}`;
+        document.getElementById("enrollmentNumber").value = student.enrollment;
+        document.getElementById("emailId").value = student.email;
+
+        const enrollModal = new bootstrap.Modal(document.getElementById("enrollModal"));
+        enrollModal.show();
+    };
+
+    window.logout = () => {
+        localStorage.removeItem("student");
+        location.href = "../index.html";
+    };
+
+    // Sidebar toggle function for mobile
+    window.toggleSidebar = function () {
+        const sidebar = document.getElementById("sidebar");
+        if (sidebar) {
+            sidebar.classList.toggle('show');
+        }
     }
-
-    document.getElementById("selectedCourseId").value = courseId;
-    document.getElementById("studentName").value = `${student.firstName} ${student.lastName}`;
-    document.getElementById("enrollmentNumber").value = student.enrollment;
-    document.getElementById("emailId").value = student.email;
-
-    const enrollModal = new bootstrap.Modal(document.getElementById("enrollModal"));
-    enrollModal.show();
-  };
-
-  window.logout = () => {
-    localStorage.removeItem("student");
-    location.href = "../index.html";
-  };
-
-  // Sidebar toggle function for mobile
-  window.toggleSidebar = function () {
-    const sidebar = document.getElementById("sidebar"); // Use the ID directly
-    const mainContent = document.querySelector(".main-content-wrapper");
-    if (sidebar && mainContent) {
-      sidebar.classList.toggle('show');
-      mainContent.classList.toggle('shifted');
-    }
-  }
 </script>
 </body>
 </html>

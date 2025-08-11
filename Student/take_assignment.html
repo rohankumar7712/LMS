@@ -5,24 +5,119 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Take Assignment</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Google Fonts - Inter for a clean look -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { background-color: #f4f6f9; }
+    body {
+      background-color: #f4f6f9;
+      font-family: 'Inter', sans-serif; /* Using Inter font */
+      display: flex; /* For centering the card */
+      justify-content: center; /* Center horizontally */
+      align-items: center; /* Center vertically */
+      min-height: 100vh; /* Full viewport height */
+      margin: 0;
+    }
     .assignment-card {
-      background: white;
-      border-radius: 10px;
-      padding: 1.5rem;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      max-width: 700px;
-      margin: 2rem auto;
+      background: linear-gradient(145deg, #ffffff, #f0f0f0); /* Subtle gradient */
+      border-radius: 15px; /* More rounded corners */
+      padding: 2.5rem; /* Increased padding */
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1); /* Stronger, softer shadow */
+      max-width: 800px; /* Slightly wider card */
+      width: 95%; /* Responsive width */
+      margin: 2rem auto; /* Adjusted margin for better centering */
+      border: 1px solid #e0e0e0; /* Subtle border */
+    }
+    .assignment-card h3 {
+      color: #2A5C88; /* Primary blue color for title */
+      font-weight: 700; /* Bolder title */
+      margin-bottom: 0.5rem;
+      font-size: 1.8rem;
+    }
+    .assignment-card .text-muted {
+      color: #6c757d !important;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+    .timer {
+      font-weight: 600; /* Semi-bold timer */
+      color: #dc3545; /* Red color for warning/urgency */
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      text-align: right; /* Align timer to the right */
+    }
+    hr {
+      border-top: 2px solid #e9ecef; /* Thicker, lighter separator */
+      margin-top: 1.5rem;
+      margin-bottom: 2rem;
     }
     .question-text {
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
+      font-size: 1.3rem; /* Larger question text */
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+      color: #343a40;
+    }
+    .form-check {
+      margin-bottom: 0.75rem; /* Spacing between options */
+    }
+    .form-check-input[type="radio"] {
+      border-color: #2A5C88; /* Custom radio button border */
+    }
+    .form-check-input[type="radio"]:checked {
+      background-color: #2A5C88; /* Custom radio button checked color */
+      border-color: #2A5C88;
+    }
+    .form-check-label {
+      font-size: 1.1rem; /* Larger option text */
+      color: #495057;
+      cursor: pointer;
     }
     .nav-buttons {
       display: flex;
-      justify-content: space-between;
-      margin-top: 1.5rem;
+      justify-content: flex-end; /* Align to the right */
+      margin-top: 2rem;
+    }
+    .btn-primary {
+      background-color: #2A5C88; /* Primary blue button */
+      border-color: #2A5C88;
+      padding: 0.75rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 8px; /* Rounded buttons */
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .btn-primary:hover {
+      background-color: #204664; /* Darker blue on hover */
+      border-color: #204664;
+      transform: translateY(-2px); /* Slight lift effect */
+    }
+    .btn-success {
+      background-color: #28a745; /* Green submit button */
+      border-color: #28a745;
+      padding: 0.75rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    .btn-success:hover {
+      background-color: #218838; /* Darker green on hover */
+      border-color: #1e7e34;
+      transform: translateY(-2px);
+    }
+    /* Status message styling */
+    #statusMessage {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1050; /* Ensure it's above other content */
+        width: auto;
+        min-width: 300px;
+        text-align: center;
+        padding: 10px 20px;
+        border-radius: 8px;
+        display: none; /* Hidden by default */
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
   </style>
 </head>
@@ -30,28 +125,31 @@
   <div class="assignment-card">
     <h3 id="assignmentTitle">Loading Assignment...</h3>
     <p class="text-muted" id="assignmentMeta"></p>
+    <p class="timer">Time left: <span id="timeLeft">--</span> seconds</p>
     <hr />
     <div id="questionContainer">
       <p>Loading questions...</p>
     </div>
     <div class="nav-buttons">
-      <button id="prevBtn" class="btn btn-secondary" disabled>Previous</button>
       <button id="nextBtn" class="btn btn-primary">Next</button>
     </div>
     <button id="submitBtn" class="btn btn-success mt-3" style="display:none;">Submit Assignment</button>
   </div>
+
+  <!-- Custom Status Message (moved inside body for proper positioning with fixed styling) -->
+  <div id="statusMessage" class="alert"></div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
   import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyBYHB5XMte4Qj919ZsQWjoiFBcNrjl1xso",
-    authDomain: "clms-dbfe1.firebaseapp.com",
-    projectId: "clms-dbfe1",
-    storageBucket: "clms-dbfe1.firebasestorage.app",
-    messagingSenderId: "1025852714357",
-    appId: "1:1025852714357:web:282d74003f389767ad773c"
+    apiKey: "AIzaSyD_C4ZPXTXQZtZJbtAwTiub_rkIZcvsE2Y",
+    authDomain: "clms-19db3.firebaseapp.com",
+    projectId: "clms-19db3",
+    storageBucket: "clms-19db3.firebasestorage.app",
+    messagingSenderId: "218119035486",
+    appId: "1:218119035486:web:39291d39b4b461b56032cf"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -59,29 +157,59 @@
 
   const params = new URLSearchParams(window.location.search);
   const assignmentId = params.get("assignmentId");
+  const statusMessageDiv = document.getElementById("statusMessage");
+
+  // Function to display custom status messages (modified to use the fixed div)
+  function showStatusMessage(message, type = 'info') {
+    statusMessageDiv.textContent = message;
+    statusMessageDiv.className = `alert alert-${type}`; /* No mt-3 needed for fixed position */
+    statusMessageDiv.style.display = 'block';
+    setTimeout(() => {
+      statusMessageDiv.style.display = 'none';
+    }, 3000); // Hide after 3 seconds
+  }
+
   if (!assignmentId) {
-    alert("Invalid assignment ID.");
+    showStatusMessage("Invalid assignment ID.", "danger");
     throw new Error("No assignmentId found.");
   }
 
-  // Sanitize Firestore doc id - replace forbidden chars with underscore
+  // Sanitize studentId for Firestore document ID
   function sanitizeId(id) {
     return id.replace(/[.#$/\[\]]/g, "_");
   }
 
-  // Get studentId from localStorage and sanitize it
-  const studentIdRaw = localStorage.getItem("studentId");
-  if (!studentIdRaw) {
-    alert("User not logged in. Please log in first.");
-    window.location.href = "login.html";
-    throw new Error("No studentId found in localStorage.");
+  const studentDataStr = localStorage.getItem("student");
+  let studentId = null;
+  let studentName = null; // New: To store student's full name
+  if (!studentDataStr) {
+    showStatusMessage("User not logged in. Please log in first.", "danger");
+    // Redirect after a short delay to allow message to be seen
+    setTimeout(() => {
+        window.location.href = "login.html";
+    }, 1500);
+    throw new Error("No student data found in localStorage.");
+  } else {
+    try {
+        const studentData = JSON.parse(studentDataStr);
+        studentId = sanitizeId(studentData.enrollment);
+        studentName = `${studentData.firstName} ${studentData.lastName}`; // Get student's full name
+    } catch (e) {
+        showStatusMessage("Error parsing student data. Please log in again.", "danger");
+        console.error("Error parsing student data from localStorage", e);
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 1500);
+        throw new Error("Invalid student data in localStorage.");
+    }
   }
-  const studentId = sanitizeId(studentIdRaw);
 
   let assignmentData = null;
   let questions = [];
   let currentIndex = 0;
   let submissionData = {};
+  let timerDuration = 15; // seconds per question
+  let timerInterval;
 
   function shuffleArray(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -95,7 +223,32 @@
     const weekNumber = parseInt(assignmentData.week.replace('Week ', ''));
     const url = `week_detail.html?courseId=${assignmentData.courseId}&week=${weekNumber}&subject=${assignmentData.subject}`;
     window.location.href = url;
-}
+  }
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    let timeLeft = timerDuration;
+    document.getElementById("timeLeft").textContent = timeLeft;
+
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      document.getElementById("timeLeft").textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        autoNextOrSubmit();
+      }
+    }, 1000);
+  }
+
+  function autoNextOrSubmit() {
+    saveCurrentAnswer();
+    if (currentIndex < questions.length - 1) {
+      currentIndex++;
+      renderQuestion();
+    } else {
+      submitAssignment();
+    }
+  }
 
   function renderQuestion() {
     const q = questions[currentIndex];
@@ -107,7 +260,7 @@
     const answerKey = `q_${currentIndex}`;
     const selectedAnswer = submissionData[answerKey]?.selected || null;
 
-    let html = `<div class="question-text"><strong>Q${currentIndex + 1}:</strong> ${q.question}</div>`;
+    let html = `<div class="question-text"><strong>Question ${currentIndex + 1}:</strong> ${q.question}</div>`;
 
     ["a", "b", "c", "d"].forEach(opt => {
       if (q[opt]) {
@@ -123,9 +276,10 @@
 
     document.getElementById("questionContainer").innerHTML = html;
 
-    document.getElementById("prevBtn").disabled = currentIndex === 0;
     document.getElementById("nextBtn").style.display = currentIndex === questions.length - 1 ? "none" : "inline-block";
     document.getElementById("submitBtn").style.display = currentIndex === questions.length - 1 ? "inline-block" : "none";
+
+    startTimer();
   }
 
   function saveCurrentAnswer() {
@@ -133,57 +287,117 @@
     const answerKey = `q_${currentIndex}`;
     submissionData[answerKey] = {
       selected: selectedInput ? selectedInput.value : null,
-      correct: questions[currentIndex].correct || null
+      correct: questions[currentIndex].correct || null // Store correct answer for scoring later
     };
   }
 
   async function checkSubmissionExists() {
     const submissionDocId = assignmentId + "_" + studentId;
-    const subSnap = await getDoc(doc(db, "submissions", submissionDocId));
+    const subRef = doc(db, "submissions", submissionDocId);
+    const subSnap = await getDoc(subRef);
     if (subSnap.exists()) {
-      alert("You have already submitted this assignment. Redirecting back.");
-      redirectToWeekDetail();
+      showStatusMessage("You have already submitted this assignment. Redirecting back.", "warning");
+      setTimeout(() => {
+        redirectToWeekDetail();
+      }, 2000);
       return true;
     }
     return false;
   }
 
   async function loadAssignment() {
-    const snap = await getDoc(doc(db, "assignments", assignmentId));
-    if (!snap.exists()) {
-      alert("Assignment not found.");
-      throw new Error("Assignment not found.");
-    }
-    assignmentData = snap.data();
+    try {
+      const snap = await getDoc(doc(db, "assignments", assignmentId));
+      if (!snap.exists()) {
+        showStatusMessage("Assignment not found.", "danger");
+        // Redirect if assignment doesn't exist
+        setTimeout(() => {
+            window.history.back(); // Go back to previous page
+        }, 2000);
+        return;
+      }
+      assignmentData = snap.data();
 
-    document.getElementById("assignmentTitle").innerText =
-      `${assignmentData.subject} - ${assignmentData.week} Assignment`;
-    document.getElementById("assignmentMeta").innerText =
-      `Created: ${new Date(assignmentData.createdAt).toLocaleDateString()}`;
+      document.getElementById("assignmentTitle").innerText =
+        `${assignmentData.subject} - ${assignmentData.week} Assignment`;
+      document.getElementById("assignmentMeta").innerText =
+        `Created: ${new Date(assignmentData.createdAt).toLocaleDateString()}`;
 
-    // Combine all questions & shuffle
-    questions = [];
-    if (Array.isArray(assignmentData.mcq)) {
-      assignmentData.mcq.forEach(q => questions.push(q));
-    }
-    if (Array.isArray(assignmentData.fillBlanks)) {
-      assignmentData.fillBlanks.forEach(q => questions.push(q));
-    }
-    if (Array.isArray(assignmentData.trueFalse)) {
-      assignmentData.trueFalse.forEach(q => questions.push(q));
-    }
-    questions = shuffleArray(questions);
+      questions = [];
+      if (Array.isArray(assignmentData.mcq)) assignmentData.mcq.forEach(q => questions.push(q));
+      // Assuming fillBlanks and trueFalse are also structured like { question: "...", correct: "..." }
+      if (Array.isArray(assignmentData.fillBlanks)) assignmentData.fillBlanks.forEach(q => questions.push(q));
+      if (Array.isArray(assignmentData.trueFalse)) assignmentData.trueFalse.forEach(q => questions.push(q));
+      
+      // Filter out any questions that might be null or undefined
+      questions = questions.filter(q => q && q.question);
+      questions = shuffleArray(questions);
 
-    // Check previous submission
-    const alreadySubmitted = await checkSubmissionExists();
-    if (alreadySubmitted) return;
+      if (questions.length === 0) {
+          document.getElementById("questionContainer").innerHTML = "<p>No questions available for this assignment.</p>";
+          document.getElementById("nextBtn").style.display = "none";
+          document.getElementById("submitBtn").style.display = "none";
+          document.querySelector(".timer").style.display = "none";
+          showStatusMessage("No questions available for this assignment.", "info");
+          return;
+      }
 
-    // Load previous answers if any (optional)
+      if (await checkSubmissionExists()) return;
+
+      submissionData = {};
+      renderQuestion();
+    } catch (error) {
+      console.error("Error loading assignment:", error);
+      showStatusMessage("Error loading assignment: " + error.message, "danger");
+    }
+  }
+
+  async function submitAssignment() {
+    clearInterval(timerInterval);
+    saveCurrentAnswer(); // Save the last question's answer
+
+    let score = 0;
+    const maxScore = questions.length; // Each question is 1 point
+    
+    // Calculate score
+    for (let i = 0; i < questions.length; i++) {
+        const qKey = `q_${i}`;
+        const submittedAnswer = submissionData[qKey]?.selected;
+        const correctAnswer = questions[i].correct;
+
+        // Simple scoring for now: 1 point if selected answer matches correct answer
+        if (submittedAnswer && submittedAnswer === correctAnswer) {
+            score++;
+        }
+    }
+
+    const percentage = maxScore > 0 ? (score / maxScore) * 100 : 0;
+
     const submissionDocId = assignmentId + "_" + studentId;
-    const subSnap = await getDoc(doc(db, "submissions", submissionDocId));
-    submissionData = subSnap.exists() ? subSnap.data() : {};
+    const submission = {
+      assignmentId,
+      courseId: assignmentData.courseId,
+      studentId,
+      studentName: studentName, // Add student's full name to submission
+      subject: assignmentData.subject,
+      week: assignmentData.week,
+      submittedAt: new Date().toISOString(),
+      answers: submissionData, // Store all collected answers
+      score: score, // Store calculated score
+      maxScore: maxScore, // Store max possible score
+      percentage: parseFloat(percentage.toFixed(2)) // Store percentage, rounded to 2 decimal places
+    };
 
-    renderQuestion();
+    try {
+      await setDoc(doc(db, "submissions", submissionDocId), submission, { merge: true });
+      showStatusMessage("Assignment submitted successfully! Score: " + score + "/" + maxScore + " (" + percentage.toFixed(2) + "%)", "success");
+      setTimeout(() => {
+        redirectToWeekDetail();
+      }, 3000); // Give user more time to see the score
+    } catch (err) {
+      console.error("Error submitting assignment:", err);
+      showStatusMessage("Error submitting assignment. Please try again.", "danger");
+    }
   }
 
   document.getElementById("nextBtn").onclick = () => {
@@ -194,38 +408,7 @@
     }
   };
 
-  document.getElementById("prevBtn").onclick = () => {
-    saveCurrentAnswer();
-    if (currentIndex > 0) {
-      currentIndex--;
-      renderQuestion();
-    }
-  };
-
-  document.getElementById("submitBtn").onclick = async () => {
-    saveCurrentAnswer();
-
-    const submissionDocId = assignmentId + "_" + studentId;
-
-    const submission = {
-      assignmentId,
-      courseId: assignmentData.courseId,
-      studentId,
-      subject: assignmentData.subject,
-      week: assignmentData.week,
-      submittedAt: new Date().toISOString(),
-      ...submissionData
-    };
-
-    try {
-      await setDoc(doc(db, "submissions", submissionDocId), submission, { merge: true });
-      alert("Assignment submitted successfully!");
-      redirectToWeekDetail();
-    } catch (err) {
-      console.error("Error submitting assignment:", err);
-      alert("Error submitting assignment. Please try again.");
-    }
-  };
+  document.getElementById("submitBtn").onclick = submitAssignment;
 
   loadAssignment();
 </script>
