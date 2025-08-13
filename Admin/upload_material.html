@@ -1,346 +1,459 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Upload Week-wise PDF Materials</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background: #f5f9f8;
-      font-family: 'Segoe UI', sans-serif;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Upload Week-wise PDF Materials</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Google Font 'Inter' for a clean, modern look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap');
+        
+        :root {
+            --primary-bg: #E8F0F7; /* Soft Light Blue */
+            --secondary-bg: #FFFFFF; /* White */
+            --left-panel-bg: #2A5C88; /* Deep Blue */
+            --card-bg: #FFFFFF; /* White */
+            --accent-color: #4A90E2; /* Bright Light Blue */
+            --text-light: #F7F7E8; /* Soft Cream */
+            --text-dark: #2C3E50; /* Dark Gray-Blue */
+            --input-border: #DDE0E3; /* Light Gray */
+            --link-color: #4A90E2; /* Bright Light Blue */
+        }
+    
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: var(--primary-bg);
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    
+        .container-flex {
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+    
+        .sidebar {
+            width: 250px;
+            background-color: var(--left-panel-bg);
+            color: var(--text-light);
+            padding: 2rem 1.5rem;
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(0);
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+    
+        .sidebar h4 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            
+        }
+    
+        .sidebar a {
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-weight: 400;
+            display: block;
+        }
+    
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+    
+        .sidebar a.active {
+            background-color: var(--accent-color);
+            font-weight: 700;
+        }
+    
+        .logout-link {
+            margin-top: auto; /* Pushes the logout link to the bottom */
+            background-color: var(--accent-color);
+            color: var(--left-panel-bg);
+            text-align: center;
+            font-weight: 700;
+        }
+    
+        .logout-link:hover {
+            background-color: #3A7DC1;
+            color: var(--text-light);
+        }
+    
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease-in-out;
+        }
+    
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 2rem;
+        }
+    
+        .form-container {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+    
+        .form-container h3 {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+        }
+    
+        .form-label {
+            font-weight: 700;
+        }
+    
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            border-color: var(--input-border);
+            padding: 0.75rem 1rem;
+            background-color: var(--primary-bg);
+        }
+    
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(74, 144, 226, 0.25);
+        }
+    
+        .btn-primary {
+            background-color: var(--accent-color);
+            border: none;
+            font-weight: 700;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s ease;
+        }
+    
+        .btn-primary:hover {
+            background-color: #3A7DC1;
+        }
 
-    .sidebar {
-      min-height: 100vh;
-      background-color: #2A5C88;
-      color: white;
-      padding: 20px 10px;
-    }
+        .toggle-btn {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background-color: var(--left-panel-bg);
+            color: var(--text-light);
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            z-index: 1001;
+            display: none; /* Hide on desktop */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: opacity 0.3s ease;
+        }
+        
+        .toggle-btn:hover {
+            opacity: 0.8;
+        }
 
-    .sidebar h4 {
-      font-weight: bold;
-      margin-bottom: 30px;
-    }
-
-    .sidebar a {
-      color: white;
-      text-decoration: none;
-      display: block;
-      padding: 10px;
-      border-radius: 8px;
-      transition: background-color 0.3s ease;
-      cursor: pointer;
-    }
-
-    .sidebar a:hover,
-    .sidebar a.active {
-      background-color: #2A5C88;
-    }
-
-    .sidebar a.logout-link {
-      color: #ffcccc !important;
-    }
-
-    .sidebar a.logout-link:hover {
-      background-color: #c0392b;
-      color: white !important;
-    }
-
-    .btn-purple {
-      background: #2A5C88;
-      color: white;
-    }
-
-    .btn-purple:hover {
-      background: #2A5C88;
-    }
-
-    .toggle-btn {
-      display: none;
-    }
-    .form-container {
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-}
-/* Mobile layout */
-  @media (max-width: 768px) {
-    .sidebar {
-      position: fixed;
-      width: 200px;
-      z-index: 1000;
-      transform: translateX(-100%);
-      transition: transform 0.3s ease-in-out;
-    }
-
-    .sidebar.show {
-      transform: translateX(0);
-    }
-
-    .toggle-btn {
-      display: block;
-      background-color: #2A5C88;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      margin: 10px;
-    }
-
-    .main-content {
-      margin-left: 0;
-    }
-  }
-
-
-    /* Desktop layout */
-@media (min-width: 769px) {
-    .sidebar {
-      position: fixed;
-      width: 220px;
-      top: 0;
-      left: 0;
-      transform: none;
-    }
-
-    .main-content {
-      margin-left: 220px; /* This rule will now apply */
-      padding: 20px;
-    }
-
-    .toggle-btn {
-      display: none;
-    }
-  }
-
-  </style>
-
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+            transition: opacity 0.3s ease;
+        }
+    
+        /* Responsive styles for mobile */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding-top: 5rem;
+            }
+            
+            .toggle-btn {
+                display: block;
+            }
+        }
+    </style>
 </head>
 <body>
-  <!-- Your toggle button -->
-  <button class="toggle-btn" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="container-flex">
+        <!-- Toggle button for mobile -->
+        <button class="toggle-btn" id="menuToggle" onclick="toggleSidebar()">☰ Menu</button>
+        <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <h4 class="mb-4">Admin Panel</h4>
-    <a href="admin_dashboard.html">Dashboard</a>
-    <a href="admin_courses.html">Courses</a>
-    <a href="create_assignment.html">Assignment</a>
-    <a href="upload_material.html" class="active">Upload Material</a>
-    <a href="student.html">Students</a>
-     <a href="admin_grades.html">Grades</a>
-    <a href="../index.html" onclick="logout()">Logout</a>
-  </div>
-  <div class="main-content"> <!-- Renamed from .container for consistency -->
-    <div class="form-container">
-    <h3>📤 Upload Multiple PDFs for a Week</h3>
-    <form id="uploadForm">
-      <div class="mb-3">
-        <label class="form-label">Select Course</label>
-        <select id="courseSelect" class="form-control" required></select>
-      </div>
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <h4>Admin Panel</h4>
+            <a href="admin_dashboard.html">Dashboard</a>
+            <a href="admin_courses.html">Courses</a>
+            <a href="create_assignment.html">Assignment</a>
+            <a href="upload_material.html" class="active">Upload Material</a>
+            <a href="student.html">Students</a>
+            <a href="admin_grades.html">Grades</a>
+            <a href="../index.html" class="logout-link" onclick="logout()">Logout</a>
+        </div>
+    
+        <!-- Main content -->
+        <main class="main-content">
+            <h1 class="dashboard-title">Upload Materials</h1>
+            <div class="form-container">
+                <h3>📤 Upload Multiple PDFs for a Week</h3>
+                <form id="uploadForm">
+                    <div class="mb-3">
+                        <label class="form-label">Select Course</label>
+                        <select id="courseSelect" class="form-control" required></select>
+                    </div>
 
-      <div class="mb-3">
-        <label class="form-label">Select Week</label>
-        <select id="weekSelect" class="form-control" required></select>
-      </div>
+                    <div class="mb-3">
+                        <label class="form-label">Select Week</label>
+                        <select id="weekSelect" class="form-control" required></select>
+                    </div>
 
-      <div class="mb-3">
-        <label class="form-label">Select Subject</label>
-        <select id="subjectSelect" class="form-control" required></select>
-      </div>
+                    <div class="mb-3">
+                        <label class="form-label">Select Subject</label>
+                        <select id="subjectSelect" class="form-control" required></select>
+                    </div>
 
-      <div class="mb-3">
-        <label class="form-label">Upload PDF(s)</label>
-        <input type="file" id="pdfFiles" class="form-control" accept="application/pdf" multiple required>
-      </div>
+                    <div class="mb-3">
+                        <label class="form-label">Upload PDF(s)</label>
+                        <input type="file" id="pdfFiles" class="form-control" accept="application/pdf" multiple required>
+                    </div>
 
-      <button type="submit" class="btn btn-primary">Upload</button>
-    </form>
-</div>
-    <div id="status" class="mt-3"></div>
-  </div>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </form>
+            </div>
+            <!-- Custom Status Message and loading indicator -->
+            <div id="statusMessage" class="alert mt-3" style="display: none;"></div>
+        </main>
+    </div>
 
-  <!-- Custom Status Message -->
-  <div id="statusMessage" class="alert"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { createClient } from "https://esm.sh/@supabase/supabase-js";
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-  import { createClient } from "https://esm.sh/@supabase/supabase-js";
+        // --- Firebase Config (unchanged) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_C4ZPXTXQZtZJbtAwTiub_rkIZcvsE2Y",
+            authDomain: "clms-19db3.firebaseapp.com",
+            projectId: "clms-19db3",
+            storageBucket: "clms-19db3.firebasestorage.app",
+            messagingSenderId: "218119035486",
+            appId: "1:218119035486:web:39291d39b4b461b56032cf"
+        };
 
-  // --- Firebase Config (unchanged) ---
-  const firebaseConfig = {
-    apiKey: "AIzaSyD_C4ZPXTXQZtZJbtAwTiub_rkIZcvsE2Y",
-    authDomain: "clms-19db3.firebaseapp.com",
-    projectId: "clms-19db3",
-    storageBucket: "clms-19db3.firebasestorage.app",
-    messagingSenderId: "218119035486",
-    appId: "1:218119035486:web:39291d39b4b461b56032cf"
-  };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+        // --- Supabase Config ---
+        const SUPABASE_URL = "https://xfoeqrxveifocprllzcz.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhmb2Vxcnh2ZWlmb2NwcmxsemN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2Mjk1OTksImV4cCI6MjA3MDIwNTU5OX0.aI9STiVB873zhXUqJCotPQmoy47lkJCHyzCo8ZVkUd0";
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // --- Supabase Config ---
-  const SUPABASE_URL = "https://xfoeqrxveifocprllzcz.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhmb2Vxcnh2ZWlmb2NwcmxsemN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2Mjk1OTksImV4cCI6MjA3MDIwNTU5OX0.aI9STiVB873zhXUqJCotPQmoy47lkJCHyzCo8ZVkUd0";
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const courseSelect = document.getElementById("courseSelect");
+        const weekSelect = document.getElementById("weekSelect");
+        const subjectSelect = document.getElementById("subjectSelect");
+        const uploadForm = document.getElementById("uploadForm");
+        const globalStatusMessageDiv = document.getElementById("statusMessage");
 
-  const courseSelect = document.getElementById("courseSelect");
-  const weekSelect = document.getElementById("weekSelect");
-  const subjectSelect = document.getElementById("subjectSelect");
-  const statusDiv = document.getElementById("status"); // This is for form-specific messages
-  const globalStatusMessageDiv = document.getElementById("statusMessage"); // For general messages
-
-  // Function to show custom status messages
-  function showStatusMessage(message, type = 'info', targetDiv = globalStatusMessageDiv) {
-    targetDiv.textContent = message;
-    targetDiv.className = `alert mt-3 alert-${type}`;
-    targetDiv.style.display = 'block';
-    setTimeout(() => {
-      targetDiv.style.display = 'none';
-    }, 3000); // Hide after 3 seconds
-  }
-
-  async function loadCourses() {
-    try {
-      const snapshot = await getDocs(collection(db, "courses"));
-      courseSelect.innerHTML = `<option value="">-- Select Course --</option>`;
-      snapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        const option = document.createElement("option");
-        option.value = docSnap.id;
-        option.textContent = data.title;
-        courseSelect.appendChild(option);
-      });
-    } catch (err) {
-      console.error("Error loading courses:", err);
-      showStatusMessage(`Error loading courses: ${err.message}`, 'danger');
-    }
-  }
-
-  courseSelect.addEventListener("change", async () => {
-    const courseId = courseSelect.value;
-    if (!courseId) {
-      weekSelect.innerHTML = `<option value="">-- Select Week --</option>`;
-      subjectSelect.innerHTML = `<option value="">-- Select Subject --</option>`;
-      return;
-    }
-
-    try {
-      const courseDoc = await getDoc(doc(db, "courses", courseId));
-      if (!courseDoc.exists()) {
-        showStatusMessage("Selected course not found.", 'warning');
-        return;
-      }
-
-      const data = courseDoc.data();
-
-      weekSelect.innerHTML = `<option value="">-- Select Week --</option>`;
-      if (typeof data.weeks === 'number') {
-        for (let i = 1; i <= data.weeks; i++) {
-          const opt = document.createElement("option");
-          opt.value = i;
-          opt.textContent = `Week ${i}`;
-          weekSelect.appendChild(opt);
+        // Function to show custom status messages
+        function showStatusMessage(message, type = 'info') {
+            globalStatusMessageDiv.textContent = message;
+            globalStatusMessageDiv.className = `alert mt-3 alert-${type}`;
+            globalStatusMessageDiv.style.display = 'block';
+            setTimeout(() => {
+                globalStatusMessageDiv.style.display = 'none';
+            }, 3000); // Hide after 3 seconds
         }
-      } else {
-        showStatusMessage("Number of weeks not defined for this course.", 'warning');
-      }
 
-      subjectSelect.innerHTML = `<option value="">-- Select Subject --</option>`;
-      if (Array.isArray(data.subjects)) {
-        data.subjects.forEach(subject => {
-          const opt = document.createElement("option");
-          opt.value = subject;
-          opt.textContent = subject;
-          subjectSelect.appendChild(opt);
+        async function loadCourses() {
+            try {
+                const snapshot = await getDocs(collection(db, "courses"));
+                courseSelect.innerHTML = `<option value="">-- Select Course --</option>`;
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const option = document.createElement("option");
+                    option.value = docSnap.id;
+                    option.textContent = data.title;
+                    courseSelect.appendChild(option);
+                });
+            } catch (err) {
+                console.error("Error loading courses:", err);
+                showStatusMessage(`Error loading courses: ${err.message}`, 'danger');
+            }
+        }
+
+        courseSelect.addEventListener("change", async () => {
+            const courseId = courseSelect.value;
+            if (!courseId) {
+                weekSelect.innerHTML = `<option value="">-- Select Week --</option>`;
+                subjectSelect.innerHTML = `<option value="">-- Select Subject --</option>`;
+                return;
+            }
+
+            try {
+                const courseDoc = await getDoc(doc(db, "courses", courseId));
+                if (!courseDoc.exists()) {
+                    showStatusMessage("Selected course not found.", 'warning');
+                    return;
+                }
+
+                const data = courseDoc.data();
+
+                weekSelect.innerHTML = `<option value="">-- Select Week --</option>`;
+                if (typeof data.weeks === 'number') {
+                    for (let i = 1; i <= data.weeks; i++) {
+                        const opt = document.createElement("option");
+                        opt.value = i;
+                        opt.textContent = `Week ${i}`;
+                        weekSelect.appendChild(opt);
+                    }
+                } else {
+                    showStatusMessage("Number of weeks not defined for this course.", 'warning');
+                }
+
+                subjectSelect.innerHTML = `<option value="">-- Select Subject --</option>`;
+                if (Array.isArray(data.subjects)) {
+                    data.subjects.forEach(subject => {
+                        const opt = document.createElement("option");
+                        opt.value = subject;
+                        opt.textContent = subject;
+                        subjectSelect.appendChild(opt);
+                    });
+                } else {
+                    showStatusMessage("Subjects not defined for this course.", 'warning');
+                }
+            } catch (error) {
+                console.error("Error loading course data:", error);
+                showStatusMessage(`Error loading course data: ${error.message}`, 'danger');
+            }
         });
-      } else {
-        showStatusMessage("Subjects not defined for this course.", 'warning');
-      }
-    } catch (error) {
-      console.error("Error loading course data:", error);
-      showStatusMessage(`Error loading course data: ${error.message}`, 'danger');
-    }
-  });
 
-  document.getElementById("uploadForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+        uploadForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            const courseId = courseSelect.value;
+            const week = weekSelect.value;
+            const subject = subjectSelect.value;
+            const files = document.getElementById("pdfFiles").files;
 
-    const courseId = courseSelect.value;
-    const week = weekSelect.value;
-    const subject = subjectSelect.value;
-    const files = document.getElementById("pdfFiles").files;
+            if (!courseId || !week || !subject) {
+                showStatusMessage("Please select course, week, and subject.", 'warning');
+                return;
+            }
 
-    if (!courseId || !week || !subject) {
-      showStatusMessage("Please select course, week, and subject.", 'warning', statusDiv);
-      return;
-    }
+            if (!files.length) {
+                showStatusMessage("Please select at least one PDF file.", 'warning');
+                return;
+            }
+            
+            const uploadBtn = uploadForm.querySelector('button[type="submit"]');
+            uploadBtn.textContent = "Uploading...";
+            uploadBtn.disabled = true;
 
-    if (!files.length) {
-      showStatusMessage("Please select at least one PDF file.", 'warning', statusDiv);
-      return;
-    }
+            showStatusMessage(`Uploading ${files.length} file(s)...`, 'info');
+            console.log(`Uploading to: materials/${courseId}/week${week}/${subject}/`);
 
-    showStatusMessage(`Uploading ${files.length} file(s)...`, 'info', statusDiv);
-    console.log(`Uploading to: materials/${courseId}/week${week}/${subject}/`);
+            try {
+                const uploadedURLs = [];
 
-    try {
-      const uploadedURLs = [];
+                for (const file of files) {
+                    const uniqueName = `${Date.now()}_${file.name}`;
+                    const filePath = `materials/${courseId}/week${week}/${subject}/${uniqueName}`;
 
-      for (const file of files) {
-        const uniqueName = `${Date.now()}_${file.name}`;
-        const filePath = `materials/${courseId}/week${week}/${subject}/${uniqueName}`;
+                    const { data, error } = await supabase.storage
+                        .from("pdf-materials") // 📌 Your Supabase bucket name
+                        .upload(filePath, file, { cacheControl: "3600", upsert: false });
 
-        const { data, error } = await supabase.storage
-          .from("pdf-materials") // 📌 Your Supabase bucket name
-          .upload(filePath, file, { cacheControl: "3600", upsert: false });
+                    if (error) throw error;
 
-        if (error) throw error;
+                    const { data: urlData } = supabase.storage
+                        .from("pdf-materials")
+                        .getPublicUrl(filePath);
 
-        const { data: urlData } = supabase.storage
-          .from("pdf-materials")
-          .getPublicUrl(filePath);
+                    uploadedURLs.push(urlData.publicUrl);
+                }
 
-        uploadedURLs.push(urlData.publicUrl);
-      }
+                const weekRef = doc(db, "courses", courseId, "weeks", `week${week}`);
+                const weekDoc = await getDoc(weekRef);
+                let weekData = weekDoc.exists() ? weekDoc.data() : { studyMaterials: {} };
 
-      const weekRef = doc(db, "courses", courseId, "weeks", `week${week}`);
-      const weekDoc = await getDoc(weekRef);
-      let weekData = weekDoc.exists() ? weekDoc.data() : { studyMaterials: {} };
+                if (!Array.isArray(weekData.studyMaterials[subject])) {
+                    weekData.studyMaterials[subject] = [];
+                }
 
-      if (!Array.isArray(weekData.studyMaterials[subject])) {
-        weekData.studyMaterials[subject] = [];
-      }
+                weekData.studyMaterials[subject] = [
+                    ...weekData.studyMaterials[subject],
+                    ...uploadedURLs
+                ];
 
-      weekData.studyMaterials[subject] = [
-        ...weekData.studyMaterials[subject],
-        ...uploadedURLs
-      ];
+                await setDoc(weekRef, weekData, { merge: true });
 
-      await setDoc(weekRef, weekData, { merge: true });
+                showStatusMessage("✅ All PDFs uploaded successfully!", "success");
+                uploadForm.reset();
+            } catch (error) {
+                console.error("Upload error:", error);
+                showStatusMessage(`❌ Error: ${error.message}`, "danger");
+            } finally {
+                uploadBtn.textContent = "Upload";
+                uploadBtn.disabled = false;
+            }
+        });
 
-      showStatusMessage("✅ All PDFs uploaded successfully!", "success", statusDiv);
-    } catch (error) {
-      console.error("Upload error:", error);
-      showStatusMessage(`❌ Error: ${error.message}`, "danger", statusDiv);
-    }
-  });
+        loadCourses();
 
-  loadCourses();
-  window.toggleSidebar = function () { // Make globally accessible
-    document.getElementById('sidebar').classList.toggle('show');
-  }
+        // The JavaScript function that now explicitly hides the menu button
+        window.toggleSidebar = function () {
+            const sidebar = document.getElementById("sidebar");
+            const overlay = document.getElementById("overlay");
+            const toggleBtn = document.getElementById('menuToggle');
+            if (sidebar && overlay && toggleBtn) {
+                if (sidebar.classList.contains('show')) {
+                    // If the sidebar is already shown, hide it
+                    sidebar.classList.remove('show');
+                    overlay.style.display = 'none';
+                    toggleBtn.style.display = 'block'; // Show the menu button
+                } else {
+                    // If the sidebar is hidden, show it
+                    sidebar.classList.add('show');
+                    overlay.style.display = 'block';
+                    toggleBtn.style.display = 'none'; // Hide the menu button
+                }
+            }
+        };
 
-  window.logout = function () {
-    window.location.href = "../index.html"; // Adjust as necessary for your logout flow
-  }
-</script>
-
-
+        window.logout = function () {
+            window.location.href = "../index.html"; 
+        };
+    </script>
 </body>
 </html>

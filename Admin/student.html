@@ -5,162 +5,208 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Registered Students</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* Base Styles */
-/* Base Styles for all screen sizes */
-body {
-    background: #f5f9f8;
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-    display: flex; /* This is what allows the sidebar and main-content to sit side-by-side */
-}
-
-/* Sidebar styling */
-.sidebar {
-    min-height: 100vh;
-    background-color: #2A5C88;
-    color: white;
-    padding: 20px 10px;
-    width: 220px;
-    /* On desktop, the sidebar is part of the document flow, not fixed. */
-    /* We'll use a media query to make it fixed on smaller screens. */
-    transition: transform 0.3s ease-in-out;
-}
-
-/* Sidebar links and active states */
-.sidebar a {
-    color: white;
-    text-decoration: none;
-    display: block;
-    padding: 10px;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
-}
-.sidebar a:hover,
-.sidebar a.active {
-    background-color: #204664;
-}
-
-.sidebar a.logout-link {
-    color: #ffcccc !important;
-}
-
-.sidebar a.logout-link:hover {
-    background-color: #c0392b;
-    color: white !important;
-}
-
-/* Toggle Button - Hide by default, show on mobile */
-.toggle-btn {
-    display: none;
-    background-color: #2A5C88;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 16px;
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    z-index: 1002;
-}
-
-/* Main Content */
-.main-content {
-    flex-grow: 1; /* Allows it to take up remaining space */
-    padding: 20px;
-    /* No margin-left here, it's handled by the parent flexbox */
-}
-
-/* Mobile Layout (screens up to 768px) */
-@media (max-width: 768px) {
-    .sidebar {
-        /* On mobile, we use fixed position and transform to create the slide-in effect */
-        position: fixed;
-        left: 0;
-        top: 0;
-        height: 100vh;
-        z-index: 1001;
-        transform: translateX(-100%);
+    /* Google Font 'Inter' for a clean, modern look */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap');
+    
+    :root {
+      --primary-bg: #E8F0F7; /* Soft Light Blue */
+      --secondary-bg: #FFFFFF; /* White */
+      --left-panel-bg: #2A5C88; /* Deep Blue */
+      --card-bg: #FFFFFF; /* White */
+      --accent-color: #4A90E2; /* Bright Light Blue */
+      --text-light: #F7F7E8; /* Soft Cream */
+      --text-dark: #2C3E50; /* Dark Gray-Blue */
+      --input-border: #DDE0E3; /* Light Gray */
+      --link-color: #4A90E2; /* Bright Light Blue */
     }
 
-    .sidebar.show {
-        transform: translateX(0);
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background-color: var(--primary-bg);
+    }
+    
+    .container-flex {
+      display: flex;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    
+    .sidebar {
+      width: 250px;
+      background-color: var(--left-panel-bg);
+      color: var(--text-light);
+      padding: 2rem 1.5rem;
+      transition: transform 0.3s ease-in-out;
+      transform: translateX(0);
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .sidebar h4 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+    }
+    
+    .sidebar a {
+      color: var(--text-light);
+      text-decoration: none;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 0.5rem;
+      transition: background-color 0.3s ease;
+      font-weight: 400;
+    }
+    
+    .sidebar a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar a.active {
+      background-color: var(--accent-color);
+      font-weight: 700;
+    }
+    
+    .logout-link {
+      margin-top: auto; /* Pushes the logout link to the bottom */
+      background-color: var(--accent-color);
+      color: var(--left-panel-bg);
+      text-align: center;
+      font-weight: 700;
+    }
+    
+    .logout-link:hover {
+      background-color: #3A7DC1;
+      color: var(--text-light);
+    }
+    
+    .main-content {
+      flex: 1;
+      margin-left: 250px;
+      padding: 2rem;
+      transition: margin-left 0.3s ease-in-out;
+    }
+    
+    .dashboard-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+    
+    .card {
+      border-radius: 1rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border: none;
+      background-color: var(--card-bg);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .card-title {
+      color: var(--text-dark);
     }
     
     .toggle-btn {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      background-color: var(--left-panel-bg);
+      color: var(--text-light);
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      z-index: 1001;
+      display: none; /* Hide on desktop */
+    }
+    
+    .toggle-btn.hidden {
+      display: none !important;
+    }
+
+    /* Responsive styles for mobile */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .toggle-btn {
         display: block;
+      }
     }
-
-    .main-content {
-        /* No margin-left on mobile */
-        margin-left: 0;
-        padding-top: 60px; /* Add padding to prevent content from going under the fixed toggle button */
+    
+    /* Make the entire content scrollable on small screens */
+    @media (max-width: 768px) {
+        .container-flex {
+            min-height: auto;
+        }
+        .main-content {
+            padding-top: 5rem; /* Add space for the toggle button */
+        }
     }
-}
-
-/* Desktop Layout (screens 769px and above) */
-@media (min-width: 769px) {
-    .sidebar {
-        /* On desktop, the sidebar is not fixed, it's a sibling of main-content */
-        position: static;
-        transform: none;
-    }
-
-    .main-content {
-        /* No margin-left needed because the sidebar is now part of the flex layout */
-        margin-left: 0;
-    }
-
-    .toggle-btn {
-        display: none; /* Hide toggle button on desktop */
-    }
-}
-    </style>
+  </style>
 </head>
 <body>
-    <button class="toggle-btn" onclick="toggleSidebar()">☰ Menu</button>
+    <div class="container-flex">
+        <button class="toggle-btn" id="menuToggle" onclick="toggleSidebar()">☰ Menu</button>
+        <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+        
+        <div class="sidebar" id="sidebar">
+            <h4>Admin Panel</h4>
+            <a href="admin_dashboard.html">Dashboard</a>
+            <a href="admin_courses.html">Courses</a>
+            <a href="create_assignment.html">Assignment</a>
+            <a href="upload_material.html">Upload Material</a>
+            <a href="student.html" class="active">Students</a>
+            <a href="admin_grades.html">Grades</a>
+            <a href="../index.html" class="logout-link" onclick="logout()">Logout</a>
+        </div>
     
-    <div class="overlay" onclick="toggleSidebar()"></div>
-
-    <div class="sidebar" id="sidebar">
-        <h4>Admin Panel</h4>
-        <a href="admin_dashboard.html" class="active">Dashboard</a>
-        <a href="admin_courses.html">Courses</a>
-        <a href="create_assignment.html">Assignment</a>
-        <a href="upload_material.html">Upload Material</a>
-        <a href="student.html">Students</a>
-        <a href="admin_grades.html">Grades</a>
-        <a href="../index.html" class="logout-link" onclick="logout()">Logout</a>
-    </div>
-
-    <div class="main-content">
-        <h1>Registered Students</h1>
-        <div class="table-responsive">
-            <table class="table table-striped table-bordered align-middle">
-                <thead class="table-primary">
-                    <tr>
-                        <th>Enrollment</th>
-                        <th>Email</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Mobile</th>
-                    </tr>
-                </thead>
-                <tbody id="studentsTableBody">
-                </tbody>
-            </table>
+        <div class="main-content">
+            <h1 class="dashboard-title">Registered Students</h1>
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Enrollment</th>
+                            <th>Email</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Mobile</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
+        // This is a placeholder; you should use a dynamic config in a production environment
         const firebaseConfig = {
             apiKey: "AIzaSyD_C4ZPXTXQZtZJbtAwTiub_rkIZcvsE2Y",
             authDomain: "clms-19db3.firebaseapp.com",
@@ -169,12 +215,12 @@ body {
             messagingSenderId: "218119035486",
             appId: "1:218119035486:web:39291d39b4b461b56032cf"
         };
-
+    
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
+    
         const studentsTableBody = document.getElementById("studentsTableBody");
-
+    
         async function loadStudents() {
             try {
                 const studentsSnapshot = await getDocs(collection(db, "students"));
@@ -200,7 +246,7 @@ body {
                 console.error("Error loading students:", error);
             }
         }
-
+    
         function capitalize(str) {
             if (!str) return "";
             return str.charAt(0).toUpperCase() + str.slice(1);
@@ -208,22 +254,25 @@ body {
         
         window.toggleSidebar = function () {
             const sidebar = document.getElementById("sidebar");
-            const overlay = document.querySelector(".overlay");
+            const overlay = document.getElementById("overlay");
+            const toggleBtn = document.getElementById('menuToggle');
             if (sidebar && overlay) {
                 sidebar.classList.toggle('show');
                 if (sidebar.classList.contains('show')) {
                     overlay.style.display = 'block';
+                    toggleBtn.classList.add('hidden');
                 } else {
                     overlay.style.display = 'none';
+                    toggleBtn.classList.remove('hidden');
                 }
             }
         }
-
+    
         window.logout = () => {
             localStorage.removeItem("admin"); 
             location.href = "../index.html"; 
         };
-
+    
         window.onload = loadStudents;
     </script>
 </body>

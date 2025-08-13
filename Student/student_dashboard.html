@@ -5,191 +5,235 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Student Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            background: #f5f9f8;
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            display: flex; /* Enables side-by-side layout for sidebar and main content */
+        :root {
+            --primary-bg: #E8F0F7; /* Soft Light Blue */
+            --secondary-bg: #FFFFFF; /* White */
+            --left-panel-bg: #2A5C88; /* Deep Blue */
+            --card-bg: #FFFFFF; /* White */
+            --accent-color: #4A90E2; /* Bright Light Blue */
+            --text-light: #F7F7E8; /* Soft Cream */
+            --text-dark: #2C3E50; /* Dark Gray-Blue */
+            --input-border: #DDE0E3; /* Light Gray */
+            --link-color: #4A90E2; /* Bright Light Blue */
         }
 
-        /* Sidebar */
-        .sidebar {
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: var(--primary-bg);
+        }
+
+        .main-container {
+            display: flex;
             min-height: 100vh;
-            background-color: #2A5C88;
-            color: white;
-            padding: 20px 10px;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--left-panel-bg);
+            color: var(--text-light);
+            padding: 2rem 1.5rem;
             transition: transform 0.3s ease-in-out;
-            z-index: 1000;
+            transform: translateX(0);
             position: fixed;
             top: 0;
+            bottom: 0;
             left: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
         }
 
         .sidebar h4 {
-            font-weight: bold;
-            margin-bottom: 30px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
         }
 
         .sidebar a {
-            color: white;
+            color: var(--text-light);
             text-decoration: none;
-            display: block;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
             transition: background-color 0.3s ease;
-            cursor: pointer;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .sidebar a:hover,
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+         
         .sidebar a.active {
-            background-color: #204664;
+            background-color: var(--accent-color);
+            font-weight: 700;
         }
 
-        .sidebar a.logout-link {
-            color: #ffcccc !important;
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease-in-out;
         }
 
-        .sidebar a.logout-link:hover {
-            background-color: #c0392b;
-            color: white !important;
+        .logout-link {
+            margin-top: auto; /* Pushes the logout link to the bottom */
+            background-color: var(--accent-color);
+            color: var(--left-panel-bg);
+            text-align: center;
+            font-weight: 700;
+        }
+         
+        .logout-link:hover {
+            background-color: #3A7DC1;
+            color: var(--text-light);
+        }
+         
+        .dashboard-title {
+            color: var(--text-dark);
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
         }
 
-        /* Toggle Button */
         .toggle-btn {
             display: none;
-            background-color: #2A5C88;
-            color: white;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background-color: var(--left-panel-bg);
+            color: var(--text-light);
             border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex-grow: 1;
-            padding: 20px;
-            margin-left: 0; /* Default for mobile, will be overridden by desktop layout */
-        }
-
-        /* Styles for the course cards */
-        .course-card {
-            background: #fff;
+            padding: 0.5rem 1rem;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 15px; /* Adjust padding for desired card size */
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            height: 100%; /* Ensures cards in a row have equal height */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+
+        /* --- FIX: Using Flexbox to align buttons at the bottom --- */
+        .course-card {
+            background-color: var(--card-bg);
+            border: none;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            /* Flexbox properties to align content and push button to the bottom */
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Pushes button to bottom */
         }
 
         .course-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
         }
 
         .course-card h5 {
-            font-weight: bold;
-            color: #2A5C88;
-            margin-bottom: 8px; /* Slightly reduced margin */
-            font-size: 1.1em; /* Slightly smaller font for title */
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
         }
 
         .course-card p {
-            margin-bottom: 3px; /* Reduced margin between paragraphs */
+            margin-bottom: 0.5rem;
             color: #555;
-            font-size: 0.9em; /* Slightly smaller font for details */
         }
 
-        .course-card .enroll-btn {
-            width: 100%;
-            padding: 8px; /* Reduced padding for button */
-            font-weight: bold;
-            border-radius: 5px;
-            margin-top: 10px; /* Reduced top margin */
-            font-size: 0.9em; /* Smaller font for button text */
+        .course-card p strong {
+            color: var(--text-dark);
         }
 
-        /* Mobile Layout */
+        .enroll-btn {
+            /* Pushes the button to the bottom of the flex container */
+            margin-top: auto;
+        }
+         
+        .alert {
+            display: none; /* Initially hidden */
+            border-radius: 8px;
+            padding: 1rem;
+            font-weight: 500;
+            text-align: center;
+        }
+         
+        .alert-info { background-color: #d1ecf1; color: #0c5460; }
+        .alert-success { background-color: #d4edda; color: #155724; }
+        .alert-danger { background-color: #f8d7da; color: #721c24; }
+
+        .modal-content {
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        #shayari {
+        font-size: 28px;
+        font-weight: 600;
+        color: var(--text-dark);
+        display: block;
+        margin: 20px 0;
+        text-align: center;
+        }
+        /* Mobile styles */
         @media (max-width: 768px) {
-            body {
-                display: block; /* Stack sidebar and main content vertically on mobile */
-            }
             .sidebar {
-                width: 200px;
                 transform: translateX(-100%);
-                position: fixed; /* Keep it fixed so it slides from left */
-                top: 0;
-                left: 0;
+                width: 75%;
             }
 
-            .sidebar.show {
-                transform: translateX(0);
+            .main-content {
+                margin-left: 0;
             }
 
             .toggle-btn {
                 display: block;
-                position: fixed;
-                top: 10px;
-                left: 10px;
-                margin: 10px;
-                z-index: 1001;
             }
 
-            .main-content {
-                margin-left: 0; /* Full width on mobile */
-                padding-top: 60px; /* Add padding to prevent content from going under the fixed toggle button */
-            }
-        }
-
-        /* Desktop Layout */
-        @media (min-width: 769px) {
-            .sidebar {
-                width: 220px;
-                transform: none; /* Always visible */
-                position: fixed;
-                top: 0;
-                left: 0;
+            .main-container.sidebar-open .main-content {
+                margin-left: 75%;
             }
             
-            .main-content {
-                margin-left: 220px; /* Space for the fixed sidebar */
-                padding: 20px;
-            }
-            
-            .toggle-btn {
+            /* The new rule to hide the button */
+            .main-container.sidebar-open .toggle-btn {
                 display: none;
             }
         }
+        
     </style>
 </head>
 <body>
 
-<!-- Toggle button for mobile -->
-<button class="toggle-btn" onclick="toggleSidebar()">☰ Menu</button>
+<div class="main-container">
 
-<div class="sidebar" id="sidebar">
-    <h4 class="mb-4">Student Panel</h4>
-    <a href="student_dashboard.html" class="active">Dashboard</a>
-    <a href="our_course.html">Course History</a>
-    <a href="../index.html" onclick="logout()">Logout</a>
+    <button class="toggle-btn" onclick="toggleSidebar()">☰ Menu</button>
+
+    <div class="sidebar" id="sidebar">
+        <h4 class="mb-4">Student Panel</h4>
+        <a href="student_dashboard.html" class="active">Dashboard</a>
+        <a href="our_course.html">Course History</a>
+        <a href="../index.html" class="logout-link" onclick="logout()">Logout</a>
+    </div>
+
+    <div class="main-content">
+        <h2 class="dashboard-title">Welcome 👋</h2>
+        <p><em id="shayari"></em></p>
+
+        <h4 class="mt-4">Available Courses</h4>
+        <div id="availableCourses" class="row"></div>
+        <div id="statusMessage" class="alert"></div> 
+    </div>
+
 </div>
 
-<div class="main-content">
-    <h2 class="dashboard-title">Welcome 👋</h2>
-    <p><em id="shayari"></em></p>
-
-    <h4 class="mt-4">Available Courses</h4>
-    <div id="availableCourses" class="row"></div>
-    <!-- Custom Status Message moved here for proper positioning -->
-    <div id="statusMessage" class="alert"></div> 
-</div>
-
-<!-- Enroll Modal -->
 <div class="modal fade" id="enrollModal" tabindex="-1">
     <div class="modal-dialog">
         <form id="enrollForm" class="modal-content">
@@ -219,7 +263,6 @@
     </div>
 </div>
 
-<!-- Firebase & Firestore -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import {
@@ -244,11 +287,21 @@
     const db = getFirestore(app);
 
     const shayaris = [
-        "हर सुबह एक नई शुरुआत है।",
-        "कभी हार मत मानो!",
-        "जो खो गया उसके लिए रोया नहीं करते।",
-        "सपने वो नहीं जो नींद में आए, सपने वो हैं जो नींद तोड़ दें।"
-    ];
+    "हर सुबह एक नई शुरुआत है।",
+    "जो अपने सपनों को सच करने की हिम्मत रखते हैं, वही इतिहास लिखते हैं।",
+    "हर दिन को अपना आख़िरी दिन समझ कर मेहनत करो,कभी हार मत मानो!",
+    "सपने वो नहीं जो नींद में आए, सपने वो हैं जो नींद तोड़ दें।",
+    "Login kar liya? Ab zara brain bhi login kar le. 🚀",
+    "Ek click sapno ke kareeb… bas YouTube mat khol dena. ✏️",
+    "Aaj ki mehnat = kal ka show-off… ya excuses. 🏆",
+    "Abhi padho, baad mein king jaisa so… ya abhi so, fail hone ka taj pahno. 😴👑",
+    "Swagat hai, procrastination ke legend! 🌟",
+    "Tera future tujhko dekh raha hai… aur facepalm kar raha hai. 🔍",
+    "Brain loading… lekin tera Wi-Fi usse tez hai. 🧠⏳",
+    "Chhoti progress bhi progress hai… par excuses hamesha chhote lagte hain. 📈",
+    "Coffee ko grades mein badal… washroom trips mein nahi. ☕📚",
+    "Roz ka ambition dose le le… laziness ka overdose mat kar. 💪"
+];
     document.getElementById("shayari").innerText = shayaris[Math.floor(Math.random() * shayaris.length)];
 
     const availableCoursesDiv = document.getElementById("availableCourses");
@@ -400,6 +453,7 @@
     });
 </script>
 
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     window.openEnrollModal = function(courseId) {
@@ -426,8 +480,10 @@
     // Sidebar toggle function for mobile
     window.toggleSidebar = function () {
         const sidebar = document.getElementById("sidebar");
-        if (sidebar) {
+        const container = document.querySelector(".main-container");
+        if (sidebar && container) {
             sidebar.classList.toggle('show');
+            container.classList.toggle('sidebar-open');
         }
     }
 </script>

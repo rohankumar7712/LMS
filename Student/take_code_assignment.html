@@ -4,257 +4,173 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Code Assignment with Judge0</title>
-  <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <!-- Google Fonts - Inter for a clean look -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Optional: Fira Code for monospace fonts (coding feel) -->
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary-bg: #E8F0F7; /* Soft Light Blue */
+      --secondary-bg: #FFFFFF; /* White */
+      --left-panel-bg: #2A5C88; /* Deep Blue */
+      --card-bg: #FFFFFF; /* White */
+      --accent-color: #4A90E2; /* Bright Light Blue */
+      --text-dark: #2C3E50; /* Dark Gray-Blue */
+      --input-border: #DDE0E3; /* Light Gray */
+      --code-bg: #282c34; /* Dark gray for code editor */
+      --code-text: #abb2bf; /* Light gray for code text */
+      --danger-color: #E74C3C; /* Red */
+    }
+
     body {
-      background-color: #f4f6f9;
-      font-family: 'Inter', sans-serif; /* Using Inter font */
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center; /* Center content vertically */
-      align-items: center; /* Center content horizontally */
-      margin: 0; /* Remove default body margin */
-      position: relative; /* For positioning the timer */
-    }
-    .container {
-      max-width: 1200px; /* Max width for the entire container */
-      width: 100%; /* Ensure it's responsive */
-      padding-top: 2rem; /* Adjusted padding */
-      padding-bottom: 2rem;
-    }
-    #assignment-container {
-      background: linear-gradient(145deg, #ffffff, #f0f0f0); /* Subtle gradient */
-      border-radius: 15px; /* More rounded corners */
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15); /* Stronger, softer shadow */
-      padding: 2.5rem; /* Increased padding */
-      border: 1px solid #e0e0e0; /* Subtle border */
-    }
-    h1, h2, h3, h4, h5, h6 {
-        color: #2A5C88; /* Consistent primary color for headings */
-        font-weight: 700; /* Bolder headings */
-    }
-    .text-primary { color: #2A5C88 !important; } /* Ensure primary color is correctly applied */
-
-    .problem-statement {
-      background: #ffffff; /* Explicitly white background */
-      border-radius: 10px; /* Slightly less rounded than main container */
-      padding: 1.8rem; /* Adjusted padding */
-      box-shadow: 0 5px 15px rgba(0,0,0,0.08); /* Lighter shadow for nested card */
-      height: 100%; /* Ensure it fills parent height */
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto; /* Enable scrolling for problem statement */
-      max-height: calc(100vh - 100px); /* Adjust max-height dynamically if needed */
-    }
-    .problem-statement h2.h5, .problem-statement h3.h6 {
-        color: #495057; /* Slightly muted color for sub-headings */
-        font-weight: 600;
-        border-bottom: 1px solid #dee2e6;
-        padding-bottom: 0.5rem;
-        margin-bottom: 1.5rem;
-    }
-    .problem-statement p {
-        font-size: 1rem;
-        line-height: 1.6;
-        color: #343a40;
-    }
-    .problem-statement .text-muted.fst-italic {
-        font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--primary-bg);
+      color: var(--text-dark);
+      padding: 1.5rem;
+      position: relative;
     }
 
-    /* Ace Editor Styling */
-    #editor {
-      height: 400px;
-      width: 100%;
-      border-radius: 0.5rem;
-      border: 1px solid #495057; /* Darker border for the editor */
-      font-size: 14px;
-      line-height: 1.5;
-      overflow: hidden;
-    }
-    .ace_editor {
-        border-radius: 0.5rem; /* Apply to Ace Editor's internal element */
-        font-family: 'Fira Code', monospace !important; /* Ensure code font */
-        background-color: #282a36 !important; /* Dark background like Dracula/Monokai */
-    }
-    .ace_gutter { /* Gutter background */
-        background-color: #282a36 !important;
-        color: #6272a4 !important; /* Gutter text color */
-    }
-    .ace_print-margin { /* Remove print margin if not desired */
-        display: none !important;
-    }
-
-    .compiler-output {
-      background-color: #212529; /* Dark background for output */
-      color: #e9ecef; /* Light text color */
-      border-radius: 0.5rem;
-      padding: 1rem;
-      white-space: pre-wrap;
-      font-family: 'Fira Code', monospace; /* Use a monospaced font for code/output */
-      overflow-x: auto;
-      min-height: 150px;
-      margin-top: 0.5rem;
-      border: 1px solid #495057;
-    }
-    #custom-input {
-      background-color: #212529;
-      color: #e9ecef;
-      border-color: #495057;
-      resize: vertical;
-      font-family: 'Fira Code', monospace;
-      font-size: 14px;
-      border-radius: 0.5rem;
-      padding: 0.75rem;
-    }
-    #language-select {
-        border-radius: 0.5rem;
-        padding: 0.65rem 1rem;
-        font-size: 1rem;
-        border-color: #ced4da;
-    }
-    .form-label {
-        font-weight: 600;
-        color: #343a40;
-    }
-    .form-label.bg-dark { /* Label for code editor */
-        background-color: #212529 !important;
-        color: #e9ecef !important;
-        border-top-left-radius: 0.5rem;
-        border-top-right-radius: 0.5rem;
-        padding: 0.75rem 1rem;
-    }
-    .form-check-label {
-        color: #343a40;
-    }
-    .form-check-input:checked {
-        background-color: #2A5C88;
-        border-color: #2A5C88;
-    }
-
-
-    /* Buttons */
-    .btn {
-        padding: 0.75rem 1.5rem;
-        font-size: 1rem;
-        font-weight: 600;
-        border-radius: 8px; /* Rounded buttons */
-        transition: all 0.3s ease;
-    }
-    .btn-primary {
-      background-color: #2A5C88;
-      border-color: #2A5C88;
-    }
-    .btn-primary:hover {
-      background-color: #204664;
-      border-color: #204664;
-      transform: translateY(-2px);
-    }
-    .btn-success {
-      background-color: #28a745;
-      border-color: #28a745;
-    }
-    .btn-success:hover {
-      background-color: #218838;
-      border-color: #1e7e34;
-      transform: translateY(-2px);
-    }
-    .btn-outline-danger {
-        border-color: #dc3545;
-        color: #dc3545;
-    }
-    .btn-outline-danger:hover {
-        background-color: #dc3545;
-        color: white;
-        transform: translateY(-2px);
-    }
-    .btn-secondary {
-        background-color: #6c757d; /* Standard secondary color */
-        border-color: #6c757d;
-    }
-    .btn-secondary:hover {
-        background-color: #5a6268;
-        border-color: #545b62;
-        transform: translateY(-2px);
-    }
-
-
-    /* Message Box */
-    #message-box > div {
+    #assignment-timer {
       position: fixed;
       top: 1rem;
-      right: 1rem;
-      z-index: 1050;
-      min-width: 300px; /* Slightly wider message box */
-      box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,.15); /* Stronger shadow */
-      border-radius: 10px; /* Rounded corners */
-      padding: 1rem 1.5rem; /* Increased padding */
-      font-size: 1rem;
-      font-weight: 500;
+      right: 1.5rem;
+      background-color: var(--card-bg);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      font-weight: 600;
+      color: var(--left-panel-bg);
+      z-index: 1000;
+      transition: background-color 0.3s, color 0.3s;
     }
 
-    /* Table for test cases */
-    .table-responsive {
-      max-height: 250px; /* Keep max height for scrolling */
+    #assignment-timer.alert-danger {
+      background-color: var(--danger-color);
+      color: #FFFFFF;
+    }
+    
+    #assignment-container {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      padding: 2rem;
+      margin-top: 3rem; /* Space for the timer */
+    }
+    
+    h1 {
+      font-weight: 700;
+      color: var(--left-panel-bg);
+    }
+    
+    .problem-statement, .code-editor-section {
+      background-color: #F8F9FA;
+      border-radius: 8px;
+      padding: 1.5rem;
+      height: 100%;
+    }
+    
+    .problem-statement h2, .problem-statement h6 {
+      color: var(--left-panel-bg);
+    }
+
+    #editor {
+      border: 1px solid var(--input-border) !important;
+      border-radius: 8px;
+      font-family: 'Fira Code', monospace;
+      font-size: 14px;
+      height: 400px;
+    }
+
+    .form-control, .form-select {
+      font-family: 'Inter', sans-serif;
+      border-radius: 8px;
+    }
+    
+    .compiler-output {
+      background-color: #2c3e50; /* A dark color for the output */
+      color: #ecf0f1;
+      padding: 1rem;
+      border-radius: 8px;
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      max-height: 200px;
       overflow-y: auto;
-      border: 1px solid #e0e0e0; /* Border around the responsive table */
-      border-radius: 0.5rem;
-    }
-    .table {
-        margin-bottom: 0; /* Remove default table bottom margin */
-    }
-    .table thead th {
-        background-color: #f8f9fa; /* Light header background for nested table */
-        color: #495057;
-        font-weight: 600;
-        border-bottom: 1px solid #e0e0e0;
-    }
-    .table tbody td {
-        white-space: pre-wrap; /* Preserve whitespace for input/output */
-        word-break: break-all; /* Break long words */
-        font-family: 'Fira Code', monospace;
-        font-size: 0.9rem;
-        vertical-align: top; /* Align content to top in table cells */
-        border-color: #e9ecef;
-    }
-    .table-bordered th, .table-bordered td {
-        border: 1px solid #dee2e6; /* Ensure borders are visible */
     }
 
-    /* Responsive adjustments */
-    @media (max-width: 991.98px) {
-        .problem-statement {
-            max-height: 400px; /* Reduce max height on smaller screens for problem statement */
-        }
+    .table-responsive {
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--input-border);
     }
 
-    /* New: Timer display */
-    #assignment-timer {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background-color: #2A5C88; /* Blue background matching theme */
-        color: white;
-        padding: 10px 15px;
-        border-radius: 8px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        z-index: 1000; /* Ensure it's above other content */
+    .table th, .table td {
+      font-size: 0.9rem;
     }
-    #assignment-timer.alert-danger { /* Red for low time */
-        background-color: #dc3545;
+
+    .btn-primary {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+
+    .btn-primary:hover {
+      background-color: #3A7DC1;
+      border-color: #3A7DC1;
+    }
+
+    .btn-success {
+      background-color: #2ECC71;
+      border-color: #2ECC71;
+    }
+    
+    .btn-success:hover {
+      background-color: #27ae60;
+      border-color: #27ae60;
+    }
+
+    .btn-outline-danger {
+      color: var(--danger-color);
+      border-color: var(--danger-color);
+    }
+    .btn-outline-danger:hover {
+      background-color: var(--danger-color);
+      color: white;
+    }
+
+    #message-box {
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1050;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    .alert-danger {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .alert-success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    /* Media queries for responsiveness */
+    @media (max-width: 992px) {
+      .row.gx-5 {
+        gap: 1.5rem !important; /* Adjust gap on smaller screens */
+      }
+      .col-lg-5, .col-lg-7 {
+        width: 100%;
+      }
+      .problem-statement, .code-editor-section {
+        padding: 1rem;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- New: Global Assignment Timer -->
   <div id="assignment-timer">Time Left: <span id="time-left-display">--:--</span></div>
 
   <div class="container">
@@ -263,7 +179,6 @@
       <p id="assignment-meta" class="text-muted"></p>
 
       <div class="row gx-5 gy-4">
-        <!-- Left: Problem Statement -->
         <div class="col-lg-5">
           <div class="problem-statement">
             <h2 class="h5 mb-3 border-bottom pb-2">Problem <span id="problem-number">1</span>: <span id="problem-title">Loading...</span></h2>
@@ -282,15 +197,13 @@
                     </tr>
                   </thead>
                   <tbody id="test-cases-table-body">
-                    <!-- Test cases will be inserted here -->
-                  </tbody>
+                    </tbody>
                 </table>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Right: Editor + Controls -->
         <div class="col-lg-7 d-flex flex-column">
           <label for="language-select" class="form-label mb-2">Select Language</label>
           <select id="language-select" class="form-select mb-3" aria-label="Select Programming Language">
@@ -331,13 +244,10 @@
       </div>
     </div>
 
-    <!-- Message Box -->
     <div id="message-box"></div>
   </div>
 
-  <!-- Ace Editor -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
-  <!-- Add themes for Ace Editor. Monokai is a popular dark theme. -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/theme-monokai.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-c_cpp.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-python.js"></script>

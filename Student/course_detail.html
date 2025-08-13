@@ -5,139 +5,191 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Course Details</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
-    body {
-      background: #f5f9f8;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      display: flex;
+    :root {
+      --primary-bg: #E8F0F7; /* Soft Light Blue */
+      --secondary-bg: #FFFFFF; /* White */
+      --left-panel-bg: #2A5C88; /* Deep Blue */
+      --card-bg: #FFFFFF; /* White */
+      --accent-color: #4A90E2; /* Bright Light Blue */
+      --text-light: #F7F7E8; /* Soft Cream */
+      --text-dark: #2C3E50; /* Dark Gray-Blue */
+      --input-border: #DDE0E3; /* Light Gray */
+      --link-color: #4A90E2; /* Bright Light Blue */
     }
 
-    /* Sidebar */
-    .sidebar {
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background-color: var(--primary-bg);
+    }
+
+    .main-container {
+      display: flex;
       min-height: 100vh;
-      background-color: #2A5C88;
-      color: white;
-      padding: 20px 10px;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: var(--left-panel-bg);
+      color: var(--text-light);
+      padding: 2rem 1.5rem;
       transition: transform 0.3s ease-in-out;
+      transform: translateX(0);
       position: fixed;
       top: 0;
+      bottom: 0;
       left: 0;
-      width: 220px;
       z-index: 1000;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar.show {
+      transform: translateX(0);
     }
 
     .sidebar h4 {
-      font-weight: bold;
-      margin-bottom: 30px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      color: var(--text-light);
     }
 
     .sidebar a {
-      color: white;
+      color: var(--text-light);
       text-decoration: none;
-      display: block;
-      padding: 10px;
-      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 0.5rem;
       transition: background-color 0.3s ease;
+      font-weight: 400;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .sidebar a:hover {
-      background-color: #1d4568;
-    }
-
+    .sidebar a:hover,
     .sidebar a.active {
-      background-color: #17405f;
+      background-color: var(--accent-color);
+      font-weight: 700;
+      color: var(--left-panel-bg);
     }
 
-    /* Mobile sidebar hidden */
-    @media (max-width: 768px) {
-      .sidebar {
-        transform: translateX(-100%);
-      }
-      .sidebar.show {
-        transform: translateX(0);
-      }
-      .toggle-btn {
-        display: block;
-        background-color: #2A5C88;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        position: fixed;
-        top: 10px;
-        left: 10px;
-        z-index: 1100;
-        border-radius: 5px;
-      }
-    }
-
-    /* Desktop adjustments */
-    @media (min-width: 769px) {
-      .toggle-btn {
-        display: none;
-      }
-      .main-content {
-        margin-left: 220px;
-      }
-    }
-
-    /* Main content */
     .main-content {
-      flex-grow: 1;
-      padding: 20px;
+      flex: 1;
+      margin-left: 250px;
+      padding: 2rem;
+      transition: margin-left 0.3s ease-in-out;
+      color: var(--text-dark);
     }
 
-    /* Week material cards */
-    .week-material-card {
-      background: #fff;
+    .toggle-btn {
+      display: none;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1001;
+      background-color: var(--left-panel-bg);
+      color: var(--text-light);
+      border: none;
+      padding: 0.5rem 1rem;
       border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      font-weight: bold;
+    }
+    
+    .week-material-card {
+      background-color: var(--card-bg);
+      border: none;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
       height: 100%;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     }
-
+    
     .week-material-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
     }
 
     .week-material-card h5 {
-      font-weight: bold;
-      color: #2A5C88;
-      margin-bottom: 8px;
-      font-size: 1.1em;
+      font-weight: 600;
+      color: var(--text-dark);
     }
 
-    #statusMessage {
-      display: none;
+    .week-material-card p {
+      color: #555;
+    }
+
+    .alert {
+      display: none; /* Initially hidden */
+      border-radius: 8px;
+      padding: 1rem;
+      font-weight: 500;
+      text-align: center;
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1050;
+      width: 90%;
+      max-width: 500px;
+    }
+    
+    .alert-info { background-color: #d1ecf1; color: #0c5460; }
+    .alert-success { background-color: #d4edda; color: #155724; }
+    .alert-danger { background-color: #f8d7da; color: #721c24; }
+
+    /* Mobile styles */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        width: 75%;
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+
+      .toggle-btn {
+        display: block;
+      }
+       .main-container.sidebar-open .toggle-btn {
+        display: none;
+    }
     }
   </style>
 </head>
 <body>
 
-<!-- Mobile toggle button -->
-<button class="toggle-btn" aria-label="Toggle menu">☰ Menu</button>
+<div class="main-container">
+  <button class="toggle-btn" aria-label="Toggle menu">☰ Menu</button>
 
-<!-- Sidebar -->
-<nav class="sidebar" id="sidebar">
-  <h4 id="courseName">Loading...</h4>
-  <div id="weeksMenu"></div>
-  <a href="our_course.html" style="background-color:#1f4568;">Back to Courses</a>
-</nav>
+  <nav class="sidebar" id="sidebar">
+    <h4 id="courseName">Loading...</h4>
+    <div id="weeksMenu"></div>
+    <a href="our_course.html" style="background-color:#1f4568; margin-top: auto;">Back to Courses</a>
+  </nav>
 
-<!-- Main Content -->
-<main class="main-content">
-  <h3 class="mb-4">Course Weeks</h3>
-  <div id="weekContent">
-    <p>Select a week from the menu to see details.</p>
-  </div>
-</main>
+  <main class="main-content">
+    <h3 class="mb-4">Course Weeks</h3>
+    <div id="weekContent">
+      <p>Select a week from the menu to see details.</p>
+    </div>
+  </main>
+</div>
 
-<!-- Status Message -->
 <div id="statusMessage" class="alert"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -202,6 +254,10 @@
         weekLink.innerText = `Week ${i}`;
         weekLink.addEventListener("click", (e) => {
           e.preventDefault();
+          // Remove active class from all links
+          document.querySelectorAll('#weeksMenu a').forEach(link => link.classList.remove('active'));
+          // Add active class to the clicked link
+          weekLink.classList.add('active');
           loadWeekContent(i);
           sidebar.classList.remove("show");
         });
@@ -229,7 +285,7 @@
             <h5>${subject}</h5>
             <p>Study Material for Week ${weekNumber} - ${subject}</p>
             <a href="week_detail.html?courseId=${courseId}&week=${weekNumber}&subject=${encodeURIComponent(subject)}" 
-               class="btn btn-primary">Enter</a>
+               class="btn btn-primary go-to-course">Enter</a>
           </div>
         </div>
       `;

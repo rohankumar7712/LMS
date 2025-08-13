@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,201 +5,252 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Add Course</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-
+  
   <style>
-  body {
-    background: #f5f9f8;
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-  }
+    /* Google Font 'Inter' for a clean, modern look */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap');
+    
+    :root {
+      --primary-bg: #E8F0F7; /* Soft Light Blue */
+      --secondary-bg: #FFFFFF; /* White */
+      --left-panel-bg: #2A5C88; /* Deep Blue */
+      --card-bg: #FFFFFF; /* White */
+      --accent-color: #4A90E2; /* Bright Light Blue */
+      --text-light: #F7F7E8; /* Soft Cream */
+      --text-dark: #2C3E50; /* Dark Gray-Blue */
+      --input-border: #DDE0E3; /* Light Gray */
+      --link-color: #4A90E2; /* Bright Light Blue */
+    }
 
-  .sidebar {
-    min-height: 100vh;
-    background-color: #2A5C88;
-    color: white;
-    padding: 20px 10px;
-  }
-
-  .sidebar h4 {
-    font-weight: bold;
-    margin-bottom: 30px;
-  }
-
-  .sidebar a {
-    color: white;
-    text-decoration: none;
-    display: block;
-    padding: 10px;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
-  }
-
-  .sidebar a:hover {
-    background-color: #1d4568;
-  }
-
-  .sidebar a.active {
-    background-color: #17405f;
-  }
-
-  .sidebar a.logout-link {
-    color: #ffcccc !important;
-  }
-
-  .sidebar a.logout-link:hover {
-    background-color: #c0392b;
-    color: white !important;
-  }
-
-  .btn-purple {
-    background: #2A5C88;
-    color: white;
-  }
-
-  .btn-purple:hover {
-    background: #1d4568;
-  }
-
-  .toggle-btn {
-    display: none;
-  }
-
-  .main-content {
-    padding: 20px;
-  }
-
-  .card {
-    border: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
-
-  /* Mobile layout */
-  @media (max-width: 768px) {
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background-color: var(--primary-bg);
+    }
+    
+    .container-flex {
+      display: flex;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    
     .sidebar {
-      position: fixed;
-      width: 200px;
-      z-index: 1000;
-      transform: translateX(-100%);
+      width: 250px;
+      background-color: var(--left-panel-bg);
+      color: var(--text-light);
+      padding: 2rem 1.5rem;
       transition: transform 0.3s ease-in-out;
-    }
-
-    .sidebar.show {
       transform: translateX(0);
-    }
-
-    .toggle-btn {
-      display: block;
-      background-color: #2A5C88;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      margin: 10px;
-    }
-
-    .main-content {
-      margin-left: 0;
-    }
-  }
-
-  /* Desktop layout */
-  @media (min-width: 769px) {
-    .sidebar {
       position: fixed;
-      width: 220px;
       top: 0;
+      bottom: 0;
       left: 0;
-      transform: none; /* Always visible */
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
     }
-
+    
+    .sidebar h4 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+    }
+    
+    .sidebar a {
+      color: var(--text-light);
+      text-decoration: none;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 0.5rem;
+      transition: background-color 0.3s ease;
+      font-weight: 400;
+    }
+    
+    .sidebar a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar a.active {
+      background-color: var(--accent-color);
+      color: var(--left-panel-bg);
+      font-weight: 700;
+    }
+    
+    .logout-link {
+      margin-top: auto; /* Pushes the logout link to the bottom */
+      background-color: var(--accent-color);
+      color: var(--left-panel-bg) !important;
+      text-align: center;
+      font-weight: 700;
+    }
+    
+    .logout-link:hover {
+      background-color: #3A7DC1;
+      color: var(--text-light) !important;
+    }
+    
     .main-content {
-      margin-left: 220px; /* Space for sidebar */
+      flex: 1;
+      margin-left: 250px;
+      padding: 2rem;
+      transition: margin-left 0.3s ease-in-out;
     }
-
+    
+    .dashboard-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+    
+    .card {
+      border-radius: 1rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border: none;
+      background-color: var(--card-bg);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .card-title {
+      color: var(--text-dark);
+    }
+    
     .toggle-btn {
-      display: none; /* Hide toggle button on desktop */
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      background-color: var(--left-panel-bg);
+      color: var(--text-light);
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      z-index: 1001;
+      display: none; /* Hide on desktop */
     }
-  }
-</style>
+    
+    .toggle-btn.hidden {
+      display: none !important;
+    }
 
+    /* Responsive styles for mobile */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .toggle-btn {
+        display: block;
+      }
+    }
+    
+    /* Make the entire content scrollable on small screens */
+    @media (max-width: 768px) {
+        .container-flex {
+            min-height: auto;
+        }
+        .main-content {
+            padding-top: 5rem; /* Add space for the toggle button */
+        }
+    }
+  </style>
 </head>
 <body>
 
   <!-- Toggle button for mobile -->
   <button class="toggle-btn">☰ Menu</button>
 
-  <div class="container-fluid">
-    <div class="row">
-      <!-- Sidebar -->
-      <div class="col-md-3 sidebar" id="sidebar">
-        <h4 class="mb-4">Admin Panel</h4>
-        <a href="admin_courses.html" class="active">Add Course</a>
-        <a href="courseHistory.html">Courses History</a>
-        <a href="admin_dashboard.html" onclick="logout()">← Back</a>
-      </div>
+  <div class="container-flex">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <h4 class="mb-4">Admin Panel</h4>
+      <a href="admin_courses.html" class="active">Add Course</a>
+      <a href="courseHistory.html">Courses History</a>
+      <a href="admin_dashboard.html" class="logout-link">← Back</a>
+    </div>
 
-      <!-- Main Content -->
-      <div class="col-md-9 main-content">
-        <h2 class="dashboard-title">Add New Course</h2>
-        <form id="courseForm" class="card p-4">
-          <div class="mb-3">
-            <label class="form-label">Course Title</label>
-            <input type="text" class="form-control" id="courseTitle" required />
+    <!-- Main Content -->
+    <div class="main-content">
+      <h2 class="dashboard-title">Add New Course</h2>
+      <form id="courseForm" class="card p-4">
+        <div class="mb-3">
+          <label class="form-label">Course Title</label>
+          <input type="text" class="form-control" id="courseTitle" required />
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Start Date</label>
+            <input type="date" class="form-control" id="startDate" required />
           </div>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label class="form-label">Start Date</label>
-              <input type="date" class="form-control" id="startDate" required />
-            </div>
-            <div class="col-md-6 mb-3">
-              <label class="form-label">End Date</label>
-              <input type="date" class="form-control" id="endDate" required />
-            </div>
-            <div class="col-md-6 mb-3">
-              <label class="form-label">No. of Weeks</label>
-              <input type="number" class="form-control" id="weeks" min="1" required />
-            </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">End Date</label>
+            <input type="date" class="form-control" id="endDate" required />
           </div>
-          <div class="mb-3">
-            <label class="form-label">Subjects</label><br/>
-            <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="Java"><label class="form-check-label">Java</label></div>
-            <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="Python"><label class="form-check-label">Python</label></div>
-            <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="HTML"><label class="form-check-label">HTML</label></div>
-            <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="CSS"><label class="form-check-label">CSS</label></div>
-            <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="JavaScript"><label class="form-check-label">JavaScript</label></div>
-            <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="SQL"><label class="form-check-label">SQL</label></div>
-            <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="C++"><label class="form-check-label">C++</label></div>
-            <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="ML"><label class="form-check-label">ML</label></div>
-            <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="C"><label class="form-check-label">C</label></div>
-            <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="Quantitative Aptitude & Reasoning"><label class="form-check-label">Quantitative Aptitude & Reasoning</label></div>
-
+          <div class="col-md-6 mb-3">
+            <label class="form-label">No. of Weeks</label>
+            <input type="number" class="form-control" id="weeks" min="1" required />
           </div>
-          <button type="submit" class="btn btn-primary">Create Course</button>
-        </form>
-        <div id="statusMessage" class="alert mt-3" style="display:none;"></div>
-      </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Subjects</label><br/>
+          <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="Java"><label class="form-check-label">Java</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="Python"><label class="form-check-label">Python</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="HTML"><label class="form-check-label">HTML</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="CSS"><label class="form-check-label">CSS</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="JavaScript"><label class="form-check-label">JavaScript</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="SQL"><label class="form-check-label">SQL</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="C++"><label class="form-check-label">C++</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="ML"><label class="form-check-label">ML</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="C"><label class="form-check-label">C</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="DSA"><label class="form-check-label">DSA</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="CN"><label class="form-check-label">CN</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="OS"><label class="form-check-label">OS</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="DBMS"><label class="form-check-label">DBMS</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input subject-checkbox" type="checkbox" value="Quantitative Aptitude & Reasoning"><label class="form-check-label">Quantitative Aptitude & Reasoning</label></div>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Course</button>
+      </form>
+      <div id="statusMessage" class="alert mt-3" style="display:none;"></div>
     </div>
   </div>
 
   <!-- Firebase + JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
     const firebaseConfig = {
-    apiKey: "AIzaSyD_C4ZPXTXQZtZJbtAwTiub_rkIZcvsE2Y",
-    authDomain: "clms-19db3.firebaseapp.com",
-    projectId: "clms-19db3",
-    storageBucket: "clms-19db3.firebasestorage.app",
-    messagingSenderId: "218119035486",
-    appId: "1:218119035486:web:39291d39b4b461b56032cf"
-  };
+      apiKey: "AIzaSyD_C4ZPXTXQZtZJbtAwTiub_rkIZcvsE2Y",
+      authDomain: "clms-19db3.firebaseapp.com",
+      projectId: "clms-19db3",
+      storageBucket: "clms-19db3.firebasestorage.app",
+      messagingSenderId: "218119035486",
+      appId: "1:218119035486:web:39291d39b4b461b56032cf"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
     const statusMessageDiv = document.getElementById("statusMessage");
 
+    /**
+     * Displays a status message to the user for a few seconds.
+     * @param {string} message The message to display.
+     * @param {string} type The type of alert ('success', 'danger', 'warning').
+     */
     function showStatusMessage(message, type = 'info') {
       statusMessageDiv.textContent = message;
       statusMessageDiv.className = `alert mt-3 alert-${type}`;
@@ -210,6 +260,9 @@
       }, 3000);
     }
 
+    /**
+     * Handles the form submission to add a new course to Firestore.
+     */
     document.getElementById("courseForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -241,24 +294,40 @@
         showStatusMessage("Error: " + err.message, "danger");
       }
     });
-
-    function logout() {
-      window.location.href = "index.html";
+    
+    /**
+     * Handles the back button functionality.
+     */
+    window.logout = function() {
+        window.location.href = "index.html";
     }
 
-    document.querySelector('.toggle-btn').addEventListener('click', () => {
+    /**
+     * Toggles the sidebar on mobile devices and hides the toggle button.
+     */
+    window.toggleSidebar = function () {
       const sidebar = document.getElementById('sidebar');
+      const toggleBtn = document.querySelector('.toggle-btn');
       sidebar.classList.toggle('show');
+      toggleBtn.classList.toggle('hidden');
+    };
+    
+    // Attach the event listener to the toggle button
+    document.querySelector('.toggle-btn').addEventListener('click', () => {
+      toggleSidebar();
     });
 
+    // Close the sidebar when a link is clicked on mobile and show the toggle button
     document.querySelectorAll('.sidebar a').forEach(link => {
       link.addEventListener('click', () => {
-        document.getElementById('sidebar').classList.remove('show');
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.querySelector('.toggle-btn');
+        if (sidebar.classList.contains('show')) {
+          sidebar.classList.remove('show');
+          toggleBtn.classList.remove('hidden');
+        }
       });
     });
-    window.toggleSidebar = function () {
-      document.getElementById('sidebar').classList.toggle('show');
-    }
   </script>
 </body>
 </html>

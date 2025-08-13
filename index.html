@@ -6,58 +6,249 @@
   <title>LMS Login</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <style>
-    body, html { height: 100%; margin: 0; font-family: 'Segoe UI', sans-serif; }
-    .container-flex { display: flex; flex-direction: column; height: 100vh; }
-    @media (min-width: 768px) { .container-flex { flex-direction: row; } }
+    /* Google Font 'Inter' for a clean, modern look */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap');
+
+    :root {
+      --primary-bg: #E8F0F7; /* Soft Light Blue */
+      --secondary-bg: #FFFFFF; /* White */
+      --left-panel-bg: #2A5C88; /* Deep Blue */
+      --card-bg: #FFFFFF; /* White */
+      --accent-color: #4A90E2; /* Bright Light Blue */
+      --text-light: #F7F7E8; /* Soft Cream */
+      --text-dark: #2C3E50; /* Dark Gray-Blue */
+      --input-border: #DDE0E3; /* Light Gray */
+      --link-color: #4A90E2; /* Bright Light Blue */
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background-color: var(--primary-bg);
+    }
+
+    .container-flex {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      flex-direction: row; /* Default desktop layout */
+    }
 
     .left-panel {
       flex: 1;
-      background: linear-gradient(135deg, #D0E6F6, #FFFFFF);
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
+      background-color: var(--left-panel-bg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       padding: 2rem;
+      color: var(--text-light);
+      text-align: center;
     }
-    .left-panel h1 { color: #2A5C88; font-size: 2.5rem; font-weight: bold; }
-    .left-panel p { color: #4B4B4B; font-size: 1.1rem; max-width: 400px; text-align: center; }
+
+    .left-panel h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .left-panel p {
+      font-size: 1.2rem;
+      font-weight: 300;
+      max-width: 500px;
+      line-height: 1.5;
+    }
 
     .right-panel {
-      flex: 1; background: #2A5C88;
-      display: flex; align-items: center; justify-content: center;
-      padding: 1rem;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+    
+    .login-box, .register-box {
+      width: 100%;
+      max-width: 450px;
+      background-color: var(--card-bg);
+      padding: 2.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transition: all 0.5s ease-in-out;
+    }
+    
+    .login-box h3, .register-box h3 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
     }
 
-    .login-box, .register-box {
-      background: #ffffff;
-      color: #2A5C88;
-      padding: 2rem;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    .login-box p, .register-box p {
+      font-size: 1rem;
+      color: var(--text-dark);
+      margin-bottom: 1.5rem;
+    }
+
+    .form-control {
+      background-color: var(--primary-bg);
+      border: 1px solid var(--input-border);
+      padding: 0.8rem 1rem;
+      border-radius: 0.5rem;
+      transition: border-color 0.3s ease;
+    }
+    
+    .form-control:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+    }
+    
+    .login-btn {
+      background-color: var(--accent-color);
+      color: var(--left-panel-bg);
+      font-weight: 700;
+      padding: 0.8rem 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .login-btn:hover {
+      background-color: #3A7DC1; /* A darker light blue */
+      transform: translateY(-2px);
     }
 
     .role-toggle .btn {
-      border-radius: 0.75rem;
-      font-size: 1rem;
-      padding: 0.5rem 0;
+      font-weight: 700;
+      padding: 0.7rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      color: var(--text-dark);
+      border-color: var(--input-border);
+    }
+    
+    .role-toggle .btn:not(.btn-primary) {
+      background-color: var(--card-bg);
     }
 
-    .form-control, .form-select {
-      background-color: #f2f7fc;
-      border: 1px solid #cfddeb;
-      color: #2A5C88;
+    .role-toggle .btn.btn-primary {
+      background-color: var(--left-panel-bg);
+      color: var(--text-light);
+      border-color: var(--left-panel-bg);
+    }
+    
+    .role-toggle .btn.btn-primary:hover {
+        background-color: var(--left-panel-bg);
+        border-color: var(--left-panel-bg);
     }
 
-    .form-control::placeholder { color: #9cb2c9; }
-    .form-control:focus { box-shadow: none; border-color: #2A5C88; }
-    .login-btn {
-      background: #2A5C88;
-      color: white;
-      font-weight: bold;
+    .text-link {
+      color: var(--link-color);
+      cursor: pointer;
+      font-weight: 700;
+      transition: color 0.3s ease;
     }
 
-    .text-link { color: #2A5C88; text-decoration: underline; cursor: pointer; }
-    .hidden { display: none; }
+    .text-link:hover {
+      color: #3A7DC1;
+      text-decoration: underline;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Custom Alert Box Styles */
+    .alert-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .alert-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .alert-box {
+      background-color: var(--card-bg);
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      text-align: center;
+      transform: translateY(-20px);
+      transition: transform 0.3s ease;
+    }
+
+    .alert-overlay.show .alert-box {
+      transform: translateY(0);
+    }
+
+    .alert-box h4 {
+      font-weight: 700;
+      color: var(--left-panel-bg);
+      margin-bottom: 1rem;
+    }
+
+    .alert-box p {
+      margin-bottom: 1.5rem;
+    }
+
+    .alert-box-btn {
+      background-color: var(--left-panel-bg);
+      color: var(--text-light);
+      font-weight: 700;
+      padding: 0.8rem 2rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .alert-box-btn:hover {
+      background-color: #2A4254;
+    }
+    
+    /* Responsive design for mobile screens */
+    @media (max-width: 768px) {
+      .container-flex {
+        flex-direction: column;
+        height: auto;
+      }
+
+      .left-panel {
+        padding: 4rem 2rem;
+        height: auto;
+      }
+      
+      .left-panel h1 {
+        font-size: 2.5rem;
+      }
+
+      .left-panel p {
+        font-size: 1rem;
+      }
+
+      .right-panel {
+        padding: 2rem 1rem;
+        flex: none;
+      }
+
+      .login-box, .register-box {
+        padding: 1.5rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -72,7 +263,7 @@
         <h3 class="text-center">Login</h3>
         <p class="text-center">Welcome Back!</p>
         <div class="d-flex justify-content-between mb-3 role-toggle">
-          <button class="btn btn-outline-primary w-50 me-2" onclick="selectRole('student')" id="studentBtn">Student</button>
+          <button class="btn btn-outline-primary w-50 me-2 btn-primary" onclick="selectRole('student')" id="studentBtn">Student</button>
           <button class="btn btn-outline-primary w-50" onclick="selectRole('admin')" id="adminBtn">Admin</button>
         </div>
 
@@ -84,7 +275,7 @@
           <div class="mb-3">
             <input type="password" class="form-control" placeholder="Password" id="loginPassword" required>
           </div>
-          <button type="submit" class="btn login-btn w-100">Login</button>
+          <button type="submit" class="btn login-btn w-100" id="loginButton">Login</button>
           <p class="mt-3 text-center">Don’t have an account? <span class="text-link" onclick="showRegister()">Sign Up</span></p>
         </form>
       </div>
@@ -107,6 +298,15 @@
     </div>
   </div>
 
+  <!-- Custom Alert Box -->
+  <div class="alert-overlay" id="customAlert">
+    <div class="alert-box">
+      <h4 id="alertTitle">Message</h4>
+      <p id="alertMessage">This is a custom alert message.</p>
+      <button class="alert-box-btn" onclick="hideAlert()">OK</button>
+    </div>
+  </div>
+
   <!-- Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
@@ -126,6 +326,17 @@
 
     const ADMIN_EMAIL = "admin@gmail.com";
     const ADMIN_PASSWORD = "admin123";
+    
+    // Custom alert functions
+    window.showAlert = (message, title = "Message") => {
+      document.getElementById('alertTitle').textContent = title;
+      document.getElementById('alertMessage').textContent = message;
+      document.getElementById('customAlert').classList.add('show');
+    };
+
+    window.hideAlert = () => {
+      document.getElementById('customAlert').classList.remove('show');
+    };
 
     // UI toggle
     window.showRegister = () => {
@@ -151,7 +362,7 @@
       try {
         const q = query(collection(db, "students"), where("email", "==", email));
         const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) return alert("Email already registered.");
+        if (!querySnapshot.empty) return showAlert("Email already registered.");
 
         const studentData = {
           firstName: document.getElementById('regFirstName').value,
@@ -164,54 +375,70 @@
 
         const docRef = doc(collection(db, "students"));
         await setDoc(docRef, studentData);
-        alert("Registration successful");
+        showAlert("Registration successful", "Success");
         showLogin();
       } catch (err) {
         console.error(err);
-        alert("Registration failed. Try again.");
+        showAlert("Registration failed. Try again.");
       }
     });
 
     // Login
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const loginButton = document.getElementById('loginButton');
+      loginButton.disabled = true;
+      loginButton.textContent = 'Logging in...';
+
       const role = document.getElementById('loginRole').value;
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
 
-      if (role === "admin") {
-        if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-          alert("Admin login successful!");
-          window.location.href = "Admin/admin_dashboard.html";
-        } else {
-          alert("Invalid admin credentials.");
+      setTimeout(async () => {
+        try {
+          if (role === "admin") {
+            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+              showAlert("Admin login successful!", "Success");
+              setTimeout(() => {
+                window.location.href = "Admin/admin_dashboard.html";
+              }, 2000); // 2-second delay after showing success message
+            } else {
+              showAlert("Invalid admin credentials.", "Error");
+            }
+          } else {
+            const q = query(collection(db, "students"), where("email", "==", email));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+              showAlert("No account found.", "Error");
+            } else {
+              const student = querySnapshot.docs[0].data();
+              if (student.password === password) {
+                showAlert("Student login successful!", "Success");
+                // ✅ Store student data securely (only essential info)
+                localStorage.setItem("student", JSON.stringify({
+                  firstName: student.firstName,
+                  lastName: student.lastName,
+                  enrollment: student.enrollment,
+                  email: student.email
+                }));
+
+                setTimeout(() => {
+                  window.location.href = "Student/student_dashboard.html";
+                }, 1000); // 2-second delay after showing success message
+              } else {
+                showAlert("Invalid password.", "Error");
+              }
+            }
+          }
+        } catch (err) {
+          console.error(err);
+          showAlert("An error occurred during login. Please try again.");
+        } finally {
+          loginButton.disabled = false;
+          loginButton.textContent = 'Login';
         }
-      } else {
-  const q = query(collection(db, "students"), where("email", "==", email));
-  const querySnapshot = await getDocs(q);
-
-  if (querySnapshot.empty) {
-    alert("No account found.");
-  } else {
-    const student = querySnapshot.docs[0].data();
-    if (student.password === password) {
-      alert("Student login successful!");
-
-      // ✅ Store student data securely (only essential info)
-      localStorage.setItem("student", JSON.stringify({
-        firstName: student.firstName,
-        lastName: student.lastName,
-        enrollment: student.enrollment,
-        email: student.email
-      }));
-
-      window.location.href = "Student/student_dashboard.html";
-    } else {
-      alert("Invalid password.");
-    }
-  }
-}
-
+      },1000); // 2-second delay for the loading state
     });
   </script>
 </body>

@@ -5,516 +5,502 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Week Details</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
+    :root {
+      --primary-bg: #E8F0F7; /* Soft Light Blue */
+      --secondary-bg: #FFFFFF; /* White */
+      --left-panel-bg: #2A5C88; /* Deep Blue */
+      --card-bg: #FFFFFF; /* White */
+      --accent-color: #4A90E2; /* Bright Light Blue */
+      --text-light: #F7F7E8; /* Soft Cream */
+      --text-dark: #2C3E50; /* Dark Gray-Blue */
+      --input-border: #DDE0E3; /* Light Gray */
+      --link-color: #4A90E2; /* Bright Light Blue */
+    }
+
     body {
-      background: #f5f9f8;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Inter', sans-serif;
       margin: 0;
-      display: flex; /* Enables side-by-side layout for sidebar and main content */
+      background-color: var(--primary-bg);
+    }
+
+    .main-container {
+      display: flex;
+      min-height: 100vh;
     }
 
     .sidebar {
-      min-height: 100vh;
-      background-color: #2A5C88;
-      color: white;
-      padding: 20px 10px;
+      width: 250px;
+      background-color: var(--left-panel-bg);
+      color: var(--text-light);
+      padding: 2rem 1.5rem;
       transition: transform 0.3s ease-in-out;
-      z-index: 1000;
-      position: fixed; /* Ensures sidebar stays fixed */
+      transform: translateX(0);
+      position: fixed;
       top: 0;
+      bottom: 0;
       left: 0;
-      width: 220px; /* Define fixed width for sidebar */
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
     }
 
-    .sidebar h4, .sidebar h5 {
-      font-weight: bold;
-      margin-bottom: 30px;
+    .sidebar.show {
+      transform: translateX(0);
+    }
+
+    .sidebar h5 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      color: var(--text-light);
     }
 
     .sidebar a {
-      color: white;
+      color: var(--text-light);
       text-decoration: none;
-      display: block;
-      padding: 10px;
-      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 0.5rem;
       transition: background-color 0.3s ease;
-      cursor: pointer;
+      font-weight: 400;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .sidebar a:hover {
-      background-color: #1d4568;
-    }
-
+    .sidebar a:hover,
     .sidebar a.active {
-      background-color: #17405f;
-    }
-
-    .sidebar a.logout-link {
-      color: #ffcccc !important;
-    }
-
-    .sidebar a.logout-link:hover {
-      background-color: #c0392b;
-      color: white !important;
-    }
-
-    .btn-purple {
-      background: #2A5C88;
-      color: white;
-    }
-
-    .btn-purple:hover {
-      background: #1d4568;
-    }
-
-    /* Style for the "Back" button */
-    #btnBackToCourse {
-        background-color: #1d4568 !important; /* Darker blue background */
-        color: white !important; /* White text color */
-        border-color: #1d4568 !important; /* Match border color */
-    }
-
-    #btnBackToCourse:hover {
-        background-color: #17405f !important; /* Even darker blue on hover */
-        border-color: #17405f !important;
-    }
-
-    .toggle-btn {
-      display: none; /* Hidden by default, shown on mobile */
+      background-color: var(--accent-color);
+      font-weight: 700;
+      color: var(--left-panel-bg);
     }
 
     .main-content {
-      flex-grow: 1; /* Allows main content to take remaining space */
-      padding: 20px;
-      margin-left: 0; /* Default for mobile, overridden by desktop media query */
+      flex: 1;
+      margin-left: 250px;
+      padding: 2rem;
+      transition: margin-left 0.3s ease-in-out;
+      color: var(--text-dark);
     }
 
-    /* Styles for general cards */
+    .toggle-btn {
+      display: none;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1001;
+      background-color: var(--left-panel-bg);
+      color: var(--text-light);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      font-weight: bold;
+    }
+    
     .card {
-        border: none;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        border-radius: 8px; /* Added border-radius for consistency */
-        background: #fff; /* Ensure white background for cards */
-        transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover */
-    }
-
-    /* Styles for the specific study material/assignment cards */
-    .card .card-body {
-        padding: 15px; /* Adjust padding for desired card size */
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        height: 100%; /* Ensure content fills card height */
-    }
-
-    .card h5.card-title { /* More specific selector for card titles */
-        font-weight: bold;
-        color: #2A5C88;
-        margin-bottom: 8px;
-        font-size: 1.1em;
-    }
-
-    .card p.card-text { /* More specific selector for card text */
-        margin-bottom: 3px;
-        color: #555;
-        font-size: 0.9em;
-    }
-
-    .card .btn {
-        width: 100%;
-        padding: 8px;
-        font-weight: bold;
-        border-radius: 5px;
-        margin-top: 10px;
-        font-size: 0.9em;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
     
     .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      transform: translateY(-5px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
     }
 
+    .card-title {
+      font-weight: 600;
+      color: var(--text-dark);
+    }
 
-    /* Mobile layout */
+    .btn-primary {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+
+    .btn-primary:hover {
+      background-color: #3A7DC1;
+      border-color: #3A7DC1;
+    }
+
+    .btn-success {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+
+    .btn-success:hover {
+      background-color: #218838;
+      border-color: #1e7e34;
+    }
+
+    .alert {
+      display: none; /* Initially hidden */
+      border-radius: 8px;
+      padding: 1rem;
+      font-weight: 500;
+      text-align: center;
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1050;
+      width: 90%;
+      max-width: 500px;
+    }
+    
+    .alert-info { background-color: #d1ecf1; color: #0c5460; }
+    .alert-success { background-color: #d4edda; color: #155724; }
+    .alert-danger { background-color: #f8d7da; color: #721c24; }
+
+    /* Mobile styles */
     @media (max-width: 768px) {
-      body {
-        display: block; /* Stack sidebar and main content vertically on mobile */
-      }
       .sidebar {
-        position: fixed;
-        width: 200px;
-        z-index: 1000;
         transform: translateX(-100%);
-        transition: transform 0.3s ease-in-out;
+        width: 75%;
       }
 
       .sidebar.show {
         transform: translateX(0);
       }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .main-container.sidebar-open .main-content {
+        margin-left: 75%;
+      }
 
       .toggle-btn {
         display: block;
-        background-color: #2A5C88;
-        color: white;
-        border: none;
-        padding: 10px 15px;
-        margin: 10px;
-        position: fixed; /* Keep toggle fixed on top-left */
-        top: 10px;
-        left: 10px;
-        z-index: 1001;
       }
-
-      .main-content {
-        margin-left: 0; /* Full width on mobile */
-        padding-top: 60px; /* Add padding to prevent content from going under the fixed toggle button */
-      }
+       .main-container.sidebar-open .toggle-btn {
+        display: none;
     }
-
-    /* Desktop layout */
-    @media (min-width: 769px) {
-      .sidebar {
-          position: fixed;
-          width: 220px;
-          top: 0;
-          left: 0;
-          transform: none; /* Always visible on desktop */
-      }
-
-      .main-content {
-          margin-left: 220px; /* Leave space for sidebar */
-          padding: 20px;
-      }
-
-      .toggle-btn {
-          display: none; /* Hide toggle button on desktop */
-      }
     }
   </style>
 </head>
 <body>
-
-  <!-- Toggle button for mobile -->
+<div class="main-container">
   <button class="toggle-btn" onclick="toggleSidebar()">☰ Menu</button>
 
-  <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <h5 id="pageTitle">Loading...</h5>
     <a id="btnStudy" href="#" role="button">📚 Study Material</a>
     <a id="btnAssignment" href="#" role="button">📝 Assignment</a>
-    <hr>
-    <!-- Removed btn-light class as it's being overridden by custom CSS -->
-    <a id="btnBackToCourse" href="#" class="btn btn-sm mt-3">⬅ Back</a>
+    <hr style="background-color: var(--text-light); height: 2px;">
+    <a id="btnBackToCourse" href="#" class="btn btn-sm mt-3" style="background-color:var(--accent-color); color:var(--left-panel-bg); font-weight:700;">⬅ Back</a>
   </div>
 
-  <!-- Main Content -->
   <div class="main-content">
     <div id="content" class="content">
       <p>Loading...</p>
     </div>
-    <!-- Custom Status Message moved here for proper positioning -->
     <div id="statusMessage" class="alert"></div>
   </div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyD_C4ZPXTXQZtZJbtAwTiub_rkIZcvsE2Y",
-      authDomain: "clms-19db3.firebaseapp.com",
-      projectId: "clms-19db3",
-      storageBucket: "clms-19db3.firebasestorage.app",
-      messagingSenderId: "218119035486",
-      appId: "1:218119035486:web:39291d39b4b461b56032cf"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyD_C4ZPXTXQZtZJbtAwTiub_rkIZcvsE2Y",
+    authDomain: "clms-19db3.firebaseapp.com",
+    projectId: "clms-19db3",
+    storageBucket: "clms-19db3.firebasestorage.app",
+    messagingSenderId: "218119035486",
+    appId: "1:218119035486:web:39291d39b4b461b56032cf"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    const statusMessageDiv = document.getElementById("statusMessage");
+  const statusMessageDiv = document.getElementById("statusMessage");
 
-    // Function to display custom status messages
-    function showStatusMessage(message, type = 'info') {
-      statusMessageDiv.textContent = message;
-      statusMessageDiv.className = `alert mt-3 alert-${type}`;
-      statusMessageDiv.style.display = 'block';
-      setTimeout(() => {
-        statusMessageDiv.style.display = 'none';
-      }, 3000); // Hide after 3 seconds
+  // Function to display custom status messages
+  function showStatusMessage(message, type = 'info') {
+    statusMessageDiv.textContent = message;
+    statusMessageDiv.className = `alert mt-3 alert-${type}`;
+    statusMessageDiv.style.display = 'block';
+    setTimeout(() => {
+      statusMessageDiv.style.display = 'none';
+    }, 3000); // Hide after 3 seconds
+  }
+
+  // Get parameters from URL
+  const params = new URLSearchParams(window.location.search);
+  const courseId = params.get("courseId");
+  const week = parseInt(params.get("week"));
+  const subject = params.get("subject");
+
+  if (!courseId || !week || !subject) {
+    showStatusMessage("Invalid parameters.", "danger");
+    throw new Error("Invalid parameters.");
+  }
+
+  document.getElementById("pageTitle").innerText = `${subject} - Week ${week}`;
+
+  // Student identifier from localStorage
+  let studentIdentifier = null;
+  const studentDataStr = localStorage.getItem("student");
+  if (studentDataStr) {
+    try {
+      const studentData = JSON.parse(studentDataStr);
+      studentIdentifier = studentData.enrollment;
+    } catch (e) {
+      console.error("Error parsing student data from localStorage", e);
     }
+  }
+  if (!studentIdentifier) {
+    showStatusMessage("Student not logged in. Please login first.", "danger");
+    window.location.href = "../index.html"; // Redirect to the main login page
+    throw new Error("Student not logged in");
+  }
 
-    // Get parameters from URL
-    const params = new URLSearchParams(window.location.search);
-    const courseId = params.get("courseId");
-    const week = parseInt(params.get("week"));
-    const subject = params.get("subject");
+  let studyMaterials = [];
+  let assignments = [];
 
-    if (!courseId || !week || !subject) {
-      showStatusMessage("Invalid parameters.", "danger");
-      throw new Error("Invalid parameters.");
+  // Helper to query submissions from a given collection
+  async function querySubmissions(collectionName, assignmentIds) {
+    if (!assignmentIds.length) return [];
+    const submissionsRef = collection(db, collectionName);
+    let results = [];
+    const chunkSize = 10; // Firestore 'in' query limit
+    for (let i = 0; i < assignmentIds.length; i += chunkSize) {
+      const chunk = assignmentIds.slice(i, i + chunkSize);
+      const q = query(
+        submissionsRef,
+        where("studentId", "==", studentIdentifier),
+        where("assignmentId", "in", chunk)
+      );
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(doc => {
+        results.push({ id: doc.id, ...doc.data() });
+      });
     }
+    return results;
+  }
 
-    document.getElementById("pageTitle").innerText = `${subject} - Week ${week}`;
+  async function loadSubmissionsForStudent(assignmentIds) {
+    // Need to query both 'submissions' (for normal assignments) and 'code_submission'
+    const [normalSubsSnapshot, codeSubsSnapshot] = await Promise.all([
+      querySubmissions("submissions", assignmentIds),
+      querySubmissions("code_submission", assignmentIds)
+    ]);
+    return [...normalSubsSnapshot, ...codeSubsSnapshot];
+  }
 
-    // Student identifier from localStorage
-    let studentIdentifier = null;
-    const studentDataStr = localStorage.getItem("student");
-    if (studentDataStr) {
-      try {
-        const studentData = JSON.parse(studentDataStr);
-        studentIdentifier = studentData.enrollment;
-      } catch (e) {
-        console.error("Error parsing student data from localStorage", e);
+  async function loadData() {
+    document.getElementById("btnBackToCourse").href = `course_detail.html?courseId=${courseId}`;
+    try {
+      // Load study materials
+      const weekRef = doc(db, "courses", courseId, "weeks", `week${week}`);
+      const weekSnap = await getDoc(weekRef);
+
+      if (weekSnap.exists()) {
+        const weekData = weekSnap.data();
+        studyMaterials = weekData.studyMaterials?.[subject] || [];
+      } else {
+        studyMaterials = [];
       }
-    }
-    if (!studentIdentifier) {
-      showStatusMessage("Student not logged in. Please login first.", "danger");
-      window.location.href = "login.html"; // adjust your login URL here
-      throw new Error("Student not logged in");
-    }
 
-    let studyMaterials = [];
-    let assignments = [];
+      // Prepare queries for assignments and code_assignments
+      const assignmentsRef = collection(db, "assignments");
+      const codeAssignmentsRef = collection(db, "code_assignments");
 
-    // Helper to query submissions from a given collection
-    async function querySubmissions(collectionName, assignmentIds) {
-      if (!assignmentIds.length) return [];
-      const submissionsRef = collection(db, collectionName);
-      let results = [];
-      const chunkSize = 10; // Firestore 'in' query limit
-      for (let i = 0; i < assignmentIds.length; i += chunkSize) {
-        const chunk = assignmentIds.slice(i, i + chunkSize);
-        const q = query(
-          submissionsRef,
-          where("studentId", "==", studentIdentifier),
-          where("assignmentId", "in", chunk)
-        );
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach(doc => {
-          results.push({ id: doc.id, ...doc.data() });
-        });
-      }
-      return results;
-    }
+      // Queries for assignments with week as number and as string (to cover both cases)
+      const qAssignmentsNumber = query(assignmentsRef,
+        where("courseId", "==", courseId),
+        where("week", "==", week),
+        where("subject", "==", subject)
+      );
+      const qAssignmentsString = query(assignmentsRef,
+        where("courseId", "==", courseId),
+        where("week", "==", `Week ${week}`), // Assuming regular assignments might use "Week X"
+        where("subject", "==", subject)
+      );
 
-    async function loadSubmissionsForStudent(assignmentIds) {
-      // Need to query both 'submissions' (for normal assignments) and 'code_submission'
-      const [normalSubsSnapshot, codeSubsSnapshot] = await Promise.all([
-        querySubmissions("submissions", assignmentIds),
-        querySubmissions("code_submission", assignmentIds)
+      const qCodeAssignmentsNumber = query(codeAssignmentsRef,
+        where("courseId", "==", courseId),
+        where("week", "==", week),
+        where("subject", "==", subject)
+      );
+      const qCodeAssignmentsString = query(codeAssignmentsRef,
+        where("courseId", "==", courseId),
+        where("week", "==", `Week ${week}`), // Code assignments could also be stored with "Week X"
+        where("subject", "==", subject)
+      );
+
+      // Fetch all docs concurrently
+      const [assignNumSnap, assignStrSnap, codeNumSnap, codeStrSnap] = await Promise.all([
+        getDocs(qAssignmentsNumber),
+        getDocs(qAssignmentsString),
+        getDocs(qCodeAssignmentsNumber),
+        getDocs(qCodeAssignmentsString),
       ]);
-      return [...normalSubsSnapshot, ...codeSubsSnapshot];
+
+      // Combine assignment docs from both week formats and add isCode flag
+      let allAssignmentDocs = [];
+      assignNumSnap.docs.forEach(doc => allAssignmentDocs.push({ id: doc.id, ...doc.data(), isCode: false }));
+      assignStrSnap.docs.forEach(doc => allAssignmentDocs.push({ id: doc.id, ...doc.data(), isCode: false }));
+      codeNumSnap.docs.forEach(doc => allAssignmentDocs.push({ id: doc.id, ...doc.data(), isCode: true }));
+      codeStrSnap.docs.forEach(doc => allAssignmentDocs.push({ id: doc.id, ...doc.data(), isCode: true }));
+
+      // Filter out duplicates based on ID
+      const uniqueAssignmentsMap = new Map();
+      allAssignmentDocs.forEach(assignment => {
+          uniqueAssignmentsMap.set(assignment.id, assignment);
+      });
+      assignments = Array.from(uniqueAssignmentsMap.values());
+
+
+      // Now load submissions for these assignments for the student
+      const assignmentIds = assignments.map(a => a.id);
+      const submissions = await loadSubmissionsForStudent(assignmentIds);
+
+      const submittedAssignmentIds = new Set(submissions.map(s => s.assignmentId));
+
+      // Mark submitted assignments
+      assignments = assignments.map(a => ({
+        ...a,
+        submitted: submittedAssignmentIds.has(a.id)
+      }));
+
+      renderContent("study"); // default to study materials on load
+    } catch (error) {
+      console.error("Error loading data:", error);
+      document.getElementById("content").innerHTML =
+        `<p class="alert alert-danger">Error loading data.</p>`;
+      showStatusMessage("Error loading data.", "danger");
     }
+  }
 
-    async function loadData() {
-      document.getElementById("btnBackToCourse").href = `course_detail.html?courseId=${courseId}`;
-      try {
-        // Load study materials
-        const weekRef = doc(db, "courses", courseId, "weeks", `week${week}`);
-        const weekSnap = await getDoc(weekRef);
+  function renderContent(type) {
+    const contentDiv = document.getElementById("content");
+    let htmlContent = "";
+    
+    // De-activate all sidebar links first
+    document.querySelectorAll('#sidebar a').forEach(link => link.classList.remove('active'));
 
-        if (weekSnap.exists()) {
-          const weekData = weekSnap.data();
-          studyMaterials = weekData.studyMaterials?.[subject] || [];
-        } else {
-          studyMaterials = [];
-        }
-
-        // Prepare queries for assignments and code_assignments
-        const assignmentsRef = collection(db, "assignments");
-        const codeAssignmentsRef = collection(db, "code_assignments");
-
-        // Queries for assignments with week as number and as string (to cover both cases)
-        const qAssignmentsNumber = query(assignmentsRef,
-          where("courseId", "==", courseId),
-          where("week", "==", week),
-          where("subject", "==", subject)
-        );
-        const qAssignmentsString = query(assignmentsRef,
-          where("courseId", "==", courseId),
-          where("week", "==", `Week ${week}`), // Assuming regular assignments might use "Week X"
-          where("subject", "==", subject)
-        );
-
-        const qCodeAssignmentsNumber = query(codeAssignmentsRef,
-          where("courseId", "==", courseId),
-          where("week", "==", week),
-          where("subject", "==", subject)
-        );
-        const qCodeAssignmentsString = query(codeAssignmentsRef,
-          where("courseId", "==", courseId),
-          where("week", "==", `Week ${week}`), // Code assignments could also be stored with "Week X"
-          where("subject", "==", subject)
-        );
-
-        // Fetch all docs concurrently
-        const [assignNumSnap, assignStrSnap, codeNumSnap, codeStrSnap] = await Promise.all([
-          getDocs(qAssignmentsNumber),
-          getDocs(qAssignmentsString),
-          getDocs(qCodeAssignmentsNumber),
-          getDocs(qCodeAssignmentsString),
-        ]);
-
-        // Combine assignment docs from both week formats and add isCode flag
-        let allAssignmentDocs = [];
-        assignNumSnap.docs.forEach(doc => allAssignmentDocs.push({ id: doc.id, ...doc.data(), isCode: false }));
-        assignStrSnap.docs.forEach(doc => allAssignmentDocs.push({ id: doc.id, ...doc.data(), isCode: false }));
-        codeNumSnap.docs.forEach(doc => allAssignmentDocs.push({ id: doc.id, ...doc.data(), isCode: true }));
-        codeStrSnap.docs.forEach(doc => allAssignmentDocs.push({ id: doc.id, ...doc.data(), isCode: true }));
-
-        // Filter out duplicates based on ID
-        const uniqueAssignmentsMap = new Map();
-        allAssignmentDocs.forEach(assignment => {
-            uniqueAssignmentsMap.set(assignment.id, assignment);
-        });
-        assignments = Array.from(uniqueAssignmentsMap.values());
-
-
-        // Now load submissions for these assignments for the student
-        const assignmentIds = assignments.map(a => a.id);
-        const submissions = await loadSubmissionsForStudent(assignmentIds);
-
-        const submittedAssignmentIds = new Set(submissions.map(s => s.assignmentId));
-
-        // Mark submitted assignments
-        assignments = assignments.map(a => ({
-          ...a,
-          submitted: submittedAssignmentIds.has(a.id)
-        }));
-
-        renderContent("study"); // default to study materials on load
-      } catch (error) {
-        console.error("Error loading data:", error);
-        document.getElementById("content").innerHTML =
-          `<p class="alert alert-danger">Error loading data.</p>`;
-        showStatusMessage("Error loading data.", "danger");
-      }
-    }
-
-    function renderContent(type) {
-      const contentDiv = document.getElementById("content");
-      let htmlContent = "";
-
-      document.getElementById("btnStudy").classList.remove("active");
-      document.getElementById("btnAssignment").classList.remove("active");
-
-      if (type === "study") {
-        document.getElementById("btnStudy").classList.add("active");
-        if (studyMaterials.length) {
-          htmlContent = `
-            <h4>📚 Study Material</h4>
-            <div class="row row-cols-1 row-cols-md-2 g-4">
-              ${studyMaterials.map(url => {
-                const parts = url.split('/');
-                const fileNameWithTimestamp = parts.pop(); // materials/courseId/weekX/subject/timestamp_filename.pdf
-                const fileName = fileNameWithTimestamp.substring(fileNameWithTimestamp.indexOf('_') + 1); // Remove timestamp part
-                const decodedFileName = decodeURIComponent(fileName).replace(/\.pdf$/, '');
-                return `
-                  <div class="col">
-                    <div class="card h-100">
-                      <div class="card-body">
-                        <h5 class="card-title">${decodedFileName}</h5>
-                        <a href="${url}" target="_blank" rel="noopener noreferrer" class="btn btn-primary mt-3">View Material</a>
-                      </div>
+    if (type === "study") {
+      document.getElementById("btnStudy").classList.add("active");
+      if (studyMaterials.length) {
+        // Updated row-cols for 4 cards in one row on large screens
+        htmlContent = `
+          <h4>📚 Study Material</h4>
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            ${studyMaterials.map(url => {
+              const parts = url.split('/');
+              const fileNameWithTimestamp = parts.pop(); // materials/courseId/weekX/subject/timestamp_filename.pdf
+              const fileName = fileNameWithTimestamp.substring(fileNameWithTimestamp.indexOf('_') + 1); // Remove timestamp part
+              const decodedFileName = decodeURIComponent(fileName).replace(/\.pdf$/, '');
+              return `
+                <div class="col">
+                  <div class="card h-100">
+                    <div class="card-body d-flex flex-column">
+                      <h5 class="card-title">${decodedFileName}</h5>
+                      <a href="${url}" target="_blank" rel="noopener noreferrer" class="btn btn-primary mt-auto">View Material</a>
                     </div>
                   </div>
-                `;
-              }).join("")}
-            </div>
-          `;
-        } else {
-          htmlContent = "<p>No study material found</p>";
-        }
-      } else if (type === "assignment") {
-        document.getElementById("btnAssignment").classList.add("active");
-        if (assignments.length) {
-          htmlContent = `
-            <h4>📝 Assignments</h4>
-            <div class="row row-cols-1 row-cols-md-2 g-4">
-              ${assignments.map(assignment => {
-                const link = assignment.isCode
-                  ? `take_code_assignment.html?assignmentId=${assignment.id}`
-                  : `take_assignment.html?assignmentId=${assignment.id}`;
-                
-                let assignmentType = assignment.isCode ? "Code Assignment" : "Objective Assignment";
-                let totalQuestions = 0;
-                let totalMarks = 0;
+                </div>
+              `;
+            }).join("")}
+          </div>
+        `;
+      } else {
+        htmlContent = "<p>No study material found</p>";
+      }
+    } else if (type === "assignment") {
+      document.getElementById("btnAssignment").classList.add("active");
+      if (assignments.length) {
+        htmlContent = `
+          <h4>📝 Assignments</h4>
+          <div class="row row-cols-1 row-cols-md-2 g-4">
+            ${assignments.map(assignment => {
+              const link = assignment.isCode
+                ? `take_code_assignment.html?assignmentId=${assignment.id}`
+                : `take_assignment.html?assignmentId=${assignment.id}`;
+              
+              let assignmentType = assignment.isCode ? "Code Assignment" : "Objective Assignment";
+              let totalQuestions = 0;
+              let totalMarks = 0;
 
-                if (assignment.isCode) {
-                    // For code assignments, count problems as questions and calculate marks from test cases
-                    totalQuestions = (assignment.problems || []).length;
-                    totalMarks = (assignment.problems || []).reduce((sum, problem) => {
-                        return sum + (problem.visibleTestCases || []).length + (problem.hiddenTestCases || []).length;
-                    }, 0);
-                } else {
-                    // For regular assignments (Objective), each question is 1 mark
-                    const mcqQuestions = assignment.mcq || [];
-                    const fillBlanksQuestions = assignment.fillBlanks || [];
-                    const trueFalseQuestions = assignment.trueFalse || [];
-                    const codeQuestions = assignment.codeQuestions || []; 
+              if (assignment.isCode) {
+                  // For code assignments, count problems as questions and calculate marks from test cases
+                  totalQuestions = (assignment.problems || []).length;
+                  totalMarks = (assignment.problems || []).reduce((sum, problem) => {
+                      return sum + (problem.visibleTestCases || []).length + (problem.hiddenTestCases || []).length;
+                  }, 0);
+              } else {
+                  // For regular assignments (Objective), each question is 1 mark
+                  const mcqQuestions = assignment.mcq || [];
+                  const fillBlanksQuestions = assignment.fillBlanks || [];
+                  const trueFalseQuestions = assignment.trueFalse || [];
+                  const codeQuestions = assignment.codeQuestions || []; 
 
-                    totalQuestions = mcqQuestions.length + fillBlanksQuestions.length + trueFalseQuestions.length + codeQuestions.length;
-                    totalMarks = totalQuestions; // 1 mark per question for objective assignments
-                }
+                  totalQuestions = mcqQuestions.length + fillBlanksQuestions.length + trueFalseQuestions.length + codeQuestions.length;
+                  totalMarks = totalQuestions; // 1 mark per question for objective assignments
+              }
 
-                // Handle createdAt which can be a Timestamp object or string
-                let createdDate;
-                if (assignment.createdAt && typeof assignment.createdAt.toDate === 'function') {
-                    createdDate = assignment.createdAt.toDate().toLocaleDateString();
-                } else if (typeof assignment.createdAt === 'string') {
-                    createdDate = new Date(assignment.createdAt).toLocaleDateString();
-                } else {
-                    createdDate = "Unknown date";
-                }
+              // Handle createdAt which can be a Timestamp object or string
+              let createdDate;
+              if (assignment.createdAt && typeof assignment.createdAt.toDate === 'function') {
+                  createdDate = assignment.createdAt.toDate().toLocaleDateString();
+              } else if (typeof assignment.createdAt === 'string') {
+                  createdDate = new Date(assignment.createdAt).toLocaleDateString();
+              } else {
+                  createdDate = "Unknown date";
+              }
 
 
-                const btnText = assignment.submitted ? "Submitted" : "Start Assignment";
-                const btnClass = assignment.submitted ? "btn-success disabled" : "btn-primary";
+              const btnText = assignment.submitted ? "Submitted" : "Start Assignment";
+              const btnClass = assignment.submitted ? "btn-success disabled" : "btn-primary";
 
-                return `
-                  <div class="col">
-                    <div class="card h-100">
-                      <div class="card-body">
-                        <h5 class="card-title">${assignmentType}</h5>
-                        <p class="card-text">Total Questions: ${totalQuestions}</p>
-                        <p class="card-text">Total Marks: ${totalMarks}</p>
-                        <p class="card-text text-muted">Created: ${createdDate}</p>
-                        <a href="${link}" class="btn ${btnClass} mt-3">${btnText}</a>
-                      </div>
+              return `
+                <div class="col">
+                  <div class="card h-100">
+                    <div class="card-body d-flex flex-column">
+                      <h5 class="card-title">${assignmentType}</h5>
+                      <p class="card-text">Total Questions: ${totalQuestions}</p>
+                      <p class="card-text">Total Marks: ${totalMarks}</p>
+                      <p class="card-text text-muted">Created: ${createdDate}</p>
+                      <a href="${link}" class="btn ${btnClass} mt-auto">${btnText}</a>
                     </div>
                   </div>
-                `;
-              }).join("")}
-            </div>
-          `;
-        } else {
-          htmlContent = "<p>No assignments found</p>";
-        }
-      }
-
-      contentDiv.innerHTML = htmlContent;
-    }
-
-    document.getElementById("btnStudy").addEventListener("click", () => renderContent("study"));
-    document.getElementById("btnAssignment").addEventListener("click", () => renderContent("assignment"));
-
-    loadData();
-
-    // Sidebar toggle function for mobile
-    window.toggleSidebar = function () {
-      const sidebar = document.getElementById("sidebar");
-      if (sidebar) {
-        sidebar.classList.toggle('show');
+                </div>
+              `;
+            }).join("")}
+          </div>
+        `;
+      } else {
+        htmlContent = "<p>No assignments found</p>";
       }
     }
 
-    // Logout function (placeholder, adapt to your actual logout logic)
-    window.logout = () => {
-        localStorage.removeItem("student"); 
-        location.href = "login.html"; // Redirect to login page
-    };
-  </script>
+    contentDiv.innerHTML = htmlContent;
+  }
+
+  document.getElementById("btnStudy").addEventListener("click", () => renderContent("study"));
+  document.getElementById("btnAssignment").addEventListener("click", () => renderContent("assignment"));
+
+  loadData();
+
+  // Sidebar toggle function for mobile
+  window.toggleSidebar = function () {
+    const sidebar = document.getElementById("sidebar");
+    const mainContainer = document.querySelector(".main-container");
+    if (sidebar && mainContainer) {
+      sidebar.classList.toggle('show');
+      mainContainer.classList.toggle('sidebar-open');
+    }
+  }
+</script>
 </body>
 </html>
