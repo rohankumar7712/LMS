@@ -398,6 +398,27 @@ Answer: d"></textarea>
                 showStatusMessage("Error loading course data: " + error.message, "danger");
             }
         });
+        weekSelect.addEventListener("change", () => {
+    if (!courseStartDate || !courseEndDate) return;
+
+    const selectedWeek = parseInt(weekSelect.value.replace("Week ", ""));
+    if (isNaN(selectedWeek)) return;
+
+    // Each week = 7 days
+    const weekStart = new Date(courseStartDate);
+    weekStart.setDate(courseStartDate.getDate() + (selectedWeek - 1) * 7);
+
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+
+    // Prevent exceeding overall course end date
+    if (weekEnd > courseEndDate) weekEnd.setTime(courseEndDate.getTime());
+
+    // Set to datetime-local (need YYYY-MM-DDTHH:mm format)
+    startDate.value = weekStart.toISOString().slice(0,16);
+    endDate.value = weekEnd.toISOString().slice(0,16);
+});
+
 
         // Question Handling
         const startDate = document.getElementById("startDate");

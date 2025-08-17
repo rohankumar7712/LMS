@@ -273,6 +273,43 @@
       background-color: var(--danger-color);
       color: white;
     }
+    
+    /* Modal styles */
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1040;
+    }
+
+    .modal-content-custom {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        max-width: 600px;
+        width: 90%;
+    }
+
+    .modal-header-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .close-btn-custom {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
   </style>
 
 </head>
@@ -319,6 +356,11 @@
           </div>
 
           <h3 class="mt-4 mb-3">Problems/Questions</h3>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-secondary mt-3 mb-3" id="loadSampleBtn">Load Sample Problems</button>
+            <button type="button" class="btn btn-secondary mt-3 mb-3" id="loadFromTextBtn">Load from Text</button>
+          </div>
+          
           <div id="questionsContainer">
             <div class="question-block border rounded p-3 mb-3">
               <div class="mb-3">
@@ -378,6 +420,21 @@
     </main>
   </div>
 
+  <div class="modal-backdrop" id="pasteModal">
+    <div class="modal-content-custom">
+        <div class="modal-header-custom">
+            <h4>Paste Questions Here</h4>
+            <button type="button" class="close-btn-custom" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <textarea id="pasteTextArea" class="form-control" rows="15" placeholder="Paste your questions here. Make sure they follow the specified format (Problem Title, Problem Statement, etc.)."></textarea>
+        </div>
+        <div class="modal-footer d-flex justify-content-end mt-3">
+            <button type="button" class="btn btn-primary" id="processPasteBtn">Load Questions</button>
+        </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script type="module">
@@ -402,9 +459,16 @@
     const subjectSelect = document.getElementById("subjectSelect");
     const totalTimeMinutesInput = document.getElementById("totalTimeMinutes");
     const questionsContainer = document.getElementById("questionsContainer");
-    const addProblemBtn = document.getElementById("addProblemBtn"); // Renamed from addQuestionBtn
+    const addProblemBtn = document.getElementById("addProblemBtn");
     const saveAssignmentBtn = document.getElementById("saveAssignmentBtn");
+    const loadSampleBtn = document.getElementById("loadSampleBtn");
+    const loadFromTextBtn = document.getElementById("loadFromTextBtn");
     const statusMessage = document.getElementById("statusMessage");
+
+    const pasteModal = document.getElementById("pasteModal");
+    const pasteTextArea = document.getElementById("pasteTextArea");
+    const processPasteBtn = document.getElementById("processPasteBtn");
+    const closeModalBtn = document.getElementById("closeModal");
 
     async function loadCourses() {
       try {
@@ -455,7 +519,7 @@
       }
     });
 
-    function createNewTestCaseInputGroup(visible = true) {
+    function createNewTestCaseInputGroup() {
       const newTestCase = document.createElement("div");
       newTestCase.className = "input-group mb-2 test-case-item";
       newTestCase.innerHTML = `
@@ -470,15 +534,13 @@
       const firstProblemBlock = questionsContainer.querySelector(".question-block");
       const newProblemBlock = firstProblemBlock.cloneNode(true);
       
-      // Clear all input values in the cloned block
       newProblemBlock.querySelectorAll("input, textarea").forEach(el => el.value = "");
       
-      // Clear existing test cases and add one default for each type
       newProblemBlock.querySelector(".visible-test-cases-container").innerHTML = '';
-      newProblemBlock.querySelector(".visible-test-cases-container").appendChild(createNewTestCaseInputGroup(true));
+      newProblemBlock.querySelector(".visible-test-cases-container").appendChild(createNewTestCaseInputGroup());
 
       newProblemBlock.querySelector(".hidden-test-cases-container").innerHTML = '';
-      newProblemBlock.querySelector(".hidden-test-cases-container").appendChild(createNewTestCaseInputGroup(false));
+      newProblemBlock.querySelector(".hidden-test-cases-container").appendChild(createNewTestCaseInputGroup());
 
       questionsContainer.appendChild(newProblemBlock);
     });
@@ -486,11 +548,11 @@
     questionsContainer.addEventListener("click", (e) => {
       if (e.target.classList.contains("add-visible-test-case-btn")) {
         const testCaseContainer = e.target.closest(".question-block").querySelector(".visible-test-cases-container");
-        testCaseContainer.appendChild(createNewTestCaseInputGroup(true));
+        testCaseContainer.appendChild(createNewTestCaseInputGroup());
       }
       if (e.target.classList.contains("add-hidden-test-case-btn")) {
         const testCaseContainer = e.target.closest(".question-block").querySelector(".hidden-test-cases-container");
-        testCaseContainer.appendChild(createNewTestCaseInputGroup(false));
+        testCaseContainer.appendChild(createNewTestCaseInputGroup());
       }
       if (e.target.classList.contains("remove-test-case-btn")) {
         e.target.closest(".test-case-item").remove();
@@ -524,11 +586,6 @@
         const outputFormat = block.querySelector(".output-format").value.trim();
         const codeConstraints = block.querySelector(".code-constraints").value.trim();
         
-        // Time limit per question is now optional in problem object
-        // The HTML input `question-time` was removed, if you want to keep it,
-        // you'd add: const timeLimitMinutes = parseInt(block.querySelector(".question-time").value.trim(), 10);
-        // and add `timeLimitMinutes: isNaN(timeLimitMinutes) ? null : timeLimitMinutes,` to the problem object.
-
         const visibleTestCases = [];
         block.querySelectorAll(".visible-test-cases-container .test-case-item").forEach(item => {
           const input = item.querySelector(".test-case-input").value.trim();
@@ -571,20 +628,350 @@
           courseId: courseSelect.value,
           subject: subjectSelect.value,
           week: parseInt(weekSelect.value, 10),
-          totalTimeMinutes: totalTimeMinutes, // Total assignment time
-          problems: problems, // Now stores an array of problem objects
+          totalTimeMinutes: totalTimeMinutes,
+          problems: problems,
           createdAt: new Date(),
           createdBy: "admin"
         });
         statusMessage.innerHTML = `<p class="text-success">Assignment saved! ID: ${newAssignmentRef.id}</p>`;
         form.reset();
         questionsContainer.innerHTML = "";
-        addProblemBtn.click(); // Add back one empty problem block
+        addProblemBtn.click();
       } catch (error) {
         statusMessage.innerHTML = `<p class="text-danger">Error saving assignment: ${error.message}</p>`;
       } finally {
         saveAssignmentBtn.disabled = false;
       }
+    });
+
+    // --- New feature: Parse and load problems from a fixed string ---
+    const sampleProblemsString = `
+      1. Problem Title: Basic Input and Output
+      Problem Statement:
+
+      Write a C++ program that takes two integers as input and prints their sum.
+      Input Format:
+
+      Two integers A and B.
+      Output Format:
+
+      A single integer, the sum of A and B.
+      Code Constraints:
+
+      −10^9 ≤ A, B ≤ 10^9
+      Visible Test Cases:
+
+      Input: 5 7 → Output: 12
+      Input: -3 10 → Output: 7
+      Hidden Test Cases (edge level):
+
+      Input: 0 0 → Output: 0
+      Input: 1000000000 1000000000 → Output: 2000000000
+      Input: -500000000 500000000 → Output: 0
+      2. Problem Title: Area of Circle
+      Problem Statement:
+
+      Write a C++ program to calculate the area of a circle using the formula:
+
+      Area = π × r × r
+      Input Format:
+
+      One integer r (radius of circle).
+      Output Format:
+
+      A float value representing the area (up to 1 decimal place).
+      Code Constraints:
+
+      1 ≤ r ≤ 10^4
+      Use const float PI = 3.14
+      Visible Test Cases:
+
+      Input: 5 → Output: 78.5
+      Input: 10 → Output: 314.0
+      Hidden Test Cases (edge level):
+
+      Input: 1 → Output: 3.1
+      Input: 1000 → Output: 3140000.0
+      Input: 1234 → Output: 4779085.0
+      3. Problem Title: Maximum of Two Numbers
+      Problem Statement:
+
+      Write a C++ program to find the maximum of two numbers using relational operators.
+      Input Format:
+
+      Two integers A and B.
+      Output Format:
+
+      The larger of the two numbers.
+      Code Constraints:
+
+      −10^9 ≤ A, B ≤ 10^9
+      Visible Test Cases:
+
+      Input: 7 9 → Output: 9
+      Input: 15 10 → Output: 15
+      Hidden Test Cases (edge level):
+
+      Input: -5 -2 → Output: -2
+      Input: 1000 1000 → Output: 1000
+      Input: -999999999 888888888 → Output: 888888888
+      4. Problem Title: Even or Odd
+      Problem Statement:
+
+      Write a C++ program to check whether a given integer is even or odd.
+      Input Format:
+
+      A single integer N.
+      Output Format:
+
+      Print "Even" if divisible by 2, otherwise "Odd".
+      Code Constraints:
+
+      −10^9 ≤ N ≤ 10^9
+      Visible Test Cases:
+
+      Input: 4 → Output: Even
+      Input: 7 → Output: Odd
+      Hidden Test Cases (edge level):
+
+      Input: 0 → Output: Even
+      Input: -8 → Output: Even
+      Input: -15 → Output: Odd
+      5. Problem Title: Simple Calculator
+      Problem Statement:
+
+      Write a C++ program that reads two integers A and B, and prints:
+      Sum (A + B)
+      Difference (A − B)
+      Product (A × B)
+      Quotient (A / B, integer division)
+      Remainder (A % B)
+      Input Format:
+
+      Two integers A and B.
+      Output Format:
+
+      Each result on a new line in order: sum, difference, product, quotient, remainder.
+      Code Constraints:
+
+      −10^9 ≤ A, B ≤ 10^9
+      B ≠ 0
+      Visible Test Cases:
+
+      Input: 10 3
+
+      Output:
+
+      13  
+      7  
+      30  
+      3  
+      1  
+      Input: 15 5
+
+      Output:
+
+      20  
+      10  
+      75  
+      3  
+      0  
+      Hidden Test Cases (edge level):
+
+      Input: 7 2 → Output: 9 5 14 3 1
+      Input: -10 4 → Output: -6 -14 -40 -2 -2
+      Input: 123456 7 → Output: 123463 123449 864192 17636 4
+    `;
+
+    function parseProblems(text) {
+      const problems = [];
+      const problemBlocks = text.split(/\n\s*\d+\.\s*Problem Title:/).filter(Boolean);
+
+      problemBlocks.forEach(block => {
+        const problem = {};
+        const lines = block.split('\n');
+        
+        let state = '';
+        let currentSection = [];
+        
+        lines.forEach(line => {
+          const trimmedLine = line.trim();
+          if (trimmedLine.startsWith('Problem Title:')) {
+            problem.title = trimmedLine.replace('Problem Title:', '').trim();
+            state = 'problemStatement';
+            currentSection = [];
+          } else if (trimmedLine.startsWith('Problem Statement:')) {
+            problem.title = problem.title || lines[0].trim().replace(/\d+\.\s*Problem Title:\s*/, '').trim(); // Fallback for the first problem
+            state = 'problemStatement';
+            currentSection = [];
+          } else if (trimmedLine.startsWith('Input Format:')) {
+            problem.problemStatement = currentSection.join('\n').trim();
+            state = 'inputFormat';
+            currentSection = [];
+          } else if (trimmedLine.startsWith('Output Format:')) {
+            problem.inputFormat = currentSection.join('\n').trim();
+            state = 'outputFormat';
+            currentSection = [];
+          } else if (trimmedLine.startsWith('Code Constraints:')) {
+            problem.outputFormat = currentSection.join('\n').trim();
+            state = 'codeConstraints';
+            currentSection = [];
+          } else if (trimmedLine.startsWith('Visible Test Cases:')) {
+            problem.codeConstraints = currentSection.join('\n').trim();
+            state = 'visibleTestCases';
+            currentSection = [];
+            problem.visibleTestCases = [];
+          } else if (trimmedLine.startsWith('Hidden Test Cases (edge level):')) {
+            problem.hiddenTestCases = [];
+            state = 'hiddenTestCases';
+          } else if (trimmedLine.startsWith('Input:')) {
+              // This is a test case line
+              const parts = line.split('→');
+              if (parts.length === 2) {
+                const input = parts[0].replace('Input:', '').trim();
+                const output = parts[1].replace('Output:', '').trim();
+                if (state === 'visibleTestCases') {
+                  problem.visibleTestCases.push({ input, expectedOutput: output });
+                } else if (state === 'hiddenTestCases') {
+                  problem.hiddenTestCases.push({ input, expectedOutput: output });
+                }
+              } else {
+                  // Handle multiline output, like in the Simple Calculator example
+                  if (state === 'visibleTestCases' && lines[lines.indexOf(line) - 1].trim().endsWith('Output:')) {
+                      // Check if the previous line ended with "Output:"
+                      const startIndex = lines.indexOf(line);
+                      let endIndex = startIndex + 1;
+                      while (endIndex < lines.length && !lines[endIndex].trim().startsWith('Input:') && !lines[endIndex].trim().startsWith('Hidden Test Cases')) {
+                          endIndex++;
+                      }
+                      const outputLines = lines.slice(startIndex, endIndex);
+                      const lastTestCase = problem.visibleTestCases[problem.visibleTestCases.length - 1];
+                      if (lastTestCase) {
+                          lastTestCase.expectedOutput = outputLines.join('\n').trim();
+                      }
+                  }
+              }
+          } else {
+            // Append to the current section
+            currentSection.push(line);
+          }
+        });
+        
+        // Capture the last section
+        if (state === 'hiddenTestCases') {
+          // No need to do anything, test cases are handled
+        } else if (state === 'codeConstraints') {
+            problem.codeConstraints = currentSection.join('\n').trim();
+        }
+
+        if (problem.title) { // Only add if it's a valid problem
+            problems.push(problem);
+        }
+      });
+      return problems;
+    }
+
+    function populateFormWithProblems(problems) {
+      questionsContainer.innerHTML = '';
+      if (problems.length === 0) {
+        addProblemBtn.click();
+        statusMessage.innerHTML = `<p class="text-danger">No problems were parsed from the provided text. Please check the format.</p>`;
+        return;
+      }
+
+      problems.forEach((problem, index) => {
+        const problemBlock = document.createElement("div");
+        problemBlock.className = "question-block border rounded p-3 mb-3";
+        problemBlock.innerHTML = `
+          <div class="mb-3">
+            <label class="form-label">Problem Title</label>
+            <input type="text" class="form-control problem-title" value="${problem.title || ''}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Problem Statement (Markdown Supported)</label>
+            <textarea class="form-control problem-statement-text" rows="5" required>${problem.problemStatement || ''}</textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Input Format</label>
+            <textarea class="form-control input-format" rows="2">${problem.inputFormat || ''}</textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Output Format</label>
+            <textarea class="form-control output-format" rows="2">${problem.outputFormat || ''}</textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Code Constraints</label>
+            <textarea class="form-control code-constraints" rows="2">${problem.codeConstraints || ''}</textarea>
+          </div>
+          
+          <h5 class="mt-4">Visible Test Cases (Shown to students)</h5>
+          <div class="visible-test-cases-container test-cases-group"></div>
+          <button type="button" class="btn btn-add-test-case btn-sm mt-2 add-visible-test-case-btn">Add Visible Test Case</button>
+
+          <h5 class="mt-4">Hidden Test Cases (Status only shown to students)</h5>
+          <div class="hidden-test-cases-container test-cases-group"></div>
+          <button type="button" class="btn btn-add-test-case btn-sm mt-2 add-hidden-test-case-btn">Add Hidden Test Case</button>
+          
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-remove-problem mt-4 remove-problem">Remove Problem</button>
+          </div>
+        `;
+
+        const visibleContainer = problemBlock.querySelector('.visible-test-cases-container');
+        if (problem.visibleTestCases && problem.visibleTestCases.length > 0) {
+          problem.visibleTestCases.forEach(tc => {
+            const newTc = createNewTestCaseInputGroup();
+            newTc.querySelector('.test-case-input').value = tc.input;
+            newTc.querySelector('.test-case-expected-output').value = tc.expectedOutput;
+            visibleContainer.appendChild(newTc);
+          });
+        } else {
+          visibleContainer.appendChild(createNewTestCaseInputGroup());
+        }
+
+        const hiddenContainer = problemBlock.querySelector('.hidden-test-cases-container');
+        if (problem.hiddenTestCases && problem.hiddenTestCases.length > 0) {
+          problem.hiddenTestCases.forEach(tc => {
+            const newTc = createNewTestCaseInputGroup();
+            newTc.querySelector('.test-case-input').value = tc.input;
+            newTc.querySelector('.test-case-expected-output').value = tc.expectedOutput;
+            hiddenContainer.appendChild(newTc);
+          });
+        } else {
+          hiddenContainer.appendChild(createNewTestCaseInputGroup());
+        }
+        
+        questionsContainer.appendChild(problemBlock);
+      });
+      statusMessage.innerHTML = `<p class="text-success">Problems loaded successfully!</p>`;
+    }
+    
+    // Event listeners for the new modal
+    loadFromTextBtn.addEventListener("click", () => {
+        pasteModal.style.display = 'flex';
+    });
+
+    closeModalBtn.addEventListener("click", () => {
+        pasteModal.style.display = 'none';
+        pasteTextArea.value = '';
+    });
+
+    processPasteBtn.addEventListener("click", () => {
+        const pastedText = pasteTextArea.value;
+        if (pastedText.trim() === '') {
+            statusMessage.innerHTML = `<p class="text-danger">Paste some text into the box first.</p>`;
+            return;
+        }
+        const problems = parseProblems(pastedText);
+        populateFormWithProblems(problems);
+        pasteModal.style.display = 'none';
+        pasteTextArea.value = '';
+    });
+
+    // --- Original sample problems feature remains ---
+    loadSampleBtn.addEventListener("click", () => {
+      const problems = parseProblems(sampleProblemsString);
+      populateFormWithProblems(problems);
     });
 
     window.toggleSidebar = function () {
@@ -594,20 +981,15 @@
       toggleBtn.classList.toggle('hidden-on-show');
     }
 
-    // Initial setup: Add one default problem block when the page loads
-    // and load courses.
     document.addEventListener("DOMContentLoaded", () => {
-        addProblemBtn.click(); // Add initial problem block
-        loadCourses();
+      questionsContainer.innerHTML = '';
+      addProblemBtn.click();
+      loadCourses();
     });
 
-    // Logout function
     window.logout = () => {
-        // Here you would implement Firebase Auth signOut
-        // For now, just redirecting for demo purposes
-        location.href = "admin_dashboard.html"; // Adjust to your admin dashboard or login
+      location.href = "admin_dashboard.html";
     };
-
   </script>
 </body>
 </html>
