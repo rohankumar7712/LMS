@@ -1,781 +1,977 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Code Assignment with Judge0</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary-bg: #E8F0F7; /* Soft Light Blue */
-      --secondary-bg: #FFFFFF; /* White */
-      --left-panel-bg: #2A5C88; /* Deep Blue */
-      --card-bg: #FFFFFF; /* White */
-      --accent-color: #4A90E2; /* Bright Light Blue */
-      --text-dark: #2C3E50; /* Dark Gray-Blue */
-      --input-border: #DDE0E3; /* Light Gray */
-      --code-bg: #282c34; /* Dark gray for code editor */
-      --code-text: #abb2bf; /* Light gray for code text */
-      --danger-color: #E74C3C; /* Red */
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Code Assignment with Judge0</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #E8F0F7; /* Soft Light Blue */
+            --secondary-bg: #FFFFFF; /* White */
+            --left-panel-bg: #2A5C88; /* Deep Blue */
+            --card-bg: #FFFFFF; /* White */
+            --accent-color: #4A90E2; /* Bright Light Blue */
+            --text-dark: #2C3E50; /* Dark Gray-Blue */
+            --input-border: #DDE0E3; /* Light Gray */
+            --code-bg: #282c34; /* Dark gray for code editor */
+            --code-text: #abb2bf; /* Light gray for code text */
+            --danger-color: #E74C3C; /* Red */
+        }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--primary-bg);
-      color: var(--text-dark);
-      padding: 1.5rem;
-      position: relative;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-dark);
+            padding: 1.5rem;
+            position: relative;
+        }
 
-    #assignment-timer {
-      position: fixed;
-      top: 1rem;
-      right: 1.5rem;
-      background-color: var(--card-bg);
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      font-weight: 600;
-      color: var(--left-panel-bg);
-      z-index: 1000;
-      transition: background-color 0.3s, color 0.3s;
-    }
+        #assignment-timer {
+            position: fixed;
+            top: 1rem;
+            right: 1.5rem;
+            background-color: var(--card-bg);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-weight: 600;
+            color: var(--left-panel-bg);
+            z-index: 1000;
+            transition: background-color 0.3s, color 0.3s;
+        }
 
-    #assignment-timer.alert-danger {
-      background-color: var(--danger-color);
-      color: #FFFFFF;
-    }
-    
-    #assignment-container {
-      background-color: var(--card-bg);
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-      padding: 2rem;
-      margin-top: 3rem; /* Space for the timer */
-    }
-    
-    h1 {
-      font-weight: 700;
-      color: var(--left-panel-bg);
-    }
-    
-    .problem-statement, .code-editor-section {
-      background-color: #F8F9FA;
-      border-radius: 8px;
-      padding: 1.5rem;
-      height: 100%;
-    }
-    
-    .problem-statement h2, .problem-statement h6 {
-      color: var(--left-panel-bg);
-    }
+        #assignment-timer.alert-danger {
+            background-color: var(--danger-color);
+            color: #FFFFFF;
+        }
+        
+        #assignment-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            margin-top: 3rem; /* Space for the timer */
+        }
+        
+        h1 {
+            font-weight: 700;
+            color: var(--left-panel-bg);
+        }
+        
+        .problem-statement, .code-editor-section {
+            background-color: #F8F9FA;
+            border-radius: 8px;
+            padding: 1.5rem;
+            height: 100%;
+        }
+        
+        .problem-statement h2, .problem-statement h6 {
+            color: var(--left-panel-bg);
+        }
 
-    #editor {
-      border: 1px solid var(--input-border) !important;
-      border-radius: 8px;
-      font-family: 'Fira Code', monospace;
-      font-size: 14px;
-      height: 400px;
-    }
+        #editor {
+            border: 1px solid var(--input-border) !important;
+            border-radius: 8px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            height: 400px;
+        }
 
-    .form-control, .form-select {
-      font-family: 'Inter', sans-serif;
-      border-radius: 8px;
-    }
-    
-    .compiler-output {
-      background-color: #2c3e50; /* A dark color for the output */
-      color: #ecf0f1;
-      padding: 1rem;
-      border-radius: 8px;
-      font-family: 'Fira Code', monospace;
-      font-size: 13px;
-      white-space: pre-wrap;
-      max-height: 200px;
-      overflow-y: auto;
-    }
+        .form-control, .form-select {
+            font-family: 'Inter', sans-serif;
+            border-radius: 8px;
+        }
+        
+        .compiler-output {
+            background-color: #2c3e50; /* A dark color for the output */
+            color: #ecf0f1;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
 
-    .table-responsive {
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--input-border);
-    }
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--input-border);
+        }
 
-    .table th, .table td {
-      font-size: 0.9rem;
-    }
+        .table th, .table td {
+            font-size: 0.9rem;
+        }
 
-    .btn-primary {
-      background-color: var(--accent-color);
-      border-color: var(--accent-color);
-    }
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
 
-    .btn-primary:hover {
-      background-color: #3A7DC1;
-      border-color: #3A7DC1;
-    }
+        .btn-primary:hover {
+            background-color: #3A7DC1;
+            border-color: #3A7DC1;
+        }
 
-    .btn-success {
-      background-color: #2ECC71;
-      border-color: #2ECC71;
-    }
-    
-    .btn-success:hover {
-      background-color: #27ae60;
-      border-color: #27ae60;
-    }
+        .btn-success {
+            background-color: #2ECC71;
+            border-color: #2ECC71;
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+            border-color: #27ae60;
+        }
 
-    .btn-outline-danger {
-      color: var(--danger-color);
-      border-color: var(--danger-color);
-    }
-    .btn-outline-danger:hover {
-      background-color: var(--danger-color);
-      color: white;
-    }
+        .btn-outline-danger {
+            color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        .btn-outline-danger:hover {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        /* Styles for Alert Messages */
+        #message-box {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1050;
+            width: 90%;
+            max-width: 500px;
+        }
 
-    #message-box {
-      position: fixed;
-      bottom: 1rem;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1050;
-      width: 90%;
-      max-width: 500px;
-    }
+        #message-box .alert {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease-out;
+            border: none;
+        }
 
-    .alert-danger {
-      background-color: #f8d7da;
-      color: #721c24;
-    }
+        /* Specific alert colors to match the theme */
+        #message-box .alert-success {
+            background-color: #D4EDDA;
+            color: #155724;
+        }
 
-    .alert-success {
-      background-color: #d4edda;
-      color: #155724;
-    }
-    
-    /* Media queries for responsiveness */
-    @media (max-width: 992px) {
-      .row.gx-5 {
-        gap: 1.5rem !important; /* Adjust gap on smaller screens */
-      }
-      .col-lg-5, .col-lg-7 {
-        width: 100%;
-      }
-      .problem-statement, .code-editor-section {
-        padding: 1rem;
-      }
-    }
-  </style>
+        #message-box .alert-danger {
+            background-color: #F8D7DA;
+            color: #721c24;
+        }
+        #message-box .alert-warning {
+            background-color: #FFF3CD;
+            color: #856404;
+        }
+
+        #message-box .alert-info {
+            background-color: #D1ECF1;
+            color: #0C5460;
+        }
+        
+        /* Icon styling for alerts */
+        #message-box .alert::before {
+            content: " ";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            margin-right: 0.5rem;
+        }
+
+        #message-box .alert-success::before {
+            content: "\f058"; /* Check-circle icon */
+            color: #28a745;
+        }
+
+        #message-box .alert-danger::before {
+            content: "\f057"; /* Times-circle icon */
+            color: #dc3545;
+        }
+
+        #message-box .alert-warning::before {
+            content: "\f06a"; /* Exclamation-circle icon */
+            color: #ffc107;
+        }
+
+        #message-box .alert-info::before {
+            content: "\f05a"; /* Info-circle icon */
+            color: #17a2b8;
+        }
+
+        /* Fade out animation on removal */
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+        
+        /* New CSS for Custom Confirmation Box */
+        #custom-confirm-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.65); /* Darker overlay for better focus */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        #custom-confirm-box {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #custom-confirm-box h6 {
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        #custom-confirm-box .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        #custom-confirm-box .btn {
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        #custom-confirm-box .btn-ok {
+            background-color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+            color: white;
+        }
+
+        #custom-confirm-box .btn-ok:hover {
+            background-color: #3A7DC1;
+            border-color: #3A7DC1;
+        }
+
+        #custom-confirm-box .btn-cancel {
+            background-color: transparent;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        #custom-confirm-box .btn-cancel:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        /* Media queries for responsiveness */
+        @media (max-width: 992px) {
+            .row.gx-5 {
+                gap: 1.5rem !important; /* Adjust gap on smaller screens */
+            }
+            .col-lg-5, .col-lg-7 {
+                width: 100%;
+            }
+            .problem-statement, .code-editor-section {
+                padding: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="assignment-timer">Time Left: <span id="time-left-display">--:--</span></div>
-
-  <div class="container">
-    <div id="assignment-container">
-      <h1 class="text-primary mb-4">Code Assignment</h1>
-      <p id="assignment-meta" class="text-muted"></p>
-
-      <div class="row gx-5 gy-4">
-        <div class="col-lg-5">
-          <div class="problem-statement">
-            <h2 class="h5 mb-3 border-bottom pb-2">Problem <span id="problem-number">1</span>: <span id="problem-title">Loading...</span></h2>
-            <div id="problem-statement-content" class="text-dark fs-6">
-              <p class="text-muted fst-italic">Loading problem details...</p>
-            </div>
-
-            <div id="test-cases-section" class="mt-4">
-              <h3 class="h6 border-bottom pb-2">Visible Sample Test Cases (First 2)</h3>
-              <div class="table-responsive">
-                <table class="table table-sm table-bordered align-middle">
-                  <thead class="table-light">
-                    <tr>
-                      <th scope="col" style="width: 40%;">Input</th>
-                      <th scope="col" style="width: 40%;">Expected Output</th>
-                    </tr>
-                  </thead>
-                  <tbody id="test-cases-table-body">
-                    </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-7 d-flex flex-column">
-          <label for="language-select" class="form-label mb-2">Select Language</label>
-          <select id="language-select" class="form-select mb-3" aria-label="Select Programming Language">
-            <option value="54">C++ (GCC 9.2.0)</option>
-            <option value="71">Python 3</option>
-            <option value="63">JavaScript (Node.js)</option>
-            <option value="62">Java (OpenJDK 13.0.1)</option>
-          </select>
-
-          <label for="editor" class="form-label bg-dark text-white p-2 rounded-top mb-0">Write your code here</label>
-          <div id="editor" class="border border-dark rounded-bottom flex-grow-1 mb-3"></div>
-
-          <div class="form-check form-switch mb-2">
-            <input class="form-check-input" type="checkbox" id="custom-input-toggle" />
-            <label class="form-check-label" for="custom-input-toggle">Provide Custom Input</label>
-          </div>
-          <textarea
-            id="custom-input"
-            class="form-control d-none mb-3"
-            rows="4"
-            placeholder="Enter custom input here..."
-            aria-label="Custom input"
-          ></textarea>
-
-          <h2 class="h6 mb-2">Compiler Message</h2>
-          <pre id="compiler-output" class="compiler-output">Output will be displayed here.</pre>
-
-          <div class="d-flex gap-3 mt-4">
-            <button id="clear-btn" class="btn btn-outline-danger flex-grow-1">Clear</button>
-            <button id="run-btn" class="btn btn-primary flex-grow-1">Compile &amp; Run</button>
-          </div>
-          <div class="d-flex justify-content-between gap-3 mt-3">
-              <button id="prev-problem-btn" class="btn btn-secondary flex-grow-1" style="display:none;">Previous</button>
-              <button id="next-problem-btn" class="btn btn-primary flex-grow-1">Next Problem</button>
-              <button id="final-submit-btn" class="btn btn-success flex-grow-1" style="display:none;">Submit Assignment</button>
-          </div>
-        </div>
-      </div>
+    <div id="assignment-timer">Time Left: <span id="time-left-display">--:--</span>
+        <button id="pause-btn" class="btn btn-sm btn-outline-info ms-2">Pause</button>
     </div>
 
-    <div id="message-box"></div>
-  </div>
+    <div class="container">
+        <div id="assignment-container">
+            <h1 class="text-primary mb-4">Code Assignment</h1>
+            <p id="assignment-meta" class="text-muted"></p>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/theme-monokai.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-c_cpp.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-python.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-javascript.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-java.js"></script>
+            <div class="row gx-5 gy-4">
+                <div class="col-lg-5">
+                    <div class="problem-statement">
+                        <h2 class="h5 mb-3 border-bottom pb-2">Problem <span id="problem-number">1</span>: <span id="problem-title">Loading...</span></h2>
+                        <div id="problem-statement-content" class="text-dark fs-6">
+                            <p class="text-muted fst-italic">Loading problem details...</p>
+                        </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import {
-      getFirestore,
-      doc,
-      getDoc,
-      setDoc,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+                        <div id="test-cases-section" class="mt-4">
+                            <h3 class="h6 border-bottom pb-2">Visible Sample Test Cases (First 2)</h3>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col" style="width: 40%;">Input</th>
+                                            <th scope="col" style="width: 40%;">Expected Output</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="test-cases-table-body">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyD_C4ZPXTXQZtZJbtAwTiub_rkIZcvsE2Y",
-      authDomain: "clms-19db3.firebaseapp.com",
-      projectId: "clms-19db3",
-      storageBucket: "clms-19db3.firebasestorage.app",
-      messagingSenderId: "218119035486",
-      appId: "1:218119035486:web:39291d39b4b461b56032cf"
-    };
+                <div class="col-lg-7 d-flex flex-column">
+                    <label for="language-select" class="form-label mb-2">Select Language</label>
+                    <select id="language-select" class="form-select mb-3" aria-label="Select Programming Language">
+                        <option value="54">C++ (GCC 9.2.0)</option>
+                        <option value="71">Python 3</option>
+                        <option value="63">JavaScript (Node.js)</option>
+                        <option value="62">Java (OpenJDK 13.0.1)</option>
+                    </select>
 
-    let app, db, editor;
-    let currentAssignment = {};
-    let allProblems = []; // Array to hold all coding problems for the assignment
-    let currentProblemIndex = 0; // Current problem being displayed
+                    <label for="editor" class="form-label bg-dark text-white p-2 rounded-top mb-0">Write your code here</label>
+                    <div id="editor" class="border border-dark rounded-bottom flex-grow-1 mb-3"></div>
 
-    // Store student info
-    let studentIdentifier = null;
-    let studentName = null;
-    try {
-      const studentDataStr = localStorage.getItem("student");
-      if (studentDataStr) {
-        const studentData = JSON.parse(studentDataStr);
-        studentIdentifier = studentData.enrollment;
-        studentName = `${studentData.firstName} ${studentData.lastName}`;
-      }
-    } catch (e) {
-      console.error("Error parsing student data from localStorage", e);
-    }
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox" id="custom-input-toggle" />
+                        <label class="form-check-label" for="custom-input-toggle">Provide Custom Input</label>
+                    </div>
+                    <textarea
+                        id="custom-input"
+                        class="form-control d-none mb-3"
+                        rows="4"
+                        placeholder="Enter custom input here..."
+                        aria-label="Custom input"
+                    ></textarea>
 
-    if (!studentIdentifier) {
-      showMessage("Student not logged in. Please login first.", "danger");
-      setTimeout(() => {
-        window.location.href = "login.html";
-      }, 2000);
-      throw new Error("Student not logged in");
-    }
+                    <h2 class="h6 mb-2">Compiler Message</h2>
+                    <pre id="compiler-output" class="compiler-output">Output will be displayed here.</pre>
 
-    // Timer variables
-    let totalTimeSeconds;
-    let timerInterval;
-    const assignmentTimerElement = document.getElementById("assignment-timer");
-    const timeLeftDisplay = document.getElementById("time-left-display");
+                    <div class="d-flex gap-3 mt-4">
+                        <button id="clear-btn" class="btn btn-outline-danger flex-grow-1">Clear</button>
+                        <button id="run-btn" class="btn btn-primary flex-grow-1">Compile &amp; Run</button>
+                    </div>
+                    <div class="d-flex justify-content-between gap-3 mt-3">
+                        <button id="prev-problem-btn" class="btn btn-secondary flex-grow-1" style="display:none;">Previous</button>
+                        <button id="next-problem-btn" class="btn btn-primary flex-grow-1">Next Problem</button>
+                        <button id="final-submit-btn" class="btn btn-success flex-grow-1" style="display:none;">Submit Assignment</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    // Submission data for all problems
-    let problemSubmissions = {}; // { problemIndex: { code: "...", languageId: "...", testCaseResults: [] } }
+        <div id="message-box"></div>
+    </div>
 
-    function showMessage(message, type = 'success') {
-      const messageBox = document.getElementById('message-box');
-      const div = document.createElement('div');
-      div.className = `alert alert-${type === 'success' ? 'success' : 'danger'} shadow`;
-      div.textContent = message;
-      messageBox.innerHTML = ''; 
-      messageBox.appendChild(div);
-      setTimeout(() => {
-        div.remove();
-      }, 3500);
-    }
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/theme-monokai.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-c_cpp.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-python.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-javascript.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/mode-java.js"></script>
 
-    const params = new URLSearchParams(window.location.search);
-    const assignmentId = params.get("assignmentId");
-    if (!assignmentId) {
-      showMessage("Assignment ID missing in URL.", "danger");
-      throw new Error("Assignment ID missing");
-    }
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            setDoc,
+            serverTimestamp,
+            updateDoc
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    async function init() {
-      app = initializeApp(firebaseConfig);
-      db = getFirestore(app);
-
-      editor = ace.edit("editor");
-      editor.setTheme("ace/theme/monokai"); // Set a dark, colorful theme
-      editor.session.setMode("ace/mode/c_cpp");
-      editor.setOption("placeholder", "// Fill your code here");
-      editor.setOptions({
-          enableLiveAutocompletion: true, // Enable autocompletion
-          enableBasicAutocompletion: true,
-          enableSnippets: true,
-          highlightActiveLine: true,
-          highlightSelectedWord: true,
-          showPrintMargin: false, // Hide the vertical print margin line
-          readOnly: false // Ensure it's editable
-      });
-
-
-      document.getElementById("language-select").addEventListener("change", (e) => {
-        const langId = e.target.value;
-        const editorMode = languageIdToAceMode(langId);
-        editor.session.setMode(editorMode);
-      });
-
-      document.getElementById("custom-input-toggle").addEventListener("change", (e) => {
-        const textarea = document.getElementById("custom-input");
-        textarea.classList.toggle("d-none", !e.target.checked);
-      });
-
-      // Navigation buttons
-      document.getElementById("prev-problem-btn").addEventListener("click", goToPreviousProblem);
-      document.getElementById("next-problem-btn").addEventListener("click", goToNextProblem);
-      document.getElementById("final-submit-btn").addEventListener("click", () => submitAssignment(false)); // Not time-up submission
-      document.getElementById("clear-btn").addEventListener("click", clearEditorOutput);
-      document.getElementById("run-btn").addEventListener("click", runCode);
-
-      await loadAssignmentData();
-    }
-
-    function languageIdToAceMode(langId) {
-      switch (langId) {
-        case "54": return "ace/mode/c_cpp";
-        case "71": return "ace/mode/python";
-        case "63": return "ace/mode/javascript";
-        case "62": return "ace/mode/java";
-        default: return "ace/mode/plain_text";
-      }
-    }
-
-    async function loadAssignmentData() {
-      try {
-        const docRef = doc(db, "code_assignments", assignmentId);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          currentAssignment = docSnap.data();
-          allProblems = currentAssignment.problems || []; 
-          
-          if (allProblems.length === 0) {
-            showMessage("No coding problems found for this assignment.", "danger");
-            document.getElementById("problem-statement-content").innerHTML = `<p class="text-danger">No coding problems available.</p>`;
-            document.getElementById("assignment-container").style.display = 'none';
-            return;
-          }
-
-          // Check if already submitted
-          const submissionDocRef = doc(db, "code_submission", `${studentIdentifier}_${assignmentId}`);
-          const submissionSnap = await getDoc(submissionDocRef);
-          if (submissionSnap.exists()) {
-              showMessage("You have already submitted this code assignment.", "warning");
-              setTimeout(() => {
-                redirectToWeekDetail();
-              }, 3000);
-              return;
-          }
-
-          // Initialize timer
-          totalTimeSeconds = (currentAssignment.totalTimeMinutes || 60) * 60; // Default 60 minutes
-          startAssignmentTimer();
-
-          renderProblem(); // Render the first problem
-        } else {
-          showMessage("Assignment not found.", "danger");
-          document.getElementById("problem-statement-content").innerHTML = `<p class="text-danger">Assignment not found.</p>`;
-        }
-      } catch (err) {
-        console.error("Error loading assignment:", err);
-        showMessage("Failed to load assignment.", "danger");
-      }
-    }
-
-    function startAssignmentTimer() {
-        clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-            totalTimeSeconds--;
-            const minutes = Math.floor(totalTimeSeconds / 60);
-            const seconds = totalTimeSeconds % 60;
-            timeLeftDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-            if (totalTimeSeconds <= 60 && totalTimeSeconds > 0) { // Last minute warning
-                assignmentTimerElement.classList.add("alert-danger");
-            } else if (totalTimeSeconds <= 0) {
-                clearInterval(timerInterval);
-                timeLeftDisplay.textContent = "00:00";
-                assignmentTimerElement.classList.remove("alert-danger");
-                showMessage("Time's up! Submitting your assignment.", "danger");
-                submitAssignment(true); // Auto-submit when time runs out
-            } else {
-                assignmentTimerElement.classList.remove("alert-danger");
-            }
-        }, 1000);
-    }
-
-    function renderProblem() {
-      const problem = allProblems[currentProblemIndex];
-      if (!problem) {
-        showMessage("Problem not found.", "danger");
-        return;
-      }
-
-      document.getElementById("problem-number").textContent = currentProblemIndex + 1;
-      document.getElementById("problem-title").textContent = problem.title || `Problem ${currentProblemIndex + 1}`;
-
-      const div = document.getElementById("problem-statement-content");
-      div.innerHTML = `
-        <p><strong>${problem.problemStatement || "No problem statement provided."}</strong></p>
-        ${problem.inputFormat ? `<h6 class="mt-3">Input Format:</h6><p>${problem.inputFormat}</p>` : ''}
-        ${problem.outputFormat ? `<h6 class="mt-3">Output Format:</h6><p>${problem.outputFormat}</p>` : ''}
-        ${problem.codeConstraints ? `<h6 class="mt-3">Constraints:</h6><p>${problem.codeConstraints}</p>` : ''}
-      `;
-
-      // Load previously saved code/language for this problem, if any
-      const savedProblemData = problemSubmissions[currentProblemIndex];
-      if (savedProblemData && savedProblemData.code) {
-        editor.setValue(savedProblemData.code, -1); // -1 to move cursor to start
-        document.getElementById("language-select").value = savedProblemData.languageId;
-        editor.session.setMode(languageIdToAceMode(savedProblemData.languageId));
-      } else {
-        editor.setValue(""); // Clear editor if no saved code
-        document.getElementById("language-select").value = "54"; // Default to C++
-        editor.session.setMode("ace/mode/c_cpp");
-      }
-      document.getElementById("compiler-output").textContent = "Output will be displayed here.";
-
-
-      const tbody = document.getElementById("test-cases-table-body");
-      tbody.innerHTML = "";
-      
-      // Display only the first 2 VISIBLE test cases
-      const visibleTestCasesToDisplay = (problem.visibleTestCases || []).slice(0, 2); 
-
-      if (visibleTestCasesToDisplay.length > 0) {
-        visibleTestCasesToDisplay.forEach(tc => {
-          const tr = document.createElement("tr");
-
-          const tdInput = document.createElement("td");
-          tdInput.textContent = tc.input;
-          tdInput.style.whiteSpace = "pre-wrap";
-
-          const tdExpected = document.createElement("td");
-          tdExpected.textContent = tc.expectedOutput;
-          tdExpected.style.whiteSpace = "pre-wrap";
-
-          tr.appendChild(tdInput);
-          tr.appendChild(tdExpected);
-          tbody.appendChild(tr);
-        });
-      } else {
-        tbody.innerHTML = `<tr><td colspan="2" class="text-center text-muted">No visible sample test cases available.</td></tr>`;
-      }
-
-      // Update navigation button visibility
-      document.getElementById("prev-problem-btn").style.display = currentProblemIndex === 0 ? "none" : "inline-block";
-      document.getElementById("next-problem-btn").style.display = currentProblemIndex === allProblems.length - 1 ? "none" : "inline-block";
-      document.getElementById("final-submit-btn").style.display = currentProblemIndex === allProblems.length - 1 ? "inline-block" : "none";
-    }
-
-    function saveCurrentProblemState() {
-        const currentProblemCode = editor.getValue();
-        const currentLanguageId = document.getElementById("language-select").value;
-        problemSubmissions[currentProblemIndex] = {
-            code: currentProblemCode,
-            languageId: currentLanguageId,
-            testCaseResults: [] // This will be populated during final submission
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_C4ZPXTXQZtZJbtAwTiub_rkIZcvsE2Y",
+            authDomain: "clms-19db3.firebaseapp.com",
+            projectId: "clms-19db3",
+            storageBucket: "clms-19db3.firebasestorage.app",
+            messagingSenderId: "218119035486",
+            appId: "1:218119035486:web:39291d39b4b461b56032cf"
         };
-    }
 
-    function goToNextProblem() {
-      saveCurrentProblemState();
-      if (currentProblemIndex < allProblems.length - 1) {
-        currentProblemIndex++;
-        renderProblem();
-      }
-    }
+        let app, db, editor;
+        let currentAssignment = {};
+        let allProblems = [];
+        let currentProblemIndex = 0;
 
-    function goToPreviousProblem() {
-      saveCurrentProblemState();
-      if (currentProblemIndex > 0) {
-        currentProblemIndex--;
-        renderProblem();
-      }
-    }
+        let studentIdentifier = null;
+        let studentName = null;
+        let submissionDocId = null;
 
-    function clearEditorOutput() {
-      editor.setValue("");
-      document.getElementById("compiler-output").textContent = "Output cleared.";
-    }
-
-    async function runCode() {
-      const code = editor.getValue();
-      const customInputToggle = document.getElementById("custom-input-toggle").checked;
-      const customInput = document.getElementById("custom-input").value;
-      const languageId = document.getElementById("language-select").value;
-
-      let input = "";
-      if (customInputToggle && customInput.trim() !== "") {
-        input = customInput.trim();
-      } else { // Use the first visible sample test case if no custom input and samples exist
-        const currentProblemVisibleTestCases = (allProblems[currentProblemIndex]?.visibleTestCases || []);
-        if (currentProblemVisibleTestCases.length > 0) {
-          input = currentProblemVisibleTestCases[0].input || "";
+        try {
+            const studentDataStr = localStorage.getItem("student");
+            if (studentDataStr) {
+                const studentData = JSON.parse(studentDataStr);
+                studentIdentifier = studentData.enrollment;
+                studentName = `${studentData.firstName} ${studentData.lastName}`;
+            }
+        } catch (e) {
+            console.error("Error parsing student data from localStorage", e);
         }
-      }
 
-      const outputEl = document.getElementById("compiler-output");
-      outputEl.textContent = "Compiling and running...";
+        if (!studentIdentifier) {
+            showMessage("Student not logged in. Please login first.", "danger");
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 2000);
+            throw new Error("Student not logged in");
+        }
 
-      try {
-        const output = await runCodeWithJudge0(code, input, languageId);
-        outputEl.textContent = output;
-      } catch (error) {
-        outputEl.textContent = "Error running code: " + error.message;
-        showMessage("Error running code: " + error.message, "danger");
-      }
-    }
+        let totalTimeSeconds;
+        let timerInterval;
+        const assignmentTimerElement = document.getElementById("assignment-timer");
+        const timeLeftDisplay = document.getElementById("time-left-display");
+        const pauseBtn = document.getElementById("pause-btn");
+        let isPaused = false;
 
-    async function runCodeWithJudge0(code, input, languageId) {
-      const payload = {
-        source_code: code,
-        stdin: input,
-        language_id: Number(languageId)
-      };
+        let problemSubmissions = {};
+        let isSubmitting = false;
 
-      const response = await fetch("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
-          "X-RapidAPI-Key": "07cf44d014msh97fbec8a029cd8fp1cbefejsn3e8c791df367" // Replace with your RapidAPI key
-        },
-        body: JSON.stringify(payload),
-      });
+        function showMessage(message, type = 'success') {
+            const messageBox = document.getElementById('message-box');
+            const div = document.createElement('div');
+            div.className = `alert alert-${type} shadow`;
+            div.textContent = message;
+            messageBox.innerHTML = '';
+            messageBox.appendChild(div);
+            setTimeout(() => {
+                div.remove();
+            }, 3500);
+        }
 
-      if (!response.ok) {
-        throw new Error("Failed to compile and run code: " + response.statusText);
-      }
+        const params = new URLSearchParams(window.location.search);
+        const assignmentId = params.get("assignmentId");
+        if (!assignmentId) {
+            showMessage("Assignment ID missing in URL.", "danger");
+            throw new Error("Assignment ID missing");
+        }
 
-      const result = await response.json();
+        async function init() {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
 
-      if (result.stderr) {
-        return `Error:\n${result.stderr}`;
-      } else if (result.compile_output) {
-        return `Compile error:\n${result.compile_output}`;
-      } else {
-        return result.stdout || "No output";
-      }
-    }
+            editor = ace.edit("editor");
+            editor.setTheme("ace/theme/monokai");
+            editor.session.setMode("ace/mode/c_cpp");
+            editor.setOption("placeholder", "// Fill your code here");
+            editor.setOptions({
+                enableLiveAutocompletion: true,
+                enableBasicAutocompletion: true,
+                enableSnippets: true,
+                highlightActiveLine: true,
+                highlightSelectedWord: true,
+                showPrintMargin: false,
+                readOnly: false
+            });
 
-    async function submitAssignment(timeUp = false) {
-      clearInterval(timerInterval); // Stop the timer
+            document.getElementById("language-select").addEventListener("change", (e) => {
+                const langId = e.target.value;
+                const editorMode = languageIdToAceMode(langId);
+                editor.session.setMode(editorMode);
+            });
 
-      // Save state of the last problem before final submission
-      saveCurrentProblemState(); 
+            document.getElementById("custom-input-toggle").addEventListener("change", (e) => {
+                const textarea = document.getElementById("custom-input");
+                textarea.classList.toggle("d-none", !e.target.checked);
+            });
 
-      const outputEl = document.getElementById("compiler-output");
-      outputEl.textContent = "Submitting assignment and running all test cases for all problems...\n\n";
+            document.getElementById("prev-problem-btn").addEventListener("click", goToPreviousProblem);
+            document.getElementById("next-problem-btn").addEventListener("click", goToNextProblem);
+            document.getElementById("final-submit-btn").addEventListener("click", () => submitAssignment(false));
+            document.getElementById("clear-btn").addEventListener("click", clearEditorOutput);
+            document.getElementById("run-btn").addEventListener("click", runCode);
+            
+            pauseBtn.addEventListener("click", togglePause);
 
-      let totalPassedCount = 0;
-      let grandTotalTests = 0;
-      let detailedProblemResults = [];
+            await loadAssignmentData();
+            
+            // Add unload handler to save progress
+            window.addEventListener('beforeunload', async (event) => {
+                if (!isSubmitting) {
+                    saveCurrentProblemState();
+                    await saveProgressToFirestore();
+                    event.preventDefault();
+                    event.returnValue = '';
+                    return 'Your progress has been saved. Are you sure you want to leave?';
+                }
+            });
+        }
 
-      for (let i = 0; i < allProblems.length; i++) {
-        const problem = allProblems[i];
-        const problemCode = problemSubmissions[i]?.code || "";
-        const problemLanguageId = problemSubmissions[i]?.languageId || document.getElementById("language-select").value;
+        function languageIdToAceMode(langId) {
+            switch (langId) {
+                case "54":
+                    return "ace/mode/c_cpp";
+                case "71":
+                    return "ace/mode/python";
+                case "63":
+                    return "ace/mode/javascript";
+                case "62":
+                    return "ace/mode/java";
+                default:
+                    return "ace/mode/plain_text";
+            }
+        }
 
-        let problemPassedCount = 0;
-        let problemTotalVisibleTests = (problem.visibleTestCases || []).length;
-        let problemTotalHiddenTests = (problem.hiddenTestCases || []).length;
-        let problemTotalTests = problemTotalVisibleTests + problemTotalHiddenTests;
+        async function loadAssignmentData() {
+            try {
+                const docRef = doc(db, "code_assignments", assignmentId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    currentAssignment = docSnap.data();
+                    allProblems = currentAssignment.problems || [];
+
+                    if (allProblems.length === 0) {
+                        showMessage("No coding problems found for this assignment.", "danger");
+                        document.getElementById("problem-statement-content").innerHTML = `<p class="text-danger">No coding problems available.</p>`;
+                        document.getElementById("assignment-container").style.display = 'none';
+                        return;
+                    }
+
+                    submissionDocId = `${studentIdentifier}_${assignmentId}`;
+                    const submissionDocRef = doc(db, "code_submission", submissionDocId);
+                    const submissionSnap = await getDoc(submissionDocRef);
+
+                    if (submissionSnap.exists() && submissionSnap.data().overallScore !== undefined) {
+                        showMessage("You have already submitted this code assignment.", "warning");
+                        setTimeout(() => {
+                            redirectToWeekDetail();
+                        }, 3000);
+                        return;
+                    }
+                    
+                    const savedState = submissionSnap.data() || {};
+                    
+                    if (savedState.problems && savedState.problems.length > 0) {
+                        problemSubmissions = savedState.problems.reduce((acc, problem, index) => {
+                            acc[index] = {
+                                code: problem.code,
+                                languageId: problem.languageId
+                            };
+                            return acc;
+                        }, {});
+                        totalTimeSeconds = savedState.remainingTimeSeconds || (currentAssignment.totalTimeMinutes || 60) * 60;
+                        showMessage("Previous progress has been loaded.", "success");
+                    } else {
+                        totalTimeSeconds = (currentAssignment.totalTimeMinutes || 60) * 60;
+                    }
+
+                    startAssignmentTimer();
+                    renderProblem();
+                } else {
+                    showMessage("Assignment not found.", "danger");
+                    document.getElementById("problem-statement-content").innerHTML = `<p class="text-danger">Assignment not found.</p>`;
+                }
+            } catch (err) {
+                console.error("Error loading assignment:", err);
+                showMessage("Failed to load assignment.", "danger");
+            }
+        }
+
+        function startAssignmentTimer() {
+            isPaused = false;
+            pauseBtn.textContent = "Pause";
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                totalTimeSeconds--;
+                const minutes = Math.floor(totalTimeSeconds / 60);
+                const seconds = totalTimeSeconds % 60;
+                timeLeftDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (totalTimeSeconds <= 60 && totalTimeSeconds > 0) {
+                    assignmentTimerElement.classList.add("alert-danger");
+                } else if (totalTimeSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    timeLeftDisplay.textContent = "00:00";
+                    assignmentTimerElement.classList.remove("alert-danger");
+                    showMessage("Time's up! Submitting your assignment.", "danger");
+                    submitAssignment(true);
+                } else {
+                    assignmentTimerElement.classList.remove("alert-danger");
+                }
+            }, 1000);
+        }
+
+        // Updated togglePause function to use custom alert
+        function togglePause() {
+            if (isPaused) {
+                startAssignmentTimer();
+                pauseBtn.textContent = "Pause";
+                showMessage("Assignment resumed.", "info");
+            } else {
+                clearInterval(timerInterval);
+                isPaused = true;
+                pauseBtn.textContent = "Resume";
+
+                showCustomConfirm("Would you like to pause the assignment and return to the week details? Click 'OK' to pause, or 'Cancel' to continue the assignment.", (userChoice) => {
+                    if (userChoice) {
+                        saveCurrentProblemState();
+                        saveProgressToFirestore().then(() => {
+                            showMessage("Assignment paused. Your progress has been saved. Redirecting...", "warning");
+                            setTimeout(() => {
+                                redirectToWeekDetail();
+                            }, 3000);
+                        }).catch(err => {
+                            console.error("Error saving progress:", err);
+                            showMessage("Failed to save progress. Please try again.", "danger");
+                            togglePause();
+                        });
+                    } else {
+                        togglePause();
+                    }
+                });
+            }
+        }
+
+        // New function to handle the custom confirmation box
+        function showCustomConfirm(message, callback) {
+            const existingOverlay = document.getElementById('custom-confirm-overlay');
+            if (existingOverlay) {
+                existingOverlay.remove();
+            }
+
+            const overlay = document.createElement('div');
+            overlay.id = 'custom-confirm-overlay';
+
+            const box = document.createElement('div');
+            box.id = 'custom-confirm-box';
+
+            const heading = document.createElement('h6');
+            heading.textContent = message;
+
+            const buttonGroup = document.createElement('div');
+            buttonGroup.className = 'button-group';
+
+            const okBtn = document.createElement('button');
+            okBtn.className = 'btn btn-ok';
+            okBtn.textContent = 'OK';
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'btn btn-cancel';
+            cancelBtn.textContent = 'Cancel';
+
+            okBtn.addEventListener('click', () => {
+                overlay.remove();
+                callback(true);
+            });
+
+            cancelBtn.addEventListener('click', () => {
+                overlay.remove();
+                callback(false);
+            });
+
+            buttonGroup.appendChild(okBtn);
+            buttonGroup.appendChild(cancelBtn);
+            box.appendChild(heading);
+            box.appendChild(buttonGroup);
+            overlay.appendChild(box);
+            document.body.appendChild(overlay);
+        }
         
-        let problemTestCaseResultsForSubmission = []; // Full details for Firestore
-        let problemTestCaseDetailsForDisplay = `--- Problem ${i + 1}: ${problem.title || `Problem ${i + 1}`} ---\n`;
-
-        grandTotalTests += problemTotalTests;
-
-        // --- Run Visible Test Cases ---
-        if (problem.visibleTestCases && problem.visibleTestCases.length > 0) {
-            problemTestCaseDetailsForDisplay += `\n--- Visible Test Cases ---\n`;
-            for (let j = 0; j < problem.visibleTestCases.length; j++) {
-                const testCase = problem.visibleTestCases[j];
-                try {
-                    const output = await runCodeWithJudge0(problemCode, testCase.input, problemLanguageId);
-                    const expected = (testCase.expectedOutput || "").trim();
-                    const actual = output.trim();
-
-                    const status = (actual === expected) ? "PASSED" : "FAILED";
-                    if (status === "PASSED") {
-                        problemPassedCount++;
-                    }
-
-                    problemTestCaseResultsForSubmission.push({
-                        type: 'visible',
-                        input: testCase.input,
-                        expectedOutput: expected,
-                        actualOutput: actual,
-                        status: status
-                    });
-
-                    problemTestCaseDetailsForDisplay += `Test Case ${j + 1} (Visible):\n`;
-                    problemTestCaseDetailsForDisplay += `Input: \n${testCase.input}\n`;
-                    problemTestCaseDetailsForDisplay += `Expected: \n${expected}\n`;
-                    problemTestCaseDetailsForDisplay += `Actual: \n${actual}\n`;
-                    problemTestCaseDetailsForDisplay += `Status: ${status}\n\n`;
-
-                } catch (error) {
-                    problemTestCaseResultsForSubmission.push({
-                        type: 'visible',
-                        input: testCase.input,
-                        expectedOutput: testCase.expectedOutput,
-                        actualOutput: `Error: ${error.message}`,
-                        status: "ERROR"
-                    });
-                    problemTestCaseDetailsForDisplay += `Test Case ${j + 1} (Visible):\n`;
-                    problemTestCaseDetailsForDisplay += `Error running: ${error.message}\n\n`;
-                }
+        function redirectToWeekDetail() {
+            if (!currentAssignment || !currentAssignment.courseId || !currentAssignment.week || !currentAssignment.subject) {
+                console.error("Missing assignment details for redirection.");
+                showMessage("Could not redirect to week details. Data is missing.", "danger");
+                return;
             }
+            
+            const courseId = currentAssignment.courseId;
+            const weekNumber = currentAssignment.week;
+            const subject = currentAssignment.subject;
+            
+            const url = `week_detail.html?courseId=${courseId}&week=${weekNumber}&subject=${encodeURIComponent(subject)}`;
+            window.location.href = url;
         }
 
-        // --- Run Hidden Test Cases ---
-        if (problem.hiddenTestCases && problem.hiddenTestCases.length > 0) {
-            problemTestCaseDetailsForDisplay += `\n--- Hidden Test Cases ---\n`;
-            for (let j = 0; j < problem.hiddenTestCases.length; j++) {
-                const testCase = problem.hiddenTestCases[j];
-                try {
-                    const output = await runCodeWithJudge0(problemCode, testCase.input, problemLanguageId);
-                    const expected = (testCase.expectedOutput || "").trim();
-                    const actual = output.trim();
-
-                    const status = (actual === expected) ? "PASSED" : "FAILED";
-                    if (status === "PASSED") {
-                        problemPassedCount++;
-                    }
-
-                    problemTestCaseResultsForSubmission.push({
-                        type: 'hidden',
-                        input: testCase.input, // Store full details for admin review
-                        expectedOutput: expected,
-                        actualOutput: actual,
-                        status: status
-                    });
-
-                    // Only display status for hidden test cases
-                    problemTestCaseDetailsForDisplay += `Hidden Test Case ${j + 1}: ${status}\n`;
-
-                } catch (error) {
-                    problemTestCaseResultsForSubmission.push({
-                        type: 'hidden',
-                        input: testCase.input,
-                        expectedOutput: testCase.expectedOutput,
-                        actualOutput: `Error: ${error.message}`,
-                        status: "ERROR"
-                    });
-                    problemTestCaseDetailsForDisplay += `Hidden Test Case ${j + 1}: ERROR (${error.message})\n`;
-                }
+        window.addEventListener('beforeunload', async (event) => {
+            if (!isSubmitting && !isPaused) {
+                saveCurrentProblemState();
+                await saveProgressToFirestore();
+                event.preventDefault();
+                event.returnValue = '';
             }
-            problemTestCaseDetailsForDisplay += '\n'; // Add extra newline after hidden test cases
-        }
-
-
-        totalPassedCount += problemPassedCount;
-
-        detailedProblemResults.push({
-            problemIndex: i,
-            problemTitle: problem.title || `Problem ${i+1}`,
-            code: problemCode,
-            languageId: problemLanguageId,
-            passedCount: problemPassedCount,
-            totalTests: problemTotalTests,
-            testCaseResults: problemTestCaseResultsForSubmission // This goes to Firestore
         });
 
-        outputEl.textContent += problemTestCaseDetailsForDisplay; // Append results for current problem
-      }
+        function renderProblem() {
+            const problem = allProblems[currentProblemIndex];
+            if (!problem) {
+                showMessage("Problem not found.", "danger");
+                return;
+            }
 
-      const overallScore = totalPassedCount;
-      const overallMaxScore = grandTotalTests;
-      const overallPercentage = overallMaxScore > 0 ? (overallScore / overallMaxScore) * 100 : 0;
+            document.getElementById("problem-number").textContent = currentProblemIndex + 1;
+            document.getElementById("problem-title").textContent = problem.title || `Problem ${currentProblemIndex + 1}`;
 
-      // Prepare submission data
-      const submissionDocId = `${studentIdentifier}_${assignmentId}`;
-      const submissionData = {
-        studentId: studentIdentifier,
-        studentName: studentName,
-        assignmentId: assignmentId,
-        courseId: currentAssignment.courseId,
-        week: currentAssignment.week,
-        subject: currentAssignment.subject,
-        submittedAt: serverTimestamp(),
-        problems: detailedProblemResults, // Store results for each problem
-        overallScore: overallScore,
-        overallMaxScore: overallMaxScore,
-        overallPercentage: parseFloat(overallPercentage.toFixed(2)),
-        timedOut: timeUp // Indicate if submitted due to timer
-      };
+            const div = document.getElementById("problem-statement-content");
+            div.innerHTML = `
+                <p><strong>${problem.problemStatement || "No problem statement provided."}</strong></p>
+                ${problem.inputFormat ? `<h6 class="mt-3">Input Format:</h6><p>${problem.inputFormat}</p>` : ''}
+                ${problem.outputFormat ? `<h6 class="mt-3">Output Format:</h6><p>${problem.outputFormat}</p>` : ''}
+                ${problem.codeConstraints ? `<h6 class="mt-3">Constraints:</h6><p>${problem.codeConstraints}</p>` : ''}
+            `;
 
-      try {
-        await setDoc(doc(db, "code_submission", submissionDocId), submissionData, { merge: true });
-        if (timeUp) {
-            showMessage(`Time's up! Assignment submitted automatically. Score: ${overallScore}/${overallMaxScore} (${overallPercentage.toFixed(2)}%)`, "warning");
-        } else if (overallScore === overallMaxScore) { /* Corrected variable name here */
-            showMessage(`All problems passed! Assignment submitted successfully. Score: ${overallScore}/${overallMaxScore} (${overallPercentage.toFixed(2)}%)`, "success");
-        } else if (overallScore > 0) { /* Corrected variable name here */
-            showMessage(`Assignment submitted. ${overallScore} of ${overallMaxScore} total test cases passed. Score: ${overallScore}/${overallMaxScore} (${overallPercentage.toFixed(2)}%)`, "warning");
-        } else {
-            showMessage(`Assignment submitted. ${overallScore} of ${overallMaxScore} total test cases passed. Score: ${overallScore}/${overallMaxScore} (${overallPercentage.toFixed(2)}%). Please review your code.`, "danger");
+            const savedProblemData = problemSubmissions[currentProblemIndex];
+            if (savedProblemData && savedProblemData.code) {
+                editor.setValue(savedProblemData.code, -1);
+                document.getElementById("language-select").value = savedProblemData.languageId;
+                editor.session.setMode(languageIdToAceMode(savedProblemData.languageId));
+            } else {
+                editor.setValue("");
+                document.getElementById("language-select").value = "54";
+                editor.session.setMode("ace/mode/c_cpp");
+            }
+            document.getElementById("compiler-output").textContent = "Output will be displayed here.";
+
+            const tbody = document.getElementById("test-cases-table-body");
+            tbody.innerHTML = "";
+            const visibleTestCasesToDisplay = (problem.visibleTestCases || []).slice(0, 2);
+
+            if (visibleTestCasesToDisplay.length > 0) {
+                visibleTestCasesToDisplay.forEach(tc => {
+                    const tr = document.createElement("tr");
+                    const tdInput = document.createElement("td");
+                    tdInput.textContent = tc.input;
+                    tdInput.style.whiteSpace = "pre-wrap";
+                    const tdExpected = document.createElement("td");
+                    tdExpected.textContent = tc.expectedOutput;
+                    tdExpected.style.whiteSpace = "pre-wrap";
+                    tr.appendChild(tdInput);
+                    tr.appendChild(tdExpected);
+                    tbody.appendChild(tr);
+                });
+            } else {
+                tbody.innerHTML = `<tr><td colspan="2" class="text-center text-muted">No visible sample test cases available.</td></tr>`;
+            }
+
+            document.getElementById("prev-problem-btn").style.display = currentProblemIndex === 0 ? "none" : "inline-block";
+            document.getElementById("next-problem-btn").style.display = currentProblemIndex === allProblems.length - 1 ? "none" : "inline-block";
+            document.getElementById("final-submit-btn").style.display = currentProblemIndex === allProblems.length - 1 ? "inline-block" : "none";
         }
 
-        setTimeout(() => {
-          redirectToWeekDetail();
-        }, 3000); // Redirect after 3 seconds
-      } catch (err) {
-        console.error("Error submitting assignment:", err);
-        showMessage("Error submitting assignment. Please try again.", "danger");
-      }
-    }
+        function saveCurrentProblemState() {
+            const currentProblemCode = editor.getValue();
+            const currentLanguageId = document.getElementById("language-select").value;
+            problemSubmissions[currentProblemIndex] = {
+                code: currentProblemCode,
+                languageId: currentLanguageId,
+            };
+        }
 
-    function redirectToWeekDetail() {
-        // Default values in case currentAssignment properties are missing
-        const courseId = currentAssignment.courseId || "defaultCourse"; 
-        const weekNumber = currentAssignment.week || 1; 
-        const subject = currentAssignment.subject || "defaultSubject";
-        const url = `week_detail.html?courseId=${courseId}&week=${weekNumber}&subject=${encodeURIComponent(subject)}`;
-        window.location.href = url;
-    }
+        async function saveProgressToFirestore() {
+            const progressData = {
+                remainingTimeSeconds: totalTimeSeconds,
+                problems: Object.values(problemSubmissions)
+            };
+            try {
+                const submissionRef = doc(db, "code_submission", submissionDocId);
+                await setDoc(submissionRef, progressData, { merge: true });
+                console.log("Progress saved to Firestore.");
+            } catch (err) {
+                console.error("Error saving progress:", err);
+            }
+        }
 
-    window.onload = init;
-  </script>
+        function goToNextProblem() {
+            saveCurrentProblemState();
+            if (currentProblemIndex < allProblems.length - 1) {
+                currentProblemIndex++;
+                renderProblem();
+            }
+        }
+
+        function goToPreviousProblem() {
+            saveCurrentProblemState();
+            if (currentProblemIndex > 0) {
+                currentProblemIndex--;
+                renderProblem();
+            }
+        }
+
+        function clearEditorOutput() {
+            editor.setValue("");
+            document.getElementById("compiler-output").textContent = "Output cleared.";
+        }
+
+        async function runCode() {
+            if (isPaused) {
+                showMessage("Cannot run code while the assignment is paused. Click 'Resume' to continue.", "warning");
+                return;
+            }
+            
+            const code = editor.getValue();
+            const customInputToggle = document.getElementById("custom-input-toggle").checked;
+            const customInput = document.getElementById("custom-input").value;
+            const languageId = document.getElementById("language-select").value;
+
+            let input = "";
+            if (customInputToggle && customInput.trim() !== "") {
+                input = customInput.trim();
+            } else {
+                const currentProblemVisibleTestCases = (allProblems[currentProblemIndex]?.visibleTestCases || []);
+                if (currentProblemVisibleTestCases.length > 0) {
+                    input = currentProblemVisibleTestCases[0].input || "";
+                }
+            }
+
+            const outputEl = document.getElementById("compiler-output");
+            outputEl.textContent = "Compiling and running...";
+
+            try {
+                const output = await runCodeWithJudge0(code, input, languageId);
+                outputEl.textContent = output;
+            } catch (error) {
+                outputEl.textContent = "Error running code: " + error.message;
+                showMessage("Error running code: " + error.message, "danger");
+            }
+        }
+
+        async function runCodeWithJudge0(code, input, languageId) {
+            const payload = {
+                source_code: code,
+                stdin: input,
+                language_id: Number(languageId)
+            };
+
+            const response = await fetch("https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+                    "X-RapidAPI-Key": "07cf44d014msh97fbec8a029cd8fp1cbefejsn3e8c791df367"
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to compile and run code: " + response.statusText);
+            }
+
+            const result = await response.json();
+
+            if (result.stderr) {
+                return `Error:\n${result.stderr}`;
+            } else if (result.compile_output) {
+                return `Compilation Error:\n${result.compile_output}`;
+            } else if (result.status.id === 3) {
+                return `Output:\n${result.stdout}`;
+            } else {
+                return `Status: ${result.status.description}\n\n${result.message || ''}`;
+            }
+        }
+
+        async function submitAssignment(isAutoSubmit = false) {
+            if (isSubmitting) return;
+
+            isSubmitting = true;
+            showMessage(isAutoSubmit ? "Time's up! Final submission in progress..." : "Submitting assignment. Please wait...", "info");
+
+            saveCurrentProblemState();
+            clearInterval(timerInterval);
+            
+            const problemDataForSubmission = allProblems.map((problem, index) => {
+                const submitted = problemSubmissions[index] || { code: "", languageId: "54" };
+                return {
+                    problemId: problem.id,
+                    title: problem.title,
+                    code: submitted.code,
+                    languageId: submitted.languageId,
+                    testCases: problem.hiddenTestCases,
+                    visibleTestCases: problem.visibleTestCases,
+                    points: problem.points || 10
+                };
+            });
+
+            const submissionResults = [];
+            let totalScore = 0;
+            let totalProblems = problemDataForSubmission.length;
+            let completedProblems = 0;
+
+            for (const [index, problem] of problemDataForSubmission.entries()) {
+                let problemScore = 0;
+                let passedTests = 0;
+                let totalTests = problem.testCases.length;
+
+                const allTestCases = [
+                    ...(problem.visibleTestCases || []).map(tc => ({ input: tc.input, expected: tc.expectedOutput })),
+                    ...(problem.testCases || []).map(tc => ({ input: tc.input, expected: tc.expectedOutput }))
+                ];
+
+                for (const testCase of allTestCases) {
+                    try {
+                        const output = await runCodeWithJudge0(problem.code, testCase.input, problem.languageId);
+                        const sanitizedOutput = output.trim();
+                        const sanitizedExpected = testCase.expected.trim();
+
+                        if (sanitizedOutput === sanitizedExpected) {
+                            passedTests++;
+                        }
+                    } catch (e) {
+                        console.error(`Error running test case for problem ${index + 1}:`, e);
+                    }
+                }
+
+                if (totalTests > 0) {
+                    problemScore = (passedTests / totalTests) * problem.points;
+                }
+                totalScore += problemScore;
+                completedProblems++;
+
+                submissionResults.push({
+                    problemId: problem.problemId,
+                    score: problemScore,
+                    totalPoints: problem.points,
+                    passedTests: passedTests,
+                    totalTests: totalTests,
+                    code: problem.code,
+                    languageId: problem.languageId
+                });
+
+                showMessage(`Checking problem ${completedProblems} of ${totalProblems}...`, "info");
+            }
+            
+            const finalSubmissionData = {
+                studentIdentifier: studentIdentifier,
+                studentName: studentName,
+                assignmentId: assignmentId,
+                totalTimeMinutes: currentAssignment.totalTimeMinutes,
+                remainingTimeSeconds: totalTimeSeconds,
+                overallScore: totalScore,
+                problems: submissionResults,
+                submittedAt: serverTimestamp(),
+                isSubmitted: true,
+                submissionType: isAutoSubmit ? 'Auto-submit' : 'Manual-submit'
+            };
+
+            const submissionRef = doc(db, "code_submission", submissionDocId);
+
+            try {
+                await setDoc(submissionRef, finalSubmissionData, { merge: true });
+                showMessage("Assignment submitted successfully! Redirecting to week details...", "success");
+                setTimeout(() => {
+                    redirectToWeekDetail();
+                }, 4000);
+            } catch (err) {
+                console.error("Error submitting assignment:", err);
+                showMessage("Failed to submit assignment. Please contact support.", "danger");
+                isSubmitting = false;
+            }
+        }
+
+        init();
+    </script>
 </body>
 </html>
