@@ -3,7 +3,7 @@
 A **web-based Learning Management System** built using **HTML, CSS, JavaScript, and Firebase**. This platform provides a centralized system for **Admins** to manage courses, students, and assignments, while allowing **Students** to track their learning progress and submit assignments.
 
 ---
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/ffc5ebe0-3fe4-4e29-b56a-f005278471aa" />
+<img width="1920" height="910" alt="image" src="https://github.com/user-attachments/assets/c45df0d7-45cb-40b5-8c41-387c30c16a58" />
 
 
 
