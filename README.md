@@ -91,4 +91,4 @@ A **web-based Learning Management System** built using **HTML, CSS, JavaScript, 
 
 1. Clone the repository:  
    ```bash
-   git clone <repository-url>
+   https://github.com/rohankumar7712/LMS.git
